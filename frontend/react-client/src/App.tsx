@@ -1,35 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "./state/store.ts";
+import {fetch_hello} from "./state/epics/rootEpic.ts";
 
 function App() {
-  const [count, setCount] = useState(0)
+    const dispatch = useDispatch();
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const msg = useSelector((state: RootState) => state.hello.msg);
+
+    return (
+        <>
+            <div className="flex justify-center h-dvh items-center">
+                <div className="flex flex-col items-start">
+                    <div className="fill-sky-300 h-32 w-64  mb-2 rounded-md px-3.5 py-2.5  bg-gray-100">
+                        {msg}
+                    </div>
+                    <button
+                        className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        onClick={() => dispatch(fetch_hello())}>Fetch hello</button>
+                </div>
+        </div>
+        </>
+    )
 }
 
 export default App
