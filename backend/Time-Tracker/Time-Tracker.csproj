@@ -7,4 +7,16 @@
     <RootNamespace>Time_Tracker</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="GraphQL\Mutations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL" Version="7.8.0" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="7.8.0" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="7.7.1" />
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="7.7.1" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="7.8.0" />
+  </ItemGroup>
+
 </Project>
