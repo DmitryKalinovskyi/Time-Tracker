@@ -16,11 +16,20 @@ builder.Services.AddGraphQL(b => b
     .AddGraphTypes(typeof(RootSchema).Assembly)
 );
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
+
+app.UseCors((policyBuilder) =>
+{
+    policyBuilder.AllowAnyHeader();
+    policyBuilder.AllowAnyMethod();
+    policyBuilder.AllowAnyOrigin();
+});
 
 // Add ui and middleware
 app.UseGraphQLAltair();
