@@ -6,6 +6,19 @@
 
         public required string Name { get; set; }
 
-        public required List<string> Permissions { get; set; }
+        public required string Permissions { get; set; }
+
+        public List<string> PermissionList
+        {
+            get
+            {
+                return Permissions.Split(' ').ToList();
+            }
+
+            set
+            {
+                Permissions = string.Join(' ', value);
+            }
+        }
     }
 }

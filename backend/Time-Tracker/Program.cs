@@ -7,9 +7,10 @@ using Time_Tracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
-builder.Services.AddSingleton<IUsersRepository, IUsersRepository>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
 
 // Configure GraphQL
