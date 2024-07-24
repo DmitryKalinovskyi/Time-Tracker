@@ -1,12 +1,16 @@
 using GraphQL;
 using GraphQL.Types;
+using System.Security;
 using Time_Tracker.GraphQL.Schemas;
+using Time_Tracker.Repositories;
+using Time_Tracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
+builder.Services.AddSingleton<IUsersRepository, IUsersRepository>();
+builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
 
 // Configure GraphQL
 builder.Services.AddGraphQL(b => b
