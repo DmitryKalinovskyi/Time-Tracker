@@ -1,9 +1,10 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ./../../../backend .
-RUN dotnet restore "./Time-Tracker/Time-Tracker.csproj" --disable-parallel
-RUN dotnet publish "./Time-Tracker/Time-Tracker.csproj" -c release -o /app --no-restore
+COPY .. .
+
+RUN dotnet restore "./Time-Tracker.csproj" --disable-parallel
+RUN dotnet publish "./Time-Tracker.csproj" -c release -o /app --no-restore
 
 # Serve stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

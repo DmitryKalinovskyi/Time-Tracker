@@ -1,0 +1,22 @@
+version: '3'
+services:
+  api:
+    build: ./backend/Time-Tracker
+    container_name: time-tracker-api
+    ports:
+      - '5015:5015'
+      - '7213:7213'
+    environment:
+      - ASPNETCORE_URLS=http://+:5015
+      - ASPNETCORE_HTTP_PORT=https://+:7213
+
+  react-client:
+    build: ./frontend/react-client
+    container_name: react-client
+    stdin_open: true
+    tty: true
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/react-client:/app
+

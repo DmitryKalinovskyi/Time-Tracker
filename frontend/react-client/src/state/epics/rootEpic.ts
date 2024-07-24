@@ -3,7 +3,7 @@ import {map, mergeMap, tap} from "rxjs";
 import {ajax} from 'rxjs/ajax';
 import {set_hello_message} from "../slices/helloSlice.ts";
 
-const url = "https://localhost:7213/graphql";
+const url = "http://localhost:5015/graphql";
 
 // fetch hello action creator
 export const fetch_hello = () => ({type: "FETCH_HELLO"});
