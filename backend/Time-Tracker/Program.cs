@@ -16,8 +16,6 @@ builder.Services.AddGraphQL(b => b
     .AddGraphTypes(typeof(RootSchema).Assembly)
 );
 
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
