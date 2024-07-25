@@ -8,21 +8,21 @@ namespace Time_Tracker.GraphQL.Queries
     {
         public TestPermissionQuery(IPermissionsService permissionsService)
         {
-            Field<StringGraphType>("name").Resolve(context =>
+            Field<StringGraphType>("test").Resolve(context =>
             {
-                if (true)
+                int userId = 2;
+
+                string result = "";
+                if(permissionsService.HasRequiredPermission(userId, Permissions.READ_TEST_QUERY))
                 {
-                    context.Errors.Add(new ExecutionError("Unauthorized."));
+                    result += " Have READ_TEST_QUERY";
+                }
+                if (permissionsService.HasRequiredPermission(userId, Permissions.MANAGE_USERS))
+                {
+                    result += " Have MANAGE_USERS";
                 }
 
-                int userId = 0;
-
-                if(!permissionsService.HasRequiredPermission(userId, Permissions.READ_TEST_QUERY))
-                {
-                    context.Errors.Add(new ExecutionError("Persmission denied."));
-                }
-
-                return "Hello! You have required persmission";
+                return "Permissions: " + result;
             });
         }
     }
