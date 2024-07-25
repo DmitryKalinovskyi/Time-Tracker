@@ -6,6 +6,8 @@ namespace Time_Tracker.GraphQL.Queries
     {
         public RootQuery()
         {
+
+            Field<IdentityQuery>("identityQuery").Resolve(context => new { });
             Field<TestQuery>("testQuery").Resolve(context => new { });
             Field<TestPermissionQuery>("testPermissionsQuery").Resolve(context => new { });
         }

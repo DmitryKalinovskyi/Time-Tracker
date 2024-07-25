@@ -38,7 +38,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
+builder.Services.AddSingleton<IPasswordService, PasswordService>();
 
 // Configure GraphQL
 builder.Services.AddGraphQL(b => b
