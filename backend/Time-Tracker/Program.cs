@@ -1,13 +1,40 @@
 using GraphQL;
 using GraphQL.Types;
-using System.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Time_Tracker.GraphQL.Schemas;
+using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
 using Time_Tracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddSingleton<TokenService>();
+
+// Configure authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = builder.Configuration["JWT:Author"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        IssuerSigningKey = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(builder.Configuration["JWT:Key"]),
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = "authorities"
+    };
+});
 
 builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
