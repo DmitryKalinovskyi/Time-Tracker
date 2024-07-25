@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = builder.Configuration["JWT:Author"],
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
         IssuerSigningKey = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(builder.Configuration["JWT:Key"]),
         ClockSkew = TimeSpan.Zero,
@@ -38,7 +38,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
+builder.Services.AddSingleton<IPasswordService, PasswordService>();
 
 // Configure GraphQL
 builder.Services.AddGraphQL(b => b
@@ -61,11 +63,12 @@ app.UseCors((policyBuilder) =>
     policyBuilder.AllowAnyOrigin();
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Add ui and middleware
 app.UseGraphQLAltair();
 app.UseGraphQL<ISchema>();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

@@ -18,7 +18,8 @@ public class TokenService
 
     public TokenDto GenerateToken(int userId)
     {
-        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings:Key"]));
+
+        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -31,8 +32,8 @@ public class TokenService
         DateTime DateExpires = DateIssued.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:DurationInMinutes"]));
 
         var token = new JwtSecurityToken(
-            _configuration["JwtSettings:Issuer"],
-            _configuration["JwtSettings:Audience"],
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
             claims,
             notBefore: DateIssued,
             expires: DateExpires,

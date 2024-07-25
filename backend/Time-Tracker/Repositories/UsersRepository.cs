@@ -20,7 +20,17 @@ namespace Time_Tracker.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                return connection.QueryFirst<User>(sql, new { userId });
+                return connection.QueryFirstOrDefault<User>(sql, new { userId });
+            }
+        }
+
+        public User? FindByEmail(string email)
+        {
+            var sql = "SELECT * FROM Users WHERE Users.Email = @email";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                return connection.QueryFirstOrDefault<User>(sql, new { email});
             }
         }
     }
