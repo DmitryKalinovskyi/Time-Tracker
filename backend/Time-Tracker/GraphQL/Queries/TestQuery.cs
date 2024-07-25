@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL;
+using GraphQL.Types;
 
 namespace Time_Tracker.GraphQL.Queries
 {
@@ -6,7 +7,10 @@ namespace Time_Tracker.GraphQL.Queries
     {
         public TestQuery()
         {
-            Field<StringGraphType>("name").Resolve(context => "Hello!");
+            Field<StringGraphType>("name").Resolve(context =>
+            {
+                return "Hello!";
+            });
         }
     }
 }

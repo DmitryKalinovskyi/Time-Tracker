@@ -3,7 +3,7 @@ using Time_Tracker.Dtos;
 
 namespace Time_Tracker.GraphQL.Types;
 
-public class LoginInputGraphType : InputObjectGraphType<LogenRequestDto>
+public class LoginInputGraphType : InputObjectGraphType<LoginRequestDto>
 {
     public LoginInputGraphType()
     {

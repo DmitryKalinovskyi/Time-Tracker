@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Time_Tracker.GraphQL.Schemas;
 using Time_Tracker.Helpers;
+using Time_Tracker.Repositories;
+using Time_Tracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+
+builder.Services.AddSingleton<TokenService>();
 
 // Configure authentication
 builder.Services.AddAuthentication(options =>
@@ -34,6 +36,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
+
 // Configure GraphQL
 builder.Services.AddGraphQL(b => b
     .AddSchema<RootSchema>()
@@ -41,8 +47,6 @@ builder.Services.AddGraphQL(b => b
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = true)
     .AddGraphTypes(typeof(RootSchema).Assembly)
 );
-
-
 
 var app = builder.Build();
 
