@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = builder.Configuration["JWT:Author"],
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
         IssuerSigningKey = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(builder.Configuration["JWT:Key"]),
         ClockSkew = TimeSpan.Zero,
@@ -63,11 +63,12 @@ app.UseCors((policyBuilder) =>
     policyBuilder.AllowAnyOrigin();
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Add ui and middleware
 app.UseGraphQLAltair();
 app.UseGraphQL<ISchema>();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

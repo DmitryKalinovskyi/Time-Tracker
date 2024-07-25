@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using System.Security.Claims;
 using Time_Tracker.Services;
 
 namespace Time_Tracker.GraphQL.Queries
@@ -10,19 +11,21 @@ namespace Time_Tracker.GraphQL.Queries
         {
             Field<StringGraphType>("test").Resolve(context =>
             {
-                int userId = 2;
+                int userId = -1;
 
-                string result = "";
-                if(permissionsService.HasRequiredPermission(userId, Permissions.READ_TEST_QUERY))
+                if(context.User is ClaimsPrincipal principal)
                 {
-                    result += " Have READ_TEST_QUERY";
-                }
-                if (permissionsService.HasRequiredPermission(userId, Permissions.MANAGE_USERS))
-                {
-                    result += " Have MANAGE_USERS";
+                    userId = int.Parse(principal.Claims.First().Value);
                 }
 
-                return "Permissions: " + result;
+                if (userId == -1) throw new ExecutionError("Unauthenticated");
+
+                if(!permissionsService.HasRequiredPermission(userId, Permissions.READ_TEST_QUERY))
+                {
+                    throw new ExecutionError("Unauthorized");
+                }
+
+                return "Hello from test permission query!";
             });
         }
     }
