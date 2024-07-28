@@ -13,7 +13,7 @@ namespace Time_Tracker.Services
 
             var role = rolesRepository.Find((int)user.RoleId);
 
-            return role?.PermissionList ?? [];
+            return role?.Permissions ?? [];
         }
 
         public bool HasRequiredPermission(int userId, string permission)
@@ -23,7 +23,7 @@ namespace Time_Tracker.Services
 
             var role = rolesRepository.Find((int)user.RoleId);
             if(role == null) return false;
-            return role.PermissionList.Contains(permission);
+            return role.Permissions.Contains(permission);
         }
 
         public bool HasRequiredPermissions(int userId, List<string> permissions)
@@ -35,7 +35,7 @@ namespace Time_Tracker.Services
             if (role == null) return false;
 
             foreach(var permission in permissions)
-                if(!role.PermissionList.Contains(permission)) return false;
+                if(!role.Permissions.Contains(permission)) return false;
 
             return true;
         }

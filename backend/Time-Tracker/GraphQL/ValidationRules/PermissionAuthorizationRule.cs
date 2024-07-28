@@ -14,7 +14,6 @@ using Azure;
 using GraphQL.Types;
 using GraphQLParser;
 using Time_Tracker.Helpers;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Time_Tracker.GraphQL.ValidationRules
 {

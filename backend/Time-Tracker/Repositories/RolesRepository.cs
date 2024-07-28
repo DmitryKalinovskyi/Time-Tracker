@@ -6,6 +6,15 @@ namespace Time_Tracker.Repositories
 {
     public class RolesRepository : IRolesRepository
     {
+        private class DBRole
+        {
+            public int Id { get; set; }
+
+            public required string Name { get; set; }
+
+            public required string Permissions { get; set; }
+        }
+
         private string _connectionString;
 
         public RolesRepository(IConfiguration configuration)
@@ -28,7 +37,10 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            return connection.QueryFirst<Role>(sql, new { roleId });
+            var dbRole = connection.QueryFirst<DBRole>(sql, new { roleId });
+            var role = new Role() { Id = dbRole.Id, Name = dbRole.Name, Permissions = [..dbRole.Permissions.Split(" ")] };
+
+            return role;
         }
 
         public int Insert(Role role)
@@ -38,7 +50,7 @@ namespace Time_Tracker.Repositories
                         SELECT CAST(SCOPE_IDENTITY() as int);";
 
             using var connection = new SqlConnection(_connectionString);
-            return connection.QuerySingle(sql, new { name=role.Name,  permissions=role.Permissions});
+            return connection.QuerySingle(sql, new { name=role.Name,  permissions=string.Join(" ", role.Permissions)});
         }
 
         public void Update(int roleId, Role role)
@@ -46,7 +58,7 @@ namespace Time_Tracker.Repositories
             var sql = "UPDATE Roles SET Name=@roleName, PERMISSIONS=@rolePermissions WHERE Roles.Id = @roleId";
 
             using var connection = new SqlConnection(_connectionString);
-            connection.Execute(sql, new { roleId, roleName = role.Name, rolePermissions = role.Permissions });
+            connection.Execute(sql, new { roleId, roleName = role.Name, rolePermissions = string.Join(" ", role.Permissions) });
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Time_Tracker.GraphQL.Queries
         public TestPermissionQuery()
         {
             Field<StringGraphType>("test")
-                .RequirePermission(Permissions.READ_TEST_QUERY)
+                .RequirePermission(Permissions.ReadTestQuery)
                 .Resolve(context => 
             {
                 return "Hello from test permission query!";
