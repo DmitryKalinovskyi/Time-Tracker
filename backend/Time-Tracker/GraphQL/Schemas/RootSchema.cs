@@ -1,4 +1,6 @@
-﻿using GraphQL.Types;
+﻿using GraphQL;
+using GraphQL.Types;
+using GraphQL.Validation;
 using Time_Tracker.GraphQL.Queries;
 
 namespace Time_Tracker.GraphQL.Schemas

@@ -5,5 +5,7 @@
         public bool HasRequiredPermissions(int userId, List<string> permissions);
 
         public bool HasRequiredPermission(int userId, string permissions);
+
+        public List<string> GetPermissions(int userId);
     }
 }

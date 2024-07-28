@@ -3,6 +3,7 @@ using GraphQL.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Time_Tracker.GraphQL.Schemas;
+using Time_Tracker.GraphQL.ValidationRules;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
 using Time_Tracker.Services;
@@ -46,6 +47,8 @@ builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddGraphQL(b => b
     .AddSchema<RootSchema>()
     .AddSystemTextJson()
+    .AddAuthorizationRule()
+    .AddValidationRule<PermissionAuthorizationRule>()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = true)
     .AddGraphTypes(typeof(RootSchema).Assembly)
 );
