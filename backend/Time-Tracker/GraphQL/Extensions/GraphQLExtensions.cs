@@ -1,6 +1,5 @@
 ﻿using GraphQL.Builders;
 using GraphQL.Types;
-using System.Security;
 
 namespace Time_Tracker.GraphQL.Extensions
 {
@@ -11,7 +10,18 @@ namespace Time_Tracker.GraphQL.Extensions
         public static bool CanAccess(this IProvideMetadata type, List<string> userPermissions)
         {
             var permissions = type.GetMetadata<IEnumerable<string>>(PermissionsKey, new List<string>());
-            return permissions.All(permission => userPermissions.Contains(permission));
+            return permissions.All(userPermissions.Contains);
+        }
+
+        public static List<string> GetRequiredPermissions(this IProvideMetadata type, List<string> userPermissions)
+        {
+            var permissions = type.GetMetadata<IEnumerable<string>>(PermissionsKey, new List<string>());
+            return permissions.Where(permission => !userPermissions.Contains(permission)).ToList();
+        }
+
+        public static List<string> GetPermissions(this IProvideMetadata type)
+        {
+            return type.GetMetadata<IEnumerable<string>>(PermissionsKey, new List<string>()).ToList();
         }
 
         public static bool RequiresPermissions(this IProvideMetadata type)
