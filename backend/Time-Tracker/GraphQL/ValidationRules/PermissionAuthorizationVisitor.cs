@@ -30,7 +30,7 @@ namespace Time_Tracker.GraphQL.ValidationRules
                         (node is GraphQLFragmentDefinition fragment && (context.GetRecursivelyReferencedFragments(context.Operation)?.Contains(fragment) ?? false)))
                 {
                     var type = context.TypeInfo.GetLastType();
-                    await AuthorizeAsync(node, type, context, _authenticated, _userPermissions).ConfigureAwait(false);
+                    await AuthorizeAsync(node, type, context).ConfigureAwait(false);
                     _validate = true;
                 }
 
@@ -41,7 +41,7 @@ namespace Time_Tracker.GraphQL.ValidationRules
                     context.TypeInfo.GetArgument()?.ResolvedType?.GetNamedType() is IComplexGraphType argumentType)
                 {
                     var fieldType = argumentType.GetField(objectFieldAst.Name);
-                    await AuthorizeAsync(objectFieldAst, fieldType, context, _authenticated, _userPermissions).ConfigureAwait(false);
+                    await AuthorizeAsync(objectFieldAst, fieldType, context).ConfigureAwait(false);
                 }
 
                 if (node is GraphQLField fieldAst)
@@ -52,9 +52,9 @@ namespace Time_Tracker.GraphQL.ValidationRules
                         return;
 
                     // check target field
-                    await AuthorizeAsync(fieldAst, fieldDef, context, _authenticated, _userPermissions).ConfigureAwait(false);
+                    await AuthorizeAsync(fieldAst, fieldDef, context).ConfigureAwait(false);
                     // check returned graph type
-                    await AuthorizeAsync(fieldAst, fieldDef.ResolvedType?.GetNamedType(), context, _authenticated, _userPermissions).ConfigureAwait(false);
+                    await AuthorizeAsync(fieldAst, fieldDef.ResolvedType?.GetNamedType(), context).ConfigureAwait(false);
                 }
 
                 if (node is GraphQLVariable variableRef)
@@ -62,7 +62,7 @@ namespace Time_Tracker.GraphQL.ValidationRules
                     if (context.TypeInfo.GetArgument()?.ResolvedType?.GetNamedType() is not IComplexGraphType variableType)
                         return;
 
-                    await AuthorizeAsync(variableRef, variableType, context, _authenticated, _userPermissions).ConfigureAwait(false);
+                    await AuthorizeAsync(variableRef, variableType, context).ConfigureAwait(false);
 
                     // Check each supplied field in the variable that exists in the variable type.
                     // If some supplied field does not exist in the variable type then some other
@@ -76,7 +76,7 @@ namespace Time_Tracker.GraphQL.ValidationRules
                         {
                             if (fieldsValues.ContainsKey(field.Name))
                             {
-                                await AuthorizeAsync(variableRef, field, context, _authenticated, _userPermissions).ConfigureAwait(false);
+                                await AuthorizeAsync(variableRef, field, context).ConfigureAwait(false);
                             }
                         }
                     }
@@ -89,13 +89,13 @@ namespace Time_Tracker.GraphQL.ValidationRules
                     _validate = false;
             }
 
-            private async ValueTask AuthorizeAsync(ASTNode? node, IProvideMetadata? metadata, ValidationContext context, bool authenticated, List<string> userPermissions)
+            private async ValueTask AuthorizeAsync(ASTNode? node, IProvideMetadata? metadata, ValidationContext context)
             {
 
                 if (metadata != null && metadata.RequiresPermissions())
                 {
 
-                    if (!authenticated)
+                    if (!_authenticated)
                     {
                         context.ReportError(new ValidationError(
                             context.Document.Source,
@@ -108,8 +108,8 @@ namespace Time_Tracker.GraphQL.ValidationRules
                     }
 
 
-                    var authorized = metadata.CanAccess(userPermissions);
-                    var requiredPermissions = string.Join(" ", metadata.GetRequiredPermissions(userPermissions));
+                    var authorized = metadata.CanAccess(_userPermissions);
+                    var requiredPermissions = string.Join(" ", metadata.GetRequiredPermissions(_userPermissions));
 
                     if (!authorized)
                     {
