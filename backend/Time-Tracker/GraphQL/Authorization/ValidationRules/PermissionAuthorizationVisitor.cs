@@ -2,7 +2,7 @@
 using GraphQL;
 using GraphQL.Validation;
 using GraphQLParser.AST;
-using Time_Tracker.GraphQL.Extensions;
+using Time_Tracker.GraphQL.Authorization;
 
 namespace Time_Tracker.GraphQL.ValidationRules
 {

@@ -1,7 +1,7 @@
 ﻿using GraphQL.Types;
 using Time_Tracker.Dtos;
 
-namespace Time_Tracker.GraphQL.Types;
+namespace Time_Tracker.GraphQL.Authorization.Types;
 
 public class LoginInputGraphType : InputObjectGraphType<LoginRequestDto>
 {

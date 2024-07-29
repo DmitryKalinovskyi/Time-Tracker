@@ -1,15 +1,15 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using GraphQL.Validation;
-using Time_Tracker.GraphQL.Queries;
 
-namespace Time_Tracker.GraphQL.Schemas
+namespace Time_Tracker.GraphQL
 {
-    public class RootSchema: Schema
+    public class RootSchema : Schema
     {
         public RootSchema(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             Query = serviceProvider.GetRequiredService<RootQuery>();
+            Mutation = serviceProvider.GetRequiredService<RootMutation>();
         }
     }
 }

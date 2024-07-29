@@ -37,7 +37,9 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            var dbRole = connection.QueryFirst<DBRole>(sql, new { roleId });
+            var dbRole = connection.QueryFirstOrDefault<DBRole>(sql, new { roleId });
+            if (dbRole == null) return null;
+
             var role = new Role() { Id = dbRole.Id, Name = dbRole.Name, Permissions = [..dbRole.Permissions.Split(" ")] };
 
             return role;
@@ -50,7 +52,7 @@ namespace Time_Tracker.Repositories
                         SELECT CAST(SCOPE_IDENTITY() as int);";
 
             using var connection = new SqlConnection(_connectionString);
-            return connection.QuerySingle(sql, new { name=role.Name,  permissions=string.Join(" ", role.Permissions)});
+            return connection.QuerySingle<int>(sql, new { name=role.Name,  permissions=string.Join(" ", role.Permissions)});
         }
 
         public void Update(int roleId, Role role)
@@ -59,6 +61,15 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
             connection.Execute(sql, new { roleId, roleName = role.Name, rolePermissions = string.Join(" ", role.Permissions) });
+        }
+
+        public List<Role> GetRoles()
+        {
+            var sql = "SELECT * FROM Roles";
+
+            using var connection = new SqlConnection(_connectionString);
+            var roles = connection.Query<DBRole>(sql) ?? [];
+            return roles.Select(dbRole => new Role() { Id = dbRole.Id, Name = dbRole.Name, Permissions = [.. dbRole.Permissions.Split(" ")] }).ToList();
         }
     }
 }
