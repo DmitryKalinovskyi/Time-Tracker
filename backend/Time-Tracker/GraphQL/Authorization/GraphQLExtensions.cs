@@ -1,7 +1,7 @@
 ﻿using GraphQL.Builders;
 using GraphQL.Types;
 
-namespace Time_Tracker.GraphQL.Extensions
+namespace Time_Tracker.GraphQL.Authorization
 {
     public static class GraphQLExtensions
     {

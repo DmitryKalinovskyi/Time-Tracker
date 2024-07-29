@@ -2,7 +2,7 @@ using GraphQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Time_Tracker.GraphQL.Schemas;
+using Time_Tracker.GraphQL;
 using Time_Tracker.GraphQL.ValidationRules;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
