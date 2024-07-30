@@ -4,7 +4,6 @@ import {store} from "../state/store.ts";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import NotFoundPage from "../pages/NotFoundPage.tsx";
 import ProtectedPage from "../pages/ProtectedPage.tsx";
-import {AuthProvider} from "./providers/AuthProvider.tsx";
 import RequirePermission from "./gates/RequirePermission.tsx";
 import LoginPage from "../pages/LoginPage.tsx";
 
@@ -27,9 +26,7 @@ const router = createBrowserRouter([
 export default function App() {
     return (
         <Provider store={store}>
-            <AuthProvider>
-                <RouterProvider router={router}/>
-            </AuthProvider>
+            <RouterProvider router={router}/>
         </Provider>
     )
 }
