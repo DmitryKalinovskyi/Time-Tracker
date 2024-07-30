@@ -3,6 +3,10 @@ import {Provider} from "react-redux";
 import {store} from "../state/store.ts";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import NotFoundPage from "../pages/NotFoundPage.tsx";
+import ProtectedPage from "../pages/ProtectedPage.tsx";
+import {AuthProvider} from "./providers/AuthProvider.tsx";
+import RequirePermission from "./gates/RequirePermission.tsx";
+import LoginPage from "../pages/LoginPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -11,6 +15,11 @@ const router = createBrowserRouter([
         children: [
             {path: "/", element: <HelloPage/>},
             {path: "/hello", element: <HelloPage/>},
+            {path: "/login", element: <LoginPage/>},
+            {element: <RequirePermission permission={"MANAGE_USERS"}/>,
+                children: [
+                    {path: "/protected", element: <ProtectedPage/>}
+                ]}
         ]
     }
 ])
@@ -18,7 +27,9 @@ const router = createBrowserRouter([
 export default function App() {
     return (
         <Provider store={store}>
-            <RouterProvider router={router}/>
+            <AuthProvider>
+                <RouterProvider router={router}/>
+            </AuthProvider>
         </Provider>
     )
 }
