@@ -53,4 +53,14 @@ public class ActivationCodeRepository : IActivationCodeRepository
 
         return userId;
     }
+
+    public async Task RemoveAsync(ActivationCode code)
+    {
+        string sql = $@"DELETE FROM ActivationCodes
+                        WHERE Id = @Id";
+
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.ExecuteAsync(sql, code);
+    }
 }

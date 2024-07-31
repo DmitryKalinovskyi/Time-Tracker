@@ -10,4 +10,5 @@ public interface IActivationCodeRepository
     Task<ActivationCode?> FindByValueAsync(Guid value);
 
     Task<int> AddAsync(ActivationCode code);
+    Task RemoveAsync(ActivationCode code);
 }

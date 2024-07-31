@@ -67,6 +67,8 @@ public class UserMutation : ObjectGraphType
 
                 await userRepository.UpdateAsync(user);
 
+                await activationCodeRepository.RemoveAsync(activationCode);
+
                 return "User activated successfully";
             });
     }
