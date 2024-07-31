@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Threading.Tasks;
 using Time_Tracker.Dtos;
 using Time_Tracker.Models;
 
@@ -35,25 +36,28 @@ namespace Time_Tracker.Repositories
             }
         }
 
-        public async Task AddUserAsync(User user)
+        public async Task<int> AddAsync(User user)
         {
             string sql = $@"INSERT INTO Users 
-                            (FullName, Email, RoleId) 
-                            VALUES (@FullName, @Email, @RoleId)";
+                            (FullName, Email) 
+                            OUTPUT INSERTED.Id
+                            VALUES (@FullName, @Email)";
 
             using var connection = new SqlConnection(_connectionString);
 
-            await connection.ExecuteAsync(sql, user);
+            int userId = await connection.QuerySingleAsync<int>(sql, user);
+
+            return userId;
         }
 
-        public async Task UpdateUserAsync(User user)
+        public async Task UpdateAsync(User user)
         {
             string query = $@"UPDATE Users SET 
                             FullName = @FullName, 
                             Email = @Email, 
                             RoleId = @RoleId, 
-                            Password = @HashedPassword, 
-                            Salt = @Salt 
+                            HashedPassword = @HashedPassword, 
+                            Salt = @Salt
                             WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);

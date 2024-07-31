@@ -6,6 +6,9 @@ namespace Time_Tracker.Repositories
     {
         public User? Find(int id);    
 
-        public User? FindByEmail(string email); 
+        public User? FindByEmail(string email);
+
+        Task<int> AddAsync(User user);
+        Task UpdateAsync(User user);
     }
 }
