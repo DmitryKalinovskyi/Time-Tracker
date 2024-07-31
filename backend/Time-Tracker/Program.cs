@@ -42,6 +42,7 @@ builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 builder.Services.AddSingleton<IActivationCodeRepository, ActivationCodeRepository>();
 
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<HashingService>();
 
 // Configure GraphQL
