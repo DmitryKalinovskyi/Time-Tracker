@@ -20,7 +20,11 @@ public class UserMutation : ObjectGraphType
             .Argument<NonNullGraphType<UserInputGraphType>>("user")
             .ResolveAsync(async context =>
             {
-                var userId = await userRepository.AddAsync(context.GetArgument<User>("user"));
+                var userInput = context.GetArgument<User>("user");
+
+                if (userRepository.FindByEmail(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
+
+                var userId = await userRepository.AddAsync(userInput);
 
                 var code = new ActivationCode()
                 {
