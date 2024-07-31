@@ -10,7 +10,7 @@ namespace Time_Tracker.GraphQL.Authorization.Queries;
 
 public class IdentityQuery : ObjectGraphType
 {
-    public IdentityQuery(TokenService tokenService, IUsersRepository usersRepository, IPasswordService passwordService)
+    public IdentityQuery(TokenService tokenService, IUsersRepository usersRepository, HashingService hashingService)
     {
         Field<LoginResponseGraphType>("login")
             .Argument<NonNullGraphType<LoginInputGraphType>>("input")
@@ -20,10 +20,10 @@ public class IdentityQuery : ObjectGraphType
 
             var user = usersRepository.FindByEmail(query.Email);
 
-            if (user == null) throw new ExecutionError("User with that email not founded.");
+            if (user == null) throw new ExecutionError("Wrong email or password.");
 
-            if (!passwordService.IsMatch(query.Password, user.HashedPassword))
-                throw new ExecutionError("Invalid credentials.");
+            if (hashingService.ComputeHash(query.Password, user.Salt) != user.HashedPassword)
+                throw new ExecutionError("Wrong email or password.");
 
             var token = tokenService.GenerateToken(user.Id);
 

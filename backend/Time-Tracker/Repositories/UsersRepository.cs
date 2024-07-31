@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Threading.Tasks;
+using Time_Tracker.Dtos;
 using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
@@ -30,8 +32,37 @@ namespace Time_Tracker.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                return connection.QueryFirstOrDefault<User>(sql, new { email});
+                return connection.QueryFirstOrDefault<User>(sql, new { email });
             }
+        }
+
+        public async Task<int> AddAsync(User user)
+        {
+            string sql = $@"INSERT INTO Users 
+                            (FullName, Email) 
+                            OUTPUT INSERTED.Id
+                            VALUES (@FullName, @Email)";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            int userId = await connection.QuerySingleAsync<int>(sql, user);
+
+            return userId;
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            string query = $@"UPDATE Users SET 
+                            FullName = @FullName, 
+                            Email = @Email, 
+                            RoleId = @RoleId, 
+                            HashedPassword = @HashedPassword, 
+                            Salt = @Salt
+                            WHERE Id = @Id";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            await connection.ExecuteAsync(query, user);
         }
     }
 }

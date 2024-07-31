@@ -12,8 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<TokenService>();
-
 // Configure authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -37,11 +35,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddSingleton<TokenService>();
+
 builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+builder.Services.AddSingleton<IActivationCodeRepository, ActivationCodeRepository>();
 
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
-builder.Services.AddSingleton<IPasswordService, PasswordService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<HashingService>();
 
 // Configure GraphQL
 builder.Services.AddGraphQL(b => b

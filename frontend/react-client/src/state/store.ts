@@ -1,13 +1,15 @@
 import {createEpicMiddleware} from "redux-observable";
 import {configureStore, Tuple} from "@reduxjs/toolkit";
-import {rootEpic} from "./epics/rootEpic.ts";
-import helloReducer from "./slices/helloSlice.ts";
+import {rootEpic} from "./rootEpic.ts";
+import helloReducer from "./hello/helloSlice.ts";
+import authReducer from "./auth/authSlice.ts";
 
 const epicMiddleware = createEpicMiddleware();
 
 export const store = configureStore({
     reducer: {
-        hello: helloReducer
+        hello: helloReducer,
+        auth: authReducer
     },
     middleware: () => new Tuple(epicMiddleware)
 })
