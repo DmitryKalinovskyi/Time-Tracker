@@ -11,6 +11,7 @@ const helloSlice = createSlice({
         set_hello_message: (state, action: PayloadAction<string>) => {
             state.msg = action.payload;
         }
+        ,
     }
 })
 
