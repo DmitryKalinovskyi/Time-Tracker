@@ -1,18 +1,17 @@
-import {combineEpics, ofType} from "redux-observable";
-import {map, mergeMap, tap} from "rxjs";
-import {ajax} from 'rxjs/ajax';
-import {set_hello_message} from "../slices/helloSlice.ts";
-
-const url = "https://localhost:7213/graphql";
-
 // fetch hello action creator
-export const fetch_hello = () => ({type: "FETCH_HELLO"});
+import {ofType} from "redux-observable";
+import {map, mergeMap, tap} from "rxjs";
+import {ajax} from "rxjs/ajax";
+import {API_URL} from "../../app/config.ts";
+import {set_hello_message} from "./helloSlice.ts";
+
+export const fetch_hello = () => ({type: "hello/fetch_hello"});
 export const fetchHelloEpic = action$ => action$.pipe(
-    ofType("FETCH_HELLO"),
+    ofType("hello/fetch_hello"),
     tap(() => console.log("Epic handled")),
     mergeMap(() =>
         ajax({
-            url: url,
+            url: `${API_URL}/graphql`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -31,7 +30,3 @@ export const fetchHelloEpic = action$ => action$.pipe(
         )
     )
 );
-
-export const rootEpic = combineEpics(
-    fetchHelloEpic
-)

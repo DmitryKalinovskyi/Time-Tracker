@@ -2,11 +2,11 @@
 using GraphQL.Types;
 using Microsoft.AspNetCore.Identity.Data;
 using Time_Tracker.Dtos;
-using Time_Tracker.GraphQL.Types;
+using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.Repositories;
 using Time_Tracker.Services;
 
-namespace Time_Tracker.GraphQL.Queries;
+namespace Time_Tracker.GraphQL.Authorization.Queries;
 
 public class IdentityQuery : ObjectGraphType
 {

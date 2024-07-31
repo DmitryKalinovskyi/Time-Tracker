@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../state/store.ts";
-import {fetch_hello} from "../state/epics/rootEpic.ts";
+import {fetch_hello} from "../state/hello/epics.ts";
 
 export default function HelloPage(){
     const dispatch = useDispatch();

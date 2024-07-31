@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="GraphQL\Mutations\" />
     <Folder Include="Data\" />
   </ItemGroup>
 
