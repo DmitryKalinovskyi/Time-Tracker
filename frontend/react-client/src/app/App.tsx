@@ -1,3 +1,5 @@
+import LoginPage from "../pages/LoginPage.tsx";
+import RegisterPage from "../pages/RegisterPage.tsx";
 import HelloPage from "../pages/HelloPage.tsx";
 import {Provider} from "react-redux";
 import {store} from "../state/store.ts";
@@ -11,6 +13,8 @@ const router = createBrowserRouter([
         children: [
             {path: "/", element: <HelloPage/>},
             {path: "/hello", element: <HelloPage/>},
+            { path: "/login", element: <LoginPage /> },
+            { path: "/register", element: <RegisterPage /> },
         ]
     }
 ])
