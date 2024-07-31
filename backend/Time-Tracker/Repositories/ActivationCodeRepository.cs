@@ -16,7 +16,11 @@ public class ActivationCodeRepository : IActivationCodeRepository
 
     public async Task<ActivationCode?> Find(int id)
     {
-        var sql = "SELECT  FROM ActiovationCodes WHERE Id = @id";
+        var sql = @"SELECT a.Id,
+                    a.Value,
+                    a.UserId
+                    FROM ActivationCodes a 
+                    WHERE Id = @id";
 
         using var connection = new SqlConnection(_connectionString);
 
@@ -25,7 +29,11 @@ public class ActivationCodeRepository : IActivationCodeRepository
 
     public async Task<ActivationCode?> FindByValueAsync(Guid value)
     {
-        var sql = "SELECT  FROM ActiovationCodes WHERE Value = @value";
+        var sql = @"SELECT a.Id,
+                    a.Value,
+                    a.UserId
+                    FROM ActivationCodes a 
+                    WHERE Value = @value";
 
         using var connection = new SqlConnection(_connectionString);
 
@@ -44,20 +52,5 @@ public class ActivationCodeRepository : IActivationCodeRepository
         int userId = await connection.QuerySingleAsync<int>(sql, code);
 
         return userId;
-    }
-
-    public async Task UpdateAsync(User user)
-    {
-        string query = $@"UPDATE Users SET 
-                            FullName = @FullName, 
-                            Email = @Email, 
-                            RoleId = @RoleId, 
-                            Password = @HashedPassword, 
-                            Salt = @Salt
-                            WHERE Id = @Id";
-
-        using var connection = new SqlConnection(_connectionString);
-
-        await connection.ExecuteAsync(query, user);
     }
 }

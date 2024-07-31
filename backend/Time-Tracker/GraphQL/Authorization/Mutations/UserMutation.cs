@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using System.Net.Mail;
+using Time_Tracker.Dtos;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.Models;
 using Time_Tracker.Repositories;
@@ -12,7 +13,8 @@ public class UserMutation : ObjectGraphType
 {
     public UserMutation(IUsersRepository userRepository,
         IActivationCodeRepository activationCodeRepository,
-        IEmailService emailService)
+        IEmailService emailService,
+        HashingService hashingService)
     {
         Field<UserGraphType>("createUser")
             .Argument<NonNullGraphType<UserInputGraphType>>("user")
@@ -39,6 +41,29 @@ public class UserMutation : ObjectGraphType
                 await emailService.SendEmail(message);
 
                 return user;
+            });
+
+        Field<StringGraphType>("activateUser")
+            .Argument<NonNullGraphType<ActivateUserInputGraphType>>("input")
+            .ResolveAsync(async context =>
+            {
+                ActivateUserDto input = context.GetArgument<ActivateUserDto>("input");
+
+                var activationCode = await activationCodeRepository.FindByValueAsync(input.Code);
+
+                if (activationCode == null) throw new ExecutionError("Activation code not found.");
+
+                var user = userRepository.Find(activationCode.UserId);
+
+                if (user == null) throw new ExecutionError("User not found.");
+
+                user.Salt = hashingService.GenerateSalt();
+
+                user.HashedPassword = hashingService.ComputeHash(input.Password, user.Salt);
+
+                await userRepository.UpdateAsync(user);
+
+                return "User activated successfully";
             });
     }
 }

@@ -56,7 +56,7 @@ namespace Time_Tracker.Repositories
                             FullName = @FullName, 
                             Email = @Email, 
                             RoleId = @RoleId, 
-                            Password = @HashedPassword, 
+                            HashedPassword = @HashedPassword, 
                             Salt = @Salt
                             WHERE Id = @Id";
 
