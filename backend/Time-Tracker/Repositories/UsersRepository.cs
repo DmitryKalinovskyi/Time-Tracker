@@ -16,6 +16,18 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
+        public async Task<List<User>> GetUsersAsync(int? first, int? afterId)
+        {
+            var sql =   "SELECT TOP (@first) * FROM Users" +
+                        " WHERE (@afterId IS NULL OR Id > @afterId)" +
+                        " ORDER BY Id";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var users =  await connection.QueryAsync<User>(sql, new { first, afterId });
+                return users.ToList();
+            }
+        }
         public User? Find(int userId)
         {
             var sql = "SELECT * FROM Users WHERE Users.Id = @userId";
