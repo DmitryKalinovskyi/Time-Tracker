@@ -48,7 +48,7 @@ const RegisterPage: React.FC = () => {
                     <AddIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign Up
+                    Create User
                 </Typography>
                 <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                     <TextField
@@ -80,15 +80,8 @@ const RegisterPage: React.FC = () => {
                         variant="contained"
                         sx={{ mt: 1, mb: 2 }}
                     >
-                        Sign Up
+                        Create User
                     </Button>
-                    <Grid container>
-                        <Grid item>
-                            <MuiLink component={RouterLink} to="/login" variant="body2">
-                                {"Do you have an account? Sign In"}
-                            </MuiLink>
-                        </Grid>
-                    </Grid>
                 </Box>
             </Box>
         </ThemeProvider>
