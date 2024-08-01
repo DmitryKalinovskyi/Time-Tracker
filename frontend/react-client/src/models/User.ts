@@ -1,0 +1,8 @@
+type User={
+    id: number,
+    fullName: string,
+    email: string,
+    roleId?: number
+}
+
+export default User;

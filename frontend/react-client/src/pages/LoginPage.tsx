@@ -9,30 +9,37 @@ import Grid from '@mui/material/Grid';
 import PersonIcon from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, Navigate} from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
+import {useDispatch} from "react-redux";
+import {loginUser} from "../state/auth/epics.ts";
+import useIsAuthenticated from "../hooks/useIsAuthenticated.ts";
 
 
 const defaultTheme = createTheme();
 const LoginPage: React.FC = () => {
     const [error, setError] = useState<string>('');
-
+    const isAuthenticated = useIsAuthenticated();
+    const dispatch = useDispatch();
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        if (data.get('email') != '' || data.get('password') != '') {
-            console.log({
-                email: data.get('email'),
-                password: data.get('password'),
-            });
-        }
+        const email = data.get('email');
+        const password = data.get('password');
 
-        if (data.get('email') === '' || data.get('password') === '') {
+        if (email === '' || password === '') {
             setError('Please fill in all fields');
             return;
         }
+
+        console.log({email, password});
+
+        dispatch(loginUser({email, password}))
     };
+
+    if(isAuthenticated)
+        return <Navigate to={"/"}/>
 
     return (
         <ThemeProvider theme={defaultTheme}>
