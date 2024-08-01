@@ -17,7 +17,7 @@ public class UserMutation : ObjectGraphType
         HashingService hashingService)
     {
         Field<UserGraphType>("createUser")
-            .Argument<NonNullGraphType<UserInputGraphType>>("user")
+            .Argument<NonNullGraphType<CreateUserInputGraphType>>("user")
             .ResolveAsync(async context =>
             {
                 var userInput = context.GetArgument<User>("user");
@@ -73,10 +73,20 @@ public class UserMutation : ObjectGraphType
             });
 
         Field<StringGraphType>("updateUser")
-            .Argument<NonNullGraphType<UserGraphType>>("user")
+            .Argument<NonNullGraphType<UpdateUserInputGraphType>>("user")
             .ResolveAsync(async context =>
             {
-                return "Test update user";
+                var userInput = context.GetArgument<User>("user");
+
+                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User with this id not found.");
+
+                if (userInput.FullName is not null) user.FullName = userInput.FullName;
+                if (userInput.Email is not null) user.Email = userInput.Email;
+                if (userInput.RoleId is not null) user.RoleId = userInput.RoleId;
+
+                await userRepository.UpdateAsync(user);
+
+                return "User updated successfully";
             });
     }
 }
