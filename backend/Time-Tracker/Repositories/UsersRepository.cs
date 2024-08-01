@@ -64,5 +64,10 @@ namespace Time_Tracker.Repositories
 
             await connection.ExecuteAsync(query, user);
         }
+
+        public async Task DeleteAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
