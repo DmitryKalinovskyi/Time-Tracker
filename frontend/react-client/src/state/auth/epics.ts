@@ -1,35 +1,51 @@
 // fetch hello action creator
 import {ofType} from "redux-observable";
-import {map, mergeMap} from "rxjs";
+import {map, mergeMap, tap} from "rxjs";
 import {ajax} from "rxjs/ajax";
 import {API_URL} from "../../app/config.ts";
+import {set_auth} from "./authSlice.ts";
 
-// TODO: Make request to api, get user token, and permissions.
-// TODO: Store request result in the state, hooks will use it
-// Question 1: How frontend should know that permissions for the user is changed?
 
-interface FetchAuthPayload{
+interface LoginInputType{
     email: string,
     password: string
 }
 
-export const fetch_auth = (payload: FetchAuthPayload) => ({type: "auth/fetch_auth", payload});
-// export const fetchAuthEpic = action$ => action$.pipe(
-//     ofType("auth/fetch_auth"),
-//     mergeMap(() =>
-//         ajax({
-//             url: `${API_URL}/graphql`,
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json"
-//             },
-//             body: {
-//                 query: ` LOGIN QUERY
-//                 `
-//             }
-//         }).pipe(
-//             // tap(ajaxResponse => console.log(ajaxResponse)),
-//             map(ajaxResponse => set_hello_message(ajaxResponse.response.data.testQuery.name))
-//         )
-//     )
-// );
+export const loginUser = (payload: LoginInputType) => ({type: "auth/login_user", payload});
+export const loginUserEpic = action$ => action$.pipe(
+    ofType("auth/login_user"),
+    mergeMap((action) =>
+        ajax({
+            url: `${API_URL}/graphql`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: {
+                query: `
+                    query Login{
+                          identityQuery{
+                            login(input: {email: "${action.payload.email}", password: "${action.payload.password}"}){
+                              accessToken{
+                               value 
+                              },
+                              user{
+                                fullName,
+                                email,
+                                role{
+                                  id,
+                                  name,
+                                  permissions
+                                }
+                              }
+                            }
+                        }
+                    }`
+            }
+        }).pipe(
+            // tap(ajaxResponse => console.log(ajaxResponse.response.data)),
+            map(ajaxResponse => set_auth(ajaxResponse.response.data.identityQuery.login))
+        )
+    )
+);
+
