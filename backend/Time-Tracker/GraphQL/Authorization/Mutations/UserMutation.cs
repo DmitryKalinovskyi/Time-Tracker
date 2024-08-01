@@ -71,5 +71,12 @@ public class UserMutation : ObjectGraphType
 
                 return "User activated successfully";
             });
+
+        Field<StringGraphType>("updateUser")
+            .Argument<NonNullGraphType<UserGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                return "Test update user";
+            });
     }
 }

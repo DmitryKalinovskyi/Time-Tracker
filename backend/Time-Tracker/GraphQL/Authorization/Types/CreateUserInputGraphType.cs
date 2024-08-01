@@ -2,9 +2,9 @@
 
 namespace Time_Tracker.GraphQL.Authorization.Types;
 
-public class UserInputGraphType : InputObjectGraphType
+public class CreateUserInputGraphType : InputObjectGraphType
 {
-    public UserInputGraphType()
+    public CreateUserInputGraphType()
     {
         Field<NonNullGraphType<StringGraphType>>("fullName");
         Field<NonNullGraphType<StringGraphType>>("email");
