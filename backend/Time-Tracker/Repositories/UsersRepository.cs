@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 using System.Threading.Tasks;
 using Time_Tracker.Dtos;
 using Time_Tracker.Models;
@@ -25,9 +26,23 @@ namespace Time_Tracker.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 var users =  await connection.QueryAsync<User>(sql, new { first, afterId });
-                return users.ToList();
+                return users.AsList();
             }
         }
+
+        public async Task<int> GetTotalUsersCount()
+        {
+            var sql = "SELECT COUNT(*) FROM USERS";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var totalCount = await connection.QuerySingleAsync<int>(sql);
+
+                return totalCount;
+            }
+
+        }
+
         public User? Find(int userId)
         {
             var sql = "SELECT * FROM Users WHERE Users.Id = @userId";
@@ -81,5 +96,7 @@ namespace Time_Tracker.Repositories
         {
             throw new NotImplementedException();
         }
+
+
     }
 }
