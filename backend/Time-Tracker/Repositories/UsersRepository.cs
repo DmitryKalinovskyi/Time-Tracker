@@ -20,7 +20,7 @@ namespace Time_Tracker.Repositories
 
         public async Task<List<User>> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
         {
-            var sql = new StringBuilder("SELECT * FROM Users WHERE 1=1");
+            var sql = new StringBuilder("SELECT TOP (@topCount) * FROM Users WHERE 1=1");
 
             if (afterId.HasValue)
             {
@@ -32,23 +32,20 @@ namespace Time_Tracker.Repositories
                 sql.Append(" AND Id < @beforeId");
             }
 
-            sql.Append(" ORDER BY Id ASC");
-
-            if (first.HasValue)
+            var orderBy = "Id ASC";
+            if (last.HasValue)
             {
-                sql.Append(" OFFSET 0 ROWS FETCH NEXT @first ROWS ONLY");
+                orderBy = "Id DESC";
             }
-            else if (last.HasValue)
-            {
-                sql.Append(" OFFSET (SELECT COUNT(*) FROM Users WHERE (@beforeId IS NULL OR Id < @beforeId) AND (@afterId IS NULL OR Id > @afterId)) - @last ROWS FETCH NEXT @last ROWS ONLY");
-            }
+            sql.Append($" ORDER BY {orderBy}");
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var users =  await connection.QueryAsync<User>(sql.ToString(), new { first, afterId, last, beforeId });
+                var users = await connection.QueryAsync<User>(sql.ToString(), new { topCount = first ?? last ?? 10, afterId, beforeId }); // Default to 10 if neither first nor last is provided
                 return users.AsList();
             }
         }
+
 
         public async Task<int> GetTotalUsersCount()
         {

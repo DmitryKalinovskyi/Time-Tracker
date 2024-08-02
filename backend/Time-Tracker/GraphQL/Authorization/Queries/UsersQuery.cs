@@ -43,10 +43,10 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
 
                 var pageInfo = new PageInfo
                 {
-                    HasNextPage = hasNextPage,
+                    HasNextPage = !last.HasValue ? hasNextPage : hasPreviousPage,
                     StartCursor = edges.First().Cursor,
                     EndCursor = edges.Last().Cursor,
-                    HasPreviousPage = hasPreviousPage,
+                    HasPreviousPage = !last.HasValue ? hasPreviousPage : hasNextPage,
                 };
 
                 return new Connection<User>
