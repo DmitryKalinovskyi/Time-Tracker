@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
+using System.Text;
 using System.Threading.Tasks;
 using Time_Tracker.Dtos;
 using Time_Tracker.Models;
@@ -17,15 +18,34 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<List<User>> GetUsersAsync(int? first, int? afterId)
+        public async Task<List<User>> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
         {
-            var sql =   "SELECT TOP (@first) * FROM Users" +
-                        " WHERE (@afterId IS NULL OR Id > @afterId)" +
-                        " ORDER BY Id";
+            var sql = new StringBuilder("SELECT * FROM Users WHERE 1=1");
+
+            if (afterId.HasValue)
+            {
+                sql.Append(" AND Id > @afterId");
+            }
+
+            if (beforeId.HasValue)
+            {
+                sql.Append(" AND Id < @beforeId");
+            }
+
+            sql.Append(" ORDER BY Id ASC");
+
+            if (first.HasValue)
+            {
+                sql.Append(" OFFSET 0 ROWS FETCH NEXT @first ROWS ONLY");
+            }
+            else if (last.HasValue)
+            {
+                sql.Append(" OFFSET (SELECT COUNT(*) FROM Users WHERE (@beforeId IS NULL OR Id < @beforeId) AND (@afterId IS NULL OR Id > @afterId)) - @last ROWS FETCH NEXT @last ROWS ONLY");
+            }
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var users =  await connection.QueryAsync<User>(sql, new { first, afterId });
+                var users =  await connection.QueryAsync<User>(sql.ToString(), new { first, afterId, last, beforeId });
                 return users.AsList();
             }
         }

@@ -5,7 +5,7 @@ namespace Time_Tracker.Repositories
 {
     public interface IUsersRepository
     {
-        public Task<List<User>> GetUsersAsync(int? first, int? afterId);
+        public Task<List<User>> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId);
         public Task<int> GetTotalUsersCount();
         public User? Find(int id);    
 
