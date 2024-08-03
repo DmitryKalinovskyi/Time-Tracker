@@ -65,6 +65,8 @@ public class UserMutation : ObjectGraphType
 
                 user.HashedPassword = hashingService.ComputeHash(input.Password, user.Salt);
 
+                user.IsActive = true;
+
                 await userRepository.UpdateAsync(user);
 
                 await activationCodeRepository.RemoveAsync(activationCode);
