@@ -19,5 +19,6 @@ public class UserGraphType : ObjectGraphType<User>
             if (roleId == null) return null;
             return rolesRepository.Find((int)roleId);
         });
+        Field(t => t.IsActive);
     }
 }
