@@ -8,9 +8,10 @@ namespace Time_Tracker.GraphQL.Authorization.Types
         public UpdateUserInputGraphType()
         {
             Field<NonNullGraphType<IntGraphType>>("id");
-            Field<StringGraphType>("fullName");
-            Field<StringGraphType>("email");
+            Field<NonNullGraphType<StringGraphType>>("fullName");
+            Field<NonNullGraphType<StringGraphType>>("email");
             Field<IntGraphType>("roleId");
+            Field<NonNullGraphType<BooleanGraphType>>("isActive");
         }
     }
 }
