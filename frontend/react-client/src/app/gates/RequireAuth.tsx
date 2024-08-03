@@ -1,4 +1,4 @@
-import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
+import useIsAuthenticated from "../hooks/useIsAuthenticated";
 import {Navigate, Outlet} from "react-router-dom";
 
 export default function RequireAuth(){

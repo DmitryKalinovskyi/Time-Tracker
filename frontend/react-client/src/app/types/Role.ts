@@ -1,4 +1,4 @@
-type Role = {
+interface Role {
     id: number,
     name: string,
     permissions: string[]

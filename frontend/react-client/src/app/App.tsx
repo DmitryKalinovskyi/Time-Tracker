@@ -1,19 +1,17 @@
-import LoginPage from "../pages/LoginPage.tsx";
-import RegisterPage from "../pages/RegisterPage.tsx";
-import AccountVerificationPage from "../pages/AccountVerificationPage.tsx";
-import HelloPage from "../pages/HelloPage.tsx";
+import LoginPage from "./ui/pages/LoginPage.tsx";
+import RegisterPage from "./ui/pages/RegisterPage.tsx";
+import AccountVerificationPage from "./ui/pages/AccountVerificationPage.tsx";
 import {Provider} from "react-redux";
-import {store} from "../state/store.ts";
+import {store} from "./store.ts";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import NotFoundPage from "../pages/NotFoundPage.tsx";
+import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
 
 const router = createBrowserRouter([
     {
         path: '/',
         errorElement: <NotFoundPage/>,
         children: [
-            {path: "/", element: <HelloPage/>},
-            {path: "/hello", element: <HelloPage/>},
+            { path: "/", element: <LoginPage /> },
             { path: "/login", element: <LoginPage /> },
             { path: "/register", element: <RegisterPage /> },
             { path: "/verification", element: <AccountVerificationPage /> },

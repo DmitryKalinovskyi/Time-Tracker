@@ -6,38 +6,42 @@ import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PersonIcon from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink } from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
+import {useDispatch} from "react-redux";
+import {authUser} from "../../features/authentification/authSlice.ts";
+import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
+
 
 const defaultTheme = createTheme();
-const AccountVerificationPage: React.FC = () => {
-    const [error, setError] = useState<string>('');
+const LoginPage: React.FC = () => {
 
-    const handleSubmit = (event) => {
+    const [error, setError] = useState<string>('');
+    const isAuthenticated = useIsAuthenticated();
+    const dispatch = useDispatch();
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        if (data.get('code') !== '' && data.get('password') !== '' && data.get('repeatPassword') !== '') {
-            console.log({
-                email: data.get('code'),
-                password: data.get('password'),
-                repeatPassword: data.get('repeatPassword')
-            });
-        }
+        const email = data.get('email')?.toString();
+        const password = data.get('password')?.toString();
 
-        if (data.get('password') === '' || data.get('repeatPassword') === '' || data.get('code') === '') {
+        if (email === '' || password === '') {
             setError('Please fill in all fields');
             return;
         }
 
-        if (data.get('password') !== data.get('repeatPassword')) {
-            setError('Passwords do not match');
-            return;
-        }
+        console.log({email, password});
+
+        dispatch(authUser({email: email ?? '', password: password ?? ''}))
     };
+
+    // if(isAuthenticated)
+    //     return <Navigate to={"/"}/>
 
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -51,20 +55,20 @@ const AccountVerificationPage: React.FC = () => {
                 }}
             >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <LockOutlinedIcon />
+                    <PersonIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Verification
+                    Sign in
                 </Typography>
                 <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        id="code"
-                        label="Verification Code"
-                        name="code"
-                        autoComplete="code"
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
                         autoFocus
                     />
                     <TextField
@@ -77,16 +81,6 @@ const AccountVerificationPage: React.FC = () => {
                         id="password"
                         autoComplete="current-password"
                     />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="repeatPassword"
-                        label="Repeat Password"
-                        type="password"
-                        id="repeatPassword"
-                        autoComplete="current-password"
-                    />
                     <Typography color="error">
                         {error}
                     </Typography>
@@ -96,12 +90,19 @@ const AccountVerificationPage: React.FC = () => {
                         variant="contained"
                         sx={{ mt: 1, mb: 2 }}
                     >
-                        Verification
+                        Sign In
                     </Button>
-                    <Grid item>
-                        <MuiLink component={RouterLink} to="/login" variant="body2">
-                            {"Do you have an account? Sign In"}
-                        </MuiLink>
+                    <Grid container>
+                        <Grid item xs>
+                            <Link href="#" variant="body2">
+                                Forgot password?
+                            </Link>
+                        </Grid>
+                        <Grid item>
+                            <MuiLink component={RouterLink} to="/verification" variant="body2">
+                                {"Account verification"}
+                            </MuiLink>
+                        </Grid>
                     </Grid>
                 </Box>
             </Box>
@@ -109,4 +110,4 @@ const AccountVerificationPage: React.FC = () => {
     );
 };
 
-export default AccountVerificationPage;
+export default LoginPage;
