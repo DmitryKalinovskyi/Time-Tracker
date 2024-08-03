@@ -65,6 +65,8 @@ public class UserMutation : ObjectGraphType
 
                 user.HashedPassword = hashingService.ComputeHash(input.Password, user.Salt);
 
+                user.IsActive = true;
+
                 await userRepository.UpdateAsync(user);
 
                 await activationCodeRepository.RemoveAsync(activationCode);
@@ -78,11 +80,16 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User with this id not found.");
+                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User not found.");
 
-                if (userInput.FullName is not null) user.FullName = userInput.FullName;
-                if (userInput.Email is not null) user.Email = userInput.Email;
-                if (userInput.RoleId is not null) user.RoleId = userInput.RoleId;
+                var emailCheckUser = userRepository.FindByEmail(userInput.Email);
+
+                if (emailCheckUser is not null && emailCheckUser.Id != userInput.Id) throw new ExecutionError("User with this email already exists.");
+
+                user.FullName = userInput.FullName;
+                user.Email = userInput.Email;
+                user.RoleId = userInput.RoleId;
+                user.IsActive = userInput.IsActive;
 
                 await userRepository.UpdateAsync(user);
 

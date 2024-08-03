@@ -39,9 +39,9 @@ namespace Time_Tracker.Repositories
         public async Task<int> AddAsync(User user)
         {
             string sql = $@"INSERT INTO Users 
-                            (FullName, Email) 
+                            (FullName, Email, IsActive) 
                             OUTPUT INSERTED.Id
-                            VALUES (@FullName, @Email)";
+                            VALUES (@FullName, @Email, @IsActive)";
 
             using var connection = new SqlConnection(_connectionString);
 
@@ -57,7 +57,8 @@ namespace Time_Tracker.Repositories
                             Email = @Email, 
                             RoleId = @RoleId, 
                             HashedPassword = @HashedPassword, 
-                            Salt = @Salt
+                            Salt = @Salt,
+                            IsActive = @IsActive
                             WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);
