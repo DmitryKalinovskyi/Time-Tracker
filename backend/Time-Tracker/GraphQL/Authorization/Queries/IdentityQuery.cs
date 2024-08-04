@@ -20,7 +20,7 @@ public class IdentityQuery : ObjectGraphType
 
             var user = usersRepository.FindByEmail(query.Email);
 
-            if (user == null) throw new ExecutionError("Wrong email or password.");
+            if (user is null || !user.IsActive) throw new ExecutionError("Wrong email or password.");
 
             if (hashingService.ComputeHash(query.Password, user.Salt) != user.HashedPassword)
                 throw new ExecutionError("Wrong email or password.");

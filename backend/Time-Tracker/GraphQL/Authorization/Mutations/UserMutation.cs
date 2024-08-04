@@ -17,7 +17,7 @@ public class UserMutation : ObjectGraphType
         HashingService hashingService)
     {
         Field<UserGraphType>("createUser")
-            .Argument<NonNullGraphType<UserInputGraphType>>("user")
+            .Argument<NonNullGraphType<CreateUserInputGraphType>>("user")
             .ResolveAsync(async context =>
             {
                 var userInput = context.GetArgument<User>("user");
@@ -65,11 +65,35 @@ public class UserMutation : ObjectGraphType
 
                 user.HashedPassword = hashingService.ComputeHash(input.Password, user.Salt);
 
+                user.IsActive = true;
+
                 await userRepository.UpdateAsync(user);
 
                 await activationCodeRepository.RemoveAsync(activationCode);
 
                 return "User activated successfully";
+            });
+
+        Field<StringGraphType>("updateUser")
+            .Argument<NonNullGraphType<UpdateUserInputGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                var userInput = context.GetArgument<User>("user");
+
+                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User not found.");
+
+                var emailCheckUser = userRepository.FindByEmail(userInput.Email);
+
+                if (emailCheckUser is not null && emailCheckUser.Id != userInput.Id) throw new ExecutionError("User with this email already exists.");
+
+                user.FullName = userInput.FullName;
+                user.Email = userInput.Email;
+                user.RoleId = userInput.RoleId;
+                user.IsActive = userInput.IsActive;
+
+                await userRepository.UpdateAsync(user);
+
+                return "User updated successfully";
             });
     }
 }

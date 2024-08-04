@@ -13,14 +13,15 @@ function isTokenExpired(token) {
 
 
 export default function useIsAuthenticated(){
-    const {auth} = useAuth();
+    const auth = useAuth();
+
     if(!auth.accessToken) return false;
 
-    if(isTokenExpired(auth.accessToken)){
-        // TODO: use refresh token to receive new access token.
-
-        return false;
-    }
+    // if(isTokenExpired(auth.accessToken)){
+    //     // TODO: use refresh token to receive new access token.
+    //
+    //     return false;
+    // }
 
     return true;
 }

@@ -9,30 +9,39 @@ import Grid from '@mui/material/Grid';
 import PersonIcon from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink } from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
+import {useDispatch} from "react-redux";
+import {authUser} from "../../features/authentification/authSlice.ts";
+import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
 
 
 const defaultTheme = createTheme();
 const LoginPage: React.FC = () => {
-    const [error, setError] = useState<string>('');
 
-    const handleSubmit = (event) => {
+    const [error, setError] = useState<string>('');
+    const isAuthenticated = useIsAuthenticated();
+    const dispatch = useDispatch();
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        if (data.get('email') != '' || data.get('password') != '') {
-            console.log({
-                email: data.get('email'),
-                password: data.get('password'),
-            });
-        }
+        const email = data.get('email')?.toString();
+        const password = data.get('password')?.toString();
 
-        if (data.get('email') === '' || data.get('password') === '') {
+        if (email === '' || password === '') {
             setError('Please fill in all fields');
             return;
         }
+
+        console.log({email, password});
+
+        dispatch(authUser({email: email ?? '', password: password ?? ''}))
     };
+
+    // if(isAuthenticated)
+    //     return <Navigate to={"/"}/>
 
     return (
         <ThemeProvider theme={defaultTheme}>

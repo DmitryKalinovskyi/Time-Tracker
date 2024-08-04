@@ -1,9 +1,12 @@
-﻿using Time_Tracker.Models;
+﻿using Microsoft.Identity.Client;
+using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
 {
     public interface IUsersRepository
     {
+        public Task<List<User>> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId);
+        public Task<int> GetTotalUsersCount();
         public User? Find(int id);    
 
         public User? FindByEmail(string email);
