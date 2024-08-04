@@ -1,5 +1,5 @@
 import LoginPage from "../pages/LoginPage.tsx";
-import RegisterPage from "../pages/RegisterPage.tsx";
+import CreateUserPage from "../pages/CreateUserPage.tsx";
 import AccountVerificationPage from "../pages/AccountVerificationPage.tsx";
 import HelloPage from "../pages/HelloPage.tsx";
 import {Provider} from "react-redux";
@@ -15,7 +15,7 @@ const router = createBrowserRouter([
             {path: "/", element: <HelloPage/>},
             {path: "/hello", element: <HelloPage/>},
             { path: "/login", element: <LoginPage /> },
-            { path: "/register", element: <RegisterPage /> },
+            { path: "/create", element: <CreateUserPage /> },
             { path: "/verification", element: <AccountVerificationPage /> },
         ]
     }
