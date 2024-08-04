@@ -1,6 +1,6 @@
-import LoginPage from "./ui/pages/LoginPage.tsx";
-import RegisterPage from "./ui/pages/RegisterPage.tsx";
-import AccountVerificationPage from "./ui/pages/AccountVerificationPage.tsx";
+import LoginPage from "../app/ui/pages/LoginPage.tsx";
+import CreateUserPage from "../app/ui/pages/CreateUserPage.tsx";
+import AccountVerificationPage from "../app/ui/pages/AccountVerificationPage.tsx";
 import {Provider} from "react-redux";
 import {store} from "./store.ts";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
         children: [
             { path: "/", element: <LoginPage /> },
             { path: "/login", element: <LoginPage /> },
-            { path: "/register", element: <RegisterPage /> },
+            { path: "/create", element: <CreateUserPage /> },
             { path: "/verification", element: <AccountVerificationPage /> },
         ]
     }
