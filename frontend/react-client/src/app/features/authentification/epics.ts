@@ -26,7 +26,7 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                         loading: false,
                         error: null
                     })),
-                    catchError((error: string) => of(authUserFailure(error)))
+                    catchError((error) => of(authUserFailure(error)))
                 )
         
             )

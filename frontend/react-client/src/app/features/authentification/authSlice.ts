@@ -49,11 +49,11 @@ const authSlice = createSlice({
             ));
         },
 
-        authUserFailure: (state, action: PayloadAction<string>) => {
+        authUserFailure: (state, action: PayloadAction<any>) => {
             console.log(`Error while authentification user: ${action.payload} `);
-
             state.accessToken = null;
             state.user = null;
+            state.error = action.payload.toString();
 
             localStorage.removeItem(AUTH_KEY_NAME);
         }

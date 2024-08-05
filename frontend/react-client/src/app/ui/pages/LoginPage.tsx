@@ -14,12 +14,14 @@ import { Link as MuiLink } from '@mui/material';
 import {useDispatch} from "react-redux";
 import {authUser} from "../../features/authentification/authSlice.ts";
 import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
+import useAuth from "../../hooks/useAuth.ts";
 
 
 const defaultTheme = createTheme();
 const LoginPage: React.FC = () => {
 
     const [error, setError] = useState<string>('');
+    const auth = useAuth();
     const isAuthenticated = useIsAuthenticated();
     const dispatch = useDispatch();
 
@@ -81,6 +83,9 @@ const LoginPage: React.FC = () => {
                     />
                     <Typography color="error">
                         {error}
+                    </Typography>
+                    <Typography color="error">
+                        {auth.error}
                     </Typography>
                     <Button
                         type="submit"
