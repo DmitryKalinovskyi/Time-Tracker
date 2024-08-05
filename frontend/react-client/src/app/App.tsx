@@ -5,13 +5,15 @@ import {Provider} from "react-redux";
 import {store} from "./store.ts";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
+import HomePage from "./ui/pages/HomePage.tsx";
 
 const router = createBrowserRouter([
     {
         path: '/',
         errorElement: <NotFoundPage/>,
         children: [
-            { path: "/", element: <LoginPage /> },
+            { path: "/", element: <HomePage /> },
+            { path: "/home", element: <HomePage /> },
             { path: "/login", element: <LoginPage /> },
             { path: "/create", element: <CreateUserPage /> },
             { path: "/verification", element: <AccountVerificationPage /> },

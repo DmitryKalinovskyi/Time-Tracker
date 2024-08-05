@@ -14,7 +14,6 @@ function isTokenExpired(token) {
 
 export default function useIsAuthenticated(){
     const auth = useAuth();
-
     if(!auth.accessToken) return false;
 
     // if(isTokenExpired(auth.accessToken)){

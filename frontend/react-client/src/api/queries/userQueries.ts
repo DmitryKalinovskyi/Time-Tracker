@@ -1,3 +1,15 @@
+import User from "../../app/types/User.ts";
+
+export interface authUserQueryResponse{
+  identityQuery: {
+    login: {
+      accessToken: {
+        value: string
+      },
+      user: User
+    }
+  }
+}
 export const authUserQuery = (
     email: string, 
     password: string, 
