@@ -1,14 +1,8 @@
 import useAuth from "./useAuth.ts";
-import {jwtDecode} from "jwt-decode";
+import Token from "../types/Token.ts";
 
-function isTokenExpired(token) {
-    try {
-        const decoded = jwtDecode(token);
-        const currentTime = Date.now() / 1000; // Current time in seconds
-        return decoded.exp < currentTime;
-    } catch (e) {
-        return true; // Treat as expired if decoding fails
-    }
+function isTokenExpired(token: Token) {
+    return new Date(token.dateExpires) < Date.now()
 }
 
 
@@ -16,11 +10,11 @@ export default function useIsAuthenticated(){
     const auth = useAuth();
     if(!auth.accessToken) return false;
 
-    // if(isTokenExpired(auth.accessToken)){
-    //     // TODO: use refresh token to receive new access token.
-    //
-    //     return false;
-    // }
+    if(isTokenExpired(auth.accessToken)){
+        // TODO: use refresh token to receive new access token.
+
+        return false;
+    }
 
     return true;
 }

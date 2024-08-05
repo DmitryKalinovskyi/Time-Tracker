@@ -13,10 +13,15 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
         from(
             ajax(createRequest(authUserQuery(action.payload.email, action.payload.password)))
                 .pipe(
-                    map((ajaxResponse: any) => ajaxResponse.response.data),
+                    map((ajaxResponse) => ajaxResponse.response.data),
                     // tap(data => console.log(data)),
                     map((data: authUserQueryResponse) => authUserSuccess({
-                        accessToken : data.identityQuery.login.accessToken.value,
+                        accessToken: data.identityQuery.login.accessToken,
+                        // accessToken : {
+                        //     value: data.identityQuery.login.accessToken.value,
+                        //     dateIssued: new Date(data.identityQuery.login.accessToken.dateIssued),
+                        //     dateExpires: new Date(data.identityQuery.login.accessToken.dateExpires),
+                        // },
                         user: data.identityQuery.login.user,
                         loading: false,
                         error: null

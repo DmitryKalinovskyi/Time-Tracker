@@ -35,8 +35,6 @@ const LoginPage: React.FC = () => {
             return;
         }
 
-        console.log({email, password});
-
         dispatch(authUser({email: email ?? '', password: password ?? ''}))
     };
 

@@ -4,7 +4,9 @@ export interface authUserQueryResponse{
   identityQuery: {
     login: {
       accessToken: {
-        value: string
+        value: string,
+        dateIssued: string,
+        dateExpires: string
       },
       user: User
     }
@@ -19,7 +21,9 @@ export const authUserQuery = (
                   identityQuery{
                     login(input: {email: "${email}", password: "${password}"}){
                       accessToken{
-                       value 
+                       value,
+                       dateIssued,
+                       dateExpires
                       },
                       user{
                         fullName,
