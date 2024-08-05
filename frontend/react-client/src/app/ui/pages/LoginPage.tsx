@@ -9,17 +9,19 @@ import Grid from '@mui/material/Grid';
 import PersonIcon from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, Navigate} from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
 import {useDispatch} from "react-redux";
 import {authUser} from "../../features/authentification/authSlice.ts";
 import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
+import useAuth from "../../hooks/useAuth.ts";
 
 
 const defaultTheme = createTheme();
 const LoginPage: React.FC = () => {
 
     const [error, setError] = useState<string>('');
+    const auth = useAuth();
     const isAuthenticated = useIsAuthenticated();
     const dispatch = useDispatch();
 
@@ -35,13 +37,11 @@ const LoginPage: React.FC = () => {
             return;
         }
 
-        console.log({email, password});
-
         dispatch(authUser({email: email ?? '', password: password ?? ''}))
     };
 
-    // if(isAuthenticated)
-    //     return <Navigate to={"/"}/>
+    if(isAuthenticated)
+        return <Navigate to={"/"}/>
 
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -83,6 +83,9 @@ const LoginPage: React.FC = () => {
                     />
                     <Typography color="error">
                         {error}
+                    </Typography>
+                    <Typography color="error">
+                        {auth.error}
                     </Typography>
                     <Button
                         type="submit"

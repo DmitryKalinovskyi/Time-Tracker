@@ -1,9 +1,10 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import User from "../../types/User.ts";
 import { AUTH_KEY_NAME } from "../../config.ts";
+import Token from "../../types/Token.ts";
 
 export interface AuthType {
-    accessToken: string | null,
+    accessToken: Token | null,
     user: User | null
     loading: boolean,
     error: string | null
@@ -14,13 +15,13 @@ export interface AuthPayload {
     password: string
 }
 
-const initialState: AuthType = 
+const initialState: AuthType = JSON.parse(localStorage[AUTH_KEY_NAME] ?? "null") ??
 {
-    accessToken: JSON.parse(localStorage[AUTH_KEY_NAME] ?? "{}"),
+    accessToken: null,
     user: null,
     loading: false,
     error: null
-}
+};
 
 const authSlice = createSlice({
     name: "AUTH",
@@ -41,15 +42,18 @@ const authSlice = createSlice({
 
             localStorage.setItem(AUTH_KEY_NAME, JSON.stringify({
                 accessToken: action.payload.accessToken,
-                user: action.payload.user}
+                user: action.payload.user,
+                loading: false,
+                error: null
+            }
             ));
         },
 
-        authUserFailure: (state, action: PayloadAction<string>) => {
+        authUserFailure: (state, action: PayloadAction<any>) => {
             console.log(`Error while authentification user: ${action.payload} `);
-
             state.accessToken = null;
             state.user = null;
+            state.error = action.payload.toString();
 
             localStorage.removeItem(AUTH_KEY_NAME);
         }
