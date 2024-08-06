@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User } from './userTypes';
+import User from '../../types/User.ts';
+
+export interface CreateUserPayload {
+    fullName: string;
+    email: string;
+    roleId?: number;
+}
 
 interface UserState {
     user: User | null;
@@ -58,6 +64,15 @@ const userSlice = createSlice({
     }
 });
 
-export const { createUserRequest, createUserSuccess, createUserFailure, clearError, clearCreateUserSuccess, verifyUserRequest, verifyUserSuccess, verifyUserFailure } = userSlice.actions;
+export const {
+    createUserRequest,
+    createUserSuccess,
+    createUserFailure,
+    clearError,
+    clearCreateUserSuccess,
+    verifyUserRequest,
+    verifyUserSuccess,
+    verifyUserFailure
+} = userSlice.actions;
 
 export default userSlice.reducer;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { verifyUserRequest } from '../../../state/user/userSlice.ts';
+import { verifyUserRequest } from '../../features/user/userSlice.ts';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
-import { RootState } from "../../../state/store.ts";
+import { RootState } from "../../store.ts";
 
 const defaultTheme = createTheme();
 
