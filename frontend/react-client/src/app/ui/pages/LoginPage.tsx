@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {useState} from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -12,32 +11,48 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {Link as RouterLink, Navigate} from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
 import {useDispatch} from "react-redux";
-import {authUser} from "../../features/authentification/authSlice.ts";
+import {authUser, authUserFailure} from "../../features/authentification/authSlice.ts";
 import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
 import useAuth from "../../hooks/useAuth.ts";
+import { useEffect, useState } from 'react';
 
 
 const defaultTheme = createTheme();
 const LoginPage: React.FC = () => {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
 
-    const [error, setError] = useState<string>('');
     const auth = useAuth();
     const isAuthenticated = useIsAuthenticated();
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        if (auth.success) {
+            setEmail('');
+            setPassword(''); 
+        }
+    }, [auth.success]);
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
 
-        const email = data.get('email')?.toString();
-        const password = data.get('password')?.toString();
-
-        if (email === '' || password === '') {
-            setError('Please fill in all fields');
+        // Email validation using RegExp
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+        // Check if email or password is missing
+        if (!email || !password) {
+            dispatch(authUserFailure('Please fill in all fields'));
             return;
         }
-
-        dispatch(authUser({email: email ?? '', password: password ?? ''}))
+    
+        // Check if the email is valid
+        if (!emailRegex.test(email)) {
+            dispatch(authUserFailure('Please enter a valid email address'));
+            return;
+        }
+    
+        // Dispatch the authUser action
+        dispatch(authUser({ email, password }));
     };
 
     if(isAuthenticated)
@@ -70,6 +85,8 @@ const LoginPage: React.FC = () => {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                     <TextField
                         margin="normal"
@@ -80,13 +97,16 @@ const LoginPage: React.FC = () => {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
-                    <Typography color="error">
-                        {error}
-                    </Typography>
-                    <Typography color="error">
-                        {auth.error}
-                    </Typography>
+                {(auth.success !== null) && 
+                <Typography
+                    color={auth.success !== false ? "success.main" : "error.main"}
+                    sx={{ width: '100%', textAlign: 'center' }}>
+                    {auth.success !== false ? 'Authenticated successfully!' : auth.error}
+                </Typography>
+                }
                     <Button
                         type="submit"
                         fullWidth

@@ -1,37 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Avatar, Button, TextField, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { clearError, clearCreateUserSuccess, createUserFailure, createUserRequest } from '../../../state/user/userSlice.ts';
-import { RootState } from '../../../state/store.ts';
+import { regUserFailure } from '../../features/registration/regSlice.ts';
+import { RootState } from '../../store.ts';
+import { regUserRequest } from '../../features/registration/regSlice.ts';
 
 const CreateUserPage: React.FC = () => {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
+
     const dispatch = useDispatch();
-    const { error, loading, createUserSuccess } = useSelector((state: RootState) => state.user);
+
+    const { error, loading, success } = useSelector((state: RootState) => state.reg);
+
+    useEffect(() => {
+        if (success) {
+            setFullName('');
+            setEmail(''); 
+        }
+    }, [success]);
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
-
+    
         if (fullName === '' || email === '') {
-            dispatch(clearError());
-            dispatch(createUserFailure('Please fill in all fields'));
+            dispatch(regUserFailure('Please fill in all fields'));
             return;
         }
-
-        dispatch(createUserRequest({ fullName, email }));
-    };
-
-    useEffect(() => {
-        if (createUserSuccess) {
-            setFullName('');
-            setEmail('');
-            setTimeout(() => {
-                dispatch(clearCreateUserSuccess());
-            }, 3000);
+    
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            dispatch(regUserFailure('Please enter a valid email address'));
+            return;
         }
-    }, [createUserSuccess, dispatch]);
+    
+        const nameParts = fullName.trim().split(' ');
+        const nameValidation = nameParts.every(name => /^[A-Z][a-z]*$/.test(name));
+        
+        if (!nameValidation) {
+            dispatch(regUserFailure('Each name must start with a capital letter'));
+            return;
+        }
+    
+        dispatch(regUserRequest({ fullName, email }));
+    };
 
     return (
         <Box
@@ -42,7 +55,7 @@ const CreateUserPage: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 maxWidth: '500px',
-                width: '100%'
+                width: '100%',
             }}
         >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -76,14 +89,14 @@ const CreateUserPage: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                {(error || createUserSuccess) && (
-                    <Typography
-                        color={createUserSuccess ? "success.main" : "error.main"}
-                        sx={{ width: '100%', textAlign: 'center' }}
-                    >
-                        {createUserSuccess ? 'User created successfully!' : error}
-                    </Typography>
-                )}
+                {(success !== null) && 
+                <Typography
+                    color={success !== false ? "success.main" : "error.main"}
+                    sx={{ width: '100%', textAlign: 'center' }}>
+                    {success !== false ? 'User created successfully!' : error}
+                </Typography>
+                }
+
                 <Button
                     type="submit"
                     fullWidth
