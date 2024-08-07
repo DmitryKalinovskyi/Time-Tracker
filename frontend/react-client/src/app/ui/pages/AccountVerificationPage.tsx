@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { verifyUserRequest } from '../../../state/user/userSlice.ts';
+import { verifUserRequest, verifUserFailure } from '../../features/verification/verifSlice.ts';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -12,62 +12,50 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
-import { RootState } from "../../../state/store.ts";
+import { RootState } from "../../store.ts";
 
 const defaultTheme = createTheme();
 
 const AccountVerificationPage: React.FC = () => {
-    const [error, setError] = useState<string>('');
+    const [code, setCode] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [repeatPassword, setRepeatPassword] = useState<string>('');
+    
     const dispatch = useDispatch();
-    const { verificationSuccess, loading, error: verifyError } = useSelector((state: RootState) => state.user);
+    const { error, loading, success } = useSelector((state: RootState) => state.verif);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
 
-        if (data.get('code') === '' || data.get('password') === '' || data.get('repeatPassword') === '') {
-            setError('Please fill in all fields');
+          // Define a regular expression for a strong password
+        const strongPasswordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/;
+
+
+        if (code === '' || password === '' || repeatPassword === '') {
+            dispatch(verifUserFailure('Please fill in all fields'));
             return;
         }
 
-        if (data.get('password') !== data.get('repeatPassword')) {
-            setError('Passwords do not match');
+        if (password !== repeatPassword) {
+            dispatch(verifUserFailure('Passwords do not match'));
             return;
         }
 
-        const verificationData = {
-            code: data.get('code'),
-            password: data.get('password')
-        };
+            if (!strongPasswordRegex.test(password)) {
+        dispatch(verifUserFailure('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character'));
+        return;
+    }
 
-        dispatch(verifyUserRequest(verificationData));
+        dispatch(verifUserRequest({code, password}));
     };
 
     useEffect(() => {
-        if (verifyError) {
-            setError(verifyError);
+        if (success) {
+            setCode('');
+            setPassword('');
+            setRepeatPassword(''); 
         }
-    }, [verifyError]);
-
-    useEffect(() => {
-        if (verificationSuccess) {
-            setError('');
-        }
-    }, [verificationSuccess]);
-
-    let message = '';
-    let messageColor: string = '';
-    let linkColor: string = '';
-
-    if (error) {
-        message = error;
-        messageColor = 'red';
-        linkColor = 'red';
-    } else if (verificationSuccess) {
-        message = 'Verification successful! You can now ';
-        messageColor = 'green';
-        linkColor = 'green';
-    }
+    }, [success]);
 
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -98,6 +86,8 @@ const AccountVerificationPage: React.FC = () => {
                         name="code"
                         autoComplete="code"
                         autoFocus
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
                     />
                     <TextField
                         margin="normal"
@@ -108,6 +98,8 @@ const AccountVerificationPage: React.FC = () => {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
                     <TextField
                         margin="normal"
@@ -118,27 +110,16 @@ const AccountVerificationPage: React.FC = () => {
                         type="password"
                         id="repeatPassword"
                         autoComplete="current-password"
+                        value={repeatPassword}
+                        onChange={(e) => setRepeatPassword(e.target.value)}
                     />
-                    {message && (
-                        <Typography sx={{ width: '100%', textAlign: 'center', color: messageColor }}>
-                            {message}
-                            {verificationSuccess && (
-                                <MuiLink
-                                    component={RouterLink}
-                                    to="/login"
-                                    sx={{
-                                        color: linkColor,
-                                        textDecoration: 'underline',
-                                        ':hover': {
-                                            textDecoration: 'none'
-                                        }
-                                    }}
-                                >
-                                    login
-                                </MuiLink>
-                            )}
+                    {(success !== null) && 
+                        <Typography
+                            color={success !== false ? "success.main" : "error.main"}
+                            sx={{ width: '100%', textAlign: 'center' }}>
+                            {success !== false ? 'Account activated successfully!' : error}
                         </Typography>
-                    )}
+                    }
                     <Button
                         type="submit"
                         fullWidth

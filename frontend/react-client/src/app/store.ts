@@ -2,12 +2,20 @@ import {combineEpics, createEpicMiddleware, Epic} from "redux-observable";
 import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 
 import authReducer from "./features/authentification/authSlice.ts";
-import { authUserEpic } from "./features/authentification/epics.ts";
+import regReducer from "./features/registration/regSlice.ts";
+import verifReducer  from "./features/verification/verifSlice.ts";
+
+import { authUserEpic } from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
+import { regUserEpic } from "./features/registration/regEpics.ts";
+import { verifUserEpic } from "./features/verification/verifEpics.ts";
+
 
 
 const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, void, any>(
-    authUserEpic
+    authUserEpic,
+    regUserEpic,
+    verifUserEpic
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, void, any>();
@@ -15,7 +23,9 @@ const epicMiddleware = createEpicMiddleware<Action, Action, void, any>();
 
 export const store = configureStore({
     reducer: {
-        auth: authReducer
+        auth: authReducer,
+        reg: regReducer,
+        verif: verifReducer
     },
     middleware: () => new Tuple(epicMiddleware)
 })

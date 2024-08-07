@@ -1,12 +1,12 @@
-import {API_URL, AUTH_KEY_NAME} from "../config";
-import {AuthType} from "../features/authentification/authSlice.ts";
+import {API_URL, ACCESS_TOKEN_KEY_NAME} from "../config";
+import Token from "../types/Token.ts";
 
 function getAccessToken() {
-  const auth: AuthType = JSON.parse(localStorage.getItem(AUTH_KEY_NAME));
-  return auth.accessToken?.value ?? "";
+  const accessToken: Token | null = JSON.parse(localStorage.getItem(ACCESS_TOKEN_KEY_NAME) ?? "null");
+  return accessToken?.value ?? "";
 }
 
-export const createQuery = (query: string, variables: object = {}) => ({
+export const createRequest = (query: string, variables: object = {}) => ({
   url: `${API_URL}/graphql`,
   method: 'POST',
   headers: {
@@ -15,20 +15,6 @@ export const createQuery = (query: string, variables: object = {}) => ({
   },
   body: {
     query,
-    variables
-  }
-});
-
-
-export const createMutation = (mutation: string, variables: object = {}) => ({
-  url: `${API_URL}/graphql`,
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${getAccessToken()}`
-  },
-  body: {
-    mutation,
     variables
   }
 });
