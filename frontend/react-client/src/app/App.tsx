@@ -6,6 +6,7 @@ import {store} from "./store.ts";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
 import HomePage from "./ui/pages/HomePage.tsx";
+import RoleManagementPage from "./ui/pages/RoleManagementPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
             { path: "/login", element: <LoginPage /> },
             { path: "/create", element: <CreateUserPage /> },
             { path: "/verification", element: <AccountVerificationPage /> },
+            { path: "/role/manage", element: <RoleManagementPage /> },
         ]
     }
 ])
