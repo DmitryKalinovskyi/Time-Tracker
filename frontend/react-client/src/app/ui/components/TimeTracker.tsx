@@ -29,14 +29,6 @@ const TimeTracker: React.FC = () => {
     setTimer(setInterval(() => setElapsedTime((prev) => prev + 1), 1000));
   };
 
-  const handlePause = () => {
-    setIsRunning(false);
-    if (timer) {
-      clearInterval(timer);
-      setTimer(null);
-    }
-  };
-
   const handleStop = () => {
     if (timer) {
       clearInterval(timer);
@@ -47,18 +39,17 @@ const TimeTracker: React.FC = () => {
       const newPeriod: Period = {
         id: periods.length + 1,
         actionName,
-        duration: elapsedTime,
+        duration: Math.floor((new Date().getTime() - startTime.getTime()) / 1000),
         startTime,
         endTime: new Date(),
       };
 
-      // Check if the last period has the same action name, if so, update its duration and end time
       if (periods.length > 0 && periods[periods.length - 1].actionName === actionName) {
         const updatedPeriods = [...periods];
         const lastPeriod = updatedPeriods.pop()!;
         updatedPeriods.push({
           ...lastPeriod,
-          duration: lastPeriod.duration + elapsedTime, // Accumulate the duration
+          duration: lastPeriod.duration + elapsedTime,
           endTime: newPeriod.endTime,
         });
         setPeriods(updatedPeriods);
@@ -68,7 +59,6 @@ const TimeTracker: React.FC = () => {
     }
 
     setIsRunning(false);
-    setElapsedTime(0); // Reset the timer display
   };
 
   const handleRemovePeriod = (id: number) => {
@@ -93,16 +83,13 @@ const TimeTracker: React.FC = () => {
         value={actionName}
         onChange={(e) => setActionName(e.target.value)}
         fullWidth
-        className="mb-4"
+        sx={{mb: 3}}
       />
       <div className="flex items-center space-x-4 mb-4">
         <Button variant="contained" color="primary" onClick={handleStart} disabled={isRunning}>
           Start
         </Button>
-        <Button variant="contained" color="secondary" onClick={handlePause} disabled={!isRunning}>
-          Pause
-        </Button>
-        <Button variant="contained" onClick={handleStop} disabled={!isRunning && !elapsedTime}>
+        <Button variant="contained" onClick={handleStop} disabled={!isRunning}>
           Stop
         </Button>
         <Typography variant="h6" className="ml-4 text-blue-800">

@@ -28,7 +28,7 @@ const Sidebar: React.FC = () => {
             { text: 'Settings', icon: <SettingsIcon /> },
           ].map((item, index) => (
             <ListItem button key={index} className="hover:bg-gray-700 transition duration-300 ease-in-out">
-              <ListItemIcon className="text-white">{item.icon}</ListItemIcon>
+              <ListItemIcon sx={{color: 'white'}}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItem>
           ))}
