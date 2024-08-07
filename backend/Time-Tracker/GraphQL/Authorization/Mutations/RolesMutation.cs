@@ -14,7 +14,7 @@ namespace Time_Tracker.GraphQL.Authorization.Mutations
         {
             Field<RoleType>("createRole")
                 .RequirePermission(Permissions.ManageRoles)
-                .Arguments(new QueryArgument<NonNullGraphType<RoleInputType>>() { Name = "role" })
+                .Argument<NonNullGraphType<CreateRoleInputType>>("role")
                 .Resolve(context =>
                 {
                     var roleId = rolesRepository.Insert(context.GetArgument<Role>("role"));
@@ -24,21 +24,19 @@ namespace Time_Tracker.GraphQL.Authorization.Mutations
 
             Field<RoleType>("updateRole")
                 .RequirePermission(Permissions.ManageRoles)
-                .Arguments(new QueryArgument<NonNullGraphType<RoleInputType>>() { Name = "role" },
-                    new QueryArgument<NonNullGraphType<IntGraphType>>() { Name = "id" })
+                .Argument<NonNullGraphType<UpdateRoleInputGraphType>>("role")
                 .Resolve(context =>
                 {
                     var role = context.GetArgument<Role>("role");
-                    var roleId = context.GetArgument<int>("id");
 
-                    rolesRepository.Update(roleId, role);
+                    rolesRepository.Update(role);
 
-                    return rolesRepository.Find(roleId);    
+                    return rolesRepository.Find(role.Id);    
                 });
 
             Field<StringGraphType>("deleteRole")
                 .RequirePermission(Permissions.ManageRoles)
-                .Arguments(new QueryArgument<NonNullGraphType<IntGraphType>>() { Name = "id" })
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .Resolve(context =>
                 {
                     var id = context.GetArgument<int>("id");
