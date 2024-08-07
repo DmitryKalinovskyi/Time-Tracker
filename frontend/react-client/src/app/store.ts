@@ -4,6 +4,7 @@ import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 import authReducer from "./features/authentification/authSlice.ts";
 import regReducer from "./features/registration/regSlice.ts";
 import verifReducer  from "./features/verification/verifSlice.ts";
+import rolesReducer  from "./features/roles/rolesSlice.ts";
 
 import { authUserEpic } from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,7 +26,8 @@ export const store = configureStore({
     reducer: {
         auth: authReducer,
         reg: regReducer,
-        verif: verifReducer
+        verif: verifReducer,
+        roles: rolesReducer
     },
     middleware: () => new Tuple(epicMiddleware)
 })

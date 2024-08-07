@@ -13,29 +13,23 @@ import {
     TableHead,
     TableRow
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import {useState} from "react";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store.ts";
+import Role from "../../types/Role.ts";
+import {addRole, removeRole, updateRole} from "../../features/roles/rolesSlice.ts";
 
 const defaultTheme = createTheme();
 
 const RoleManagementPage: React.FC = () => {
-    const [avaiblePermissions, setAvaiblePermissions] = useState([
-        "Manage Users",
-        "Manage Roles",
-    ])
+    const permissions = useSelector((state: RootState) => state.roles.permissions);
+    const roles = useSelector((state: RootState) => state.roles.roles);
+    const dispatch = useDispatch();
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [editRole, setEditRole] = useState<object>({name: "", permissions: []});
-    const [roles, setRoles] = useState(
-        [
-            {id: 1, name: "Role 1", permissions: ["Manage Users"]},
-            {id: 2, name: "Role 2", permissions: []},
-            {id: 3, name: "Role 3", permissions: []},
-            {id: 4, name: "Role 4", permissions: ["Manage Roles"]},
-        ]
-    )
+    const [editRole, setEditRole] = useState<Role|null>(null);
 
     function startEditRole(id: number){
         setEditModalOpen(true);
@@ -46,20 +40,13 @@ const RoleManagementPage: React.FC = () => {
         setEditModalOpen(false);
     }
 
-    function updateRole(role){
-        setRoles([...roles.filter(r => r.id != role.id), role]);
-        stopEditRole();
-    }
-
     function createNewRole(){
-        setRoles([...roles, {id: (Math.floor(Math.random() * 20000)), name: "New Role", permissions: []}]);
-    }
-
-    function deleteRole(id: number){
-        setRoles(roles.filter(r => r.id != id));
+        dispatch(addRole( {id: (Math.floor(Math.random() * 20000)), name: "New Role", permissions: []}))
     }
 
     function togglePermission(permission: string){
+        if(editRole == null) return;
+
         if(editRole.permissions.indexOf(permission) != -1){
             setEditRole({
                 ...editRole,
@@ -88,7 +75,7 @@ const RoleManagementPage: React.FC = () => {
                 </Button>
 
                 <TableContainer component={Paper} sx={{mt: 2}}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <Table sx={{ minWidth: 650 }}>
                         <TableHead>
                             <TableRow>
                                 <TableCell>Name</TableCell>
@@ -99,7 +86,7 @@ const RoleManagementPage: React.FC = () => {
                             {roles.map((role) => (
                                 <TableRow
                                     hover
-                                    key={role.name}
+                                    key={role.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
@@ -112,7 +99,7 @@ const RoleManagementPage: React.FC = () => {
                                         >Edit</Button>
                                         <Button variant="contained"
                                                 color="error"
-                                                onClick={() => deleteRole(role.id)}
+                                                onClick={() => dispatch(removeRole(role.id))}
                                         >Delete</Button>
                                     </TableCell>
                                 </TableRow>
@@ -120,7 +107,7 @@ const RoleManagementPage: React.FC = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-
+                {editRole &&
                 <Dialog
                     open={editModalOpen}
                     onClose={() => setEditModalOpen(false)}
@@ -130,7 +117,6 @@ const RoleManagementPage: React.FC = () => {
                         <TextField
                             value={editRole.name}
                             onChange={(e) => setEditRole({...editRole, name: e.target.value}) }
-                            autoFocus
                             required
                             label="Role name"
                             // variant="standard"
@@ -140,7 +126,7 @@ const RoleManagementPage: React.FC = () => {
                         <Divider sx={{my: 2}}/>
                         <Typography >Permissions</Typography>
                         <List>
-                            {avaiblePermissions.map((p, index) =>
+                            {permissions.map((p, index) =>
                             <ListItem sx={{px: 0}} key={index}>
                                 <ListItemText primary={p} />
                                 <Switch
@@ -153,13 +139,14 @@ const RoleManagementPage: React.FC = () => {
                         </List>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => updateRole(editRole)}>Update</Button>
+                        <Button onClick={() => {editRole && dispatch(updateRole(editRole)); stopEditRole();}}>
+                            Update
+                        </Button>
                         <Button onClick={() => stopEditRole()} color="error">Cancel</Button>
                     </DialogActions>
                 </Dialog>
+                }
             </Box>
-
-
         </ThemeProvider>
     );
 };
