@@ -7,7 +7,7 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
     {
         public PermissionsQuery()
         {
-            Field<NonNullGraphType<ListGraphType<StringGraphType>>>("avaiblePermissions")
+            Field<NonNullGraphType<ListGraphType<StringGraphType>>>("availablePermissions")
                 .Resolve(context => Permissions.GetAllPermissions());
         }
     }

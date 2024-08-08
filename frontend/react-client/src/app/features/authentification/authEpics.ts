@@ -11,9 +11,10 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(authUser.type),
     mergeMap((action: PayloadAction<AuthPayload>) =>
         from(
-            ajax(createRequest(authUserQuery(action.payload.email, action.payload.password), null))
+            ajax(createRequest(authUserQuery(action.payload.email, action.payload.password)))
                 .pipe(
                     map((ajaxResponse: any) => {
+                        console.log(ajaxResponse.data)
                         const errors = ajaxResponse.response.errors;
                         const data: authUserQueryResponse = ajaxResponse.response.data;
         

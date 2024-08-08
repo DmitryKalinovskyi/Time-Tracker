@@ -79,7 +79,7 @@ export const verifUserQuery = (
   const query = `
     mutation ActivateUser {
         userMutation {
-            activateUser(input: {code: "${code}" password: "${password}"})
+            activateUser(input: {code: "${code}", password: "${password}"})
         }
     }
 `;

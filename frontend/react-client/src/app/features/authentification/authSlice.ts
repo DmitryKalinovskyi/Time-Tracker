@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import User from "../../types/User.ts";
-import { AUTH_KEY_NAME } from "../../config.ts";
+import { ACCESS_TOKEN_KEY_NAME } from "../../config.ts";
 import Token from "../../types/Token.ts";
 
 export interface AuthType {
@@ -18,7 +18,7 @@ export interface AuthPayload {
 
 const initialState: AuthType =
 {
-    accessToken: JSON.parse(localStorage.getItem(AUTH_KEY_NAME) as string) ?? null,
+    accessToken: JSON.parse(localStorage.getItem(ACCESS_TOKEN_KEY_NAME) as string) ?? null,
     user: null,
     loading: false,
     error: null,
@@ -48,7 +48,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
 
-            localStorage.setItem(AUTH_KEY_NAME, JSON.stringify(
+            localStorage.setItem(ACCESS_TOKEN_KEY_NAME, JSON.stringify(
                 action.payload.accessToken
             ));
         },
@@ -62,7 +62,7 @@ const authSlice = createSlice({
             state.success = false;
             state.loading = false;
             
-            localStorage.removeItem(AUTH_KEY_NAME);
+            localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
         }
     }
 })

@@ -6,5 +6,7 @@ export default function useIsHavePermission(permission: string){
     const auth = useAuth();
 
     if(!isAuthenticated) return false;
-    return auth.permissions.filter(p => p === permission).length > 0;
+
+    const permissions =  auth.user?.role?.permissions ?? [];
+    return permissions.filter(p => p === permission).length > 0;
 }
