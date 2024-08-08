@@ -18,7 +18,7 @@ export interface AuthPayload {
 
 const initialState: AuthType =
 {
-    accessToken: JSON.parse(localStorage[ACCESS_TOKEN_KEY_NAME] ?? "null"),
+    accessToken: JSON.parse(localStorage.getItem(ACCESS_TOKEN_KEY_NAME) as string) ?? null,
     user: null,
     loading: false,
     error: null,
