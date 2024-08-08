@@ -1,19 +1,25 @@
 import Role from "../../app/types/Role.ts";
 
-export interface getRolesResponse{
+export interface getRolesAndPermissionsResponse{
     rolesQuery:{
         roles: Role[]
+    },
+    permissionsQuery: {
+        availablePermissions: string[]
     }
 }
 
-export const getRolesQuery = () => `
-query GetRoles{
+export const getRolesAndPermissionsQuery = () => `
+query GetRolesAndPermissions{
   rolesQuery{
     roles{
       id,
       name,
       permissions
     }
+  },
+  permissionsQuery{
+    availablePermissions
   }
 }`
 
@@ -27,21 +33,18 @@ export interface createRoleResponse{
     }
 }
 
-export const createRoleQuery = (role: Role
-) => `
-    mutation CreateRole{
-      rolesMutation{
-        createRole(role: {
-          name: "${role.name}",
-          permissions: [${role.permissions}]
-        }){
-          id,
-          name,
-          permissions
-        }
-      }
+export const createRoleQuery =
+() => `
+mutation CreateRole($role: CreateRoleInputType!){
+  rolesMutation{
+    createRole(role: $role){
+      id,
+      name,
+      permissions
     }
-    `;
+  }
+}
+`;
 
 export interface updateRoleResponse{
     rolesMutation: {
@@ -53,15 +56,10 @@ export interface updateRoleResponse{
     }
 }
 
-export const updateRoleQuery = (role: Role
-) => `
-    mutation UpdateRole{
+export const updateRoleQuery = () => `
+  mutation UpdateRole($role: UpdateRoleInput!){
       rolesMutation{
-          updateRole(role:{
-            id: ${role.id},
-            name: "${role.name}",
-            permissions: [${role.permissions}]
-          }){
+          updateRole(role: $role){
             id,
             name,
             permissions

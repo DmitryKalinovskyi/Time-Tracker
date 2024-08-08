@@ -15,22 +15,27 @@ import {
 import Role from "../../types/Role.ts";
 import {
     createRoleQuery,
-    createRoleResponse, deleteRoleQuery, deleteRoleResponse, getRolesQuery, getRolesResponse,
+    createRoleResponse,
+    deleteRoleQuery,
+    deleteRoleResponse,
+    getRolesAndPermissionsQuery,
+    getRolesAndPermissionsResponse,
     updateRoleQuery,
     updateRoleResponse
 } from "../../../api/queries/roleQueries.ts";
 
 export const getRolesEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(getRoles.type),
-    mergeMap((action: PayloadAction<null>) =>
+    mergeMap((action: PayloadAction) =>
         from(
-            ajax(createRequest(getRolesQuery()))
+            ajax(createRequest(getRolesAndPermissionsQuery()))
                 .pipe(
                     map((ajaxResponse: any) => {
-                        const data: getRolesResponse = ajaxResponse.response.data;
+                        const data: getRolesAndPermissionsResponse = ajaxResponse.response.data;
 
-                        if (data && data.rolesQuery && data.rolesQuery.roles) {
-                            return getRolesSuccess(data.rolesQuery.roles);
+                        if (data && data.rolesQuery && data.rolesQuery.roles
+                            && data.permissionsQuery && data.permissionsQuery.availablePermissions) {
+                            return getRolesSuccess({roles: data.rolesQuery.roles, permissions: data.permissionsQuery.availablePermissions});
                         } else {
                             throw new Error('[ROLES] Unexpected response format');
                         }
@@ -52,9 +57,9 @@ export const getRolesEpic = (action$: Observable<Action>) => action$.pipe(
 
 export const addRoleEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(addRole.type),
-    mergeMap((action: PayloadAction<Role>) =>
+    mergeMap((action: PayloadAction<{ name: string, permissions: string[]}>) =>
         from(
-            ajax(createRequest(createRoleQuery(action.payload)))
+            ajax(createRequest(createRoleQuery(), {role: {name: action.payload.name, permissions: action.payload.permissions}}))
             .pipe(
                 map((ajaxResponse: any) => {
                     const data: createRoleResponse = ajaxResponse.response.data;
@@ -66,6 +71,7 @@ export const addRoleEpic = (action$: Observable<Action>) => action$.pipe(
                     }
                 }),
                 catchError((error) => {
+                    console.log(error)
                         const errors = error.response.errors;
                         if (errors && errors.length > 0) {
                             if(errors[0].extensions.code == "auth-required")
@@ -84,11 +90,10 @@ export const updateRoleEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(updateRole.type),
     mergeMap((action: PayloadAction<Role>) =>
         from(
-            ajax(createRequest(updateRoleQuery(action.payload)))
+            ajax(createRequest(updateRoleQuery(), {role: action.payload}))
                 .pipe(
                     map((ajaxResponse: any) => {
                         const data: updateRoleResponse = ajaxResponse.response.data;
-                        console.log(data);
                         if (data && data.rolesMutation && data.rolesMutation.updateRole) {
                             return updateRoleSuccess(data.rolesMutation.updateRole);
                         } else {

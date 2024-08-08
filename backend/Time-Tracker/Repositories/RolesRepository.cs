@@ -60,7 +60,7 @@ namespace Time_Tracker.Repositories
             var sql = "UPDATE Roles SET Name=@roleName, PERMISSIONS=@rolePermissions WHERE Roles.Id = @roleId";
 
             using var connection = new SqlConnection(_connectionString);
-            connection.Execute(sql, new { role.Id, roleName = role.Name, rolePermissions = string.Join(" ", role.Permissions) });
+            connection.Execute(sql, new { roleId = role.Id, roleName = role.Name, rolePermissions = string.Join(" ", role.Permissions) });
         }
 
         public List<Role> GetRoles()

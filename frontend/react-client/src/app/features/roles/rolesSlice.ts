@@ -3,7 +3,7 @@ import Role from "../../types/Role.ts";
 
 const initialState = {
     roles: [],
-    permissions: ["MANAGE_USERS", "MANAGE_ROLES"],
+    permissions: [],
     errors: []
 };
 
@@ -12,12 +12,13 @@ const rolesSlice = createSlice({
     initialState,
     reducers: {
         getRoles: (state, action: PayloadAction) => {},
-        addRole: (state, action: PayloadAction<Role>) => {},
+        addRole: (state, action: PayloadAction<{name: string, permissions: string[] }>) => {},
         updateRole: (state, action: PayloadAction<Role>) => {},
-        removeRole: (state, action: PayloadAction<Role>) => {},
+        removeRole: (state, action: PayloadAction<number>) => {},
 
-        getRolesSuccess: (state, action: PayloadAction<Role[]>) => {
-            state.roles = action.payload;
+        getRolesSuccess: (state, action: PayloadAction<{roles: Role[], permissions: string[]}>) => {
+            state.roles = action.payload.roles;
+            state.permissions = action.payload.permissions;
         },
         addRoleSuccess: (state, action: PayloadAction<Role>) => {
             state.roles.push(action.payload);

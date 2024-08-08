@@ -50,7 +50,7 @@ const RoleManagementPage: React.FC = () => {
     }
 
     function createNewRole(){
-        dispatch(addRole( {id: (Math.floor(Math.random() * 20000)), name: "New Role", permissions: []}))
+        dispatch(addRole( {name: "New Role", permissions: []}))
     }
 
     function togglePermission(permission: string){
