@@ -1,4 +1,22 @@
 import Role from "../../app/types/Role.ts";
+
+export interface getRolesResponse{
+    rolesQuery:{
+        roles: Role[]
+    }
+}
+
+export const getRolesQuery = () => `
+query GetRoles{
+  rolesQuery{
+    roles{
+      id,
+      name,
+      permissions
+    }
+  }
+}`
+
 export interface createRoleResponse{
     rolesMutation: {
         createRole: {
@@ -15,7 +33,7 @@ export const createRoleQuery = (role: Role
       rolesMutation{
         createRole(role: {
           name: "${role.name}",
-          permissions: ${role.permissions}
+          permissions: [${role.permissions}]
         }){
           id,
           name,
@@ -42,7 +60,7 @@ export const updateRoleQuery = (role: Role
           updateRole(role:{
             id: ${role.id},
             name: "${role.name}",
-            permissions: ${role.permissions}
+            permissions: [${role.permissions}]
           }){
             id,
             name,

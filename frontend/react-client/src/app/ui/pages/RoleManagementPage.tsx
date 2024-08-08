@@ -14,22 +14,31 @@ import {
     TableRow
 } from "@mui/material";
 import Button from "@mui/material/Button";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.ts";
 import Role from "../../types/Role.ts";
-import {addRole, removeRole, updateRole} from "../../features/roles/rolesSlice.ts";
+import {addRole, getRoles, removeRole, updateRole} from "../../features/roles/rolesSlice.ts";
 
 const defaultTheme = createTheme();
 
 const RoleManagementPage: React.FC = () => {
     const permissions = useSelector((state: RootState) => state.roles.permissions);
     const roles = useSelector((state: RootState) => state.roles.roles);
+    const errors = useSelector((state: RootState) => state.roles.errors);
     const dispatch = useDispatch();
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editRole, setEditRole] = useState<Role|null>(null);
+
+    useEffect(() => {
+        dispatch(getRoles())
+    }, [dispatch]);
+
+    useEffect(() => {
+        console.log(errors);
+    }, [errors]);
 
     function startEditRole(id: number){
         setEditModalOpen(true);
