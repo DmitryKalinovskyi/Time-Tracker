@@ -39,26 +39,15 @@ const TimeTracker: React.FC = () => {
       const newPeriod: Period = {
         id: periods.length + 1,
         actionName,
-        duration: Math.floor((new Date().getTime() - startTime.getTime()) / 1000),
+        duration: elapsedTime,
         startTime,
         endTime: new Date(),
       };
-
-      if (periods.length > 0 && periods[periods.length - 1].actionName === actionName) {
-        const updatedPeriods = [...periods];
-        const lastPeriod = updatedPeriods.pop()!;
-        updatedPeriods.push({
-          ...lastPeriod,
-          duration: lastPeriod.duration + elapsedTime,
-          endTime: newPeriod.endTime,
-        });
-        setPeriods(updatedPeriods);
-      } else {
-        setPeriods([...periods, newPeriod]);
-      }
+      setPeriods([newPeriod, ...periods]);
     }
 
     setIsRunning(false);
+    setElapsedTime(0);
   };
 
   const handleRemovePeriod = (id: number) => {
@@ -66,6 +55,7 @@ const TimeTracker: React.FC = () => {
   };
 
   const formatTime = (seconds: number) => {
+    console.log(seconds);
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
@@ -81,6 +71,7 @@ const TimeTracker: React.FC = () => {
         label="Action Name"
         variant="outlined"
         value={actionName}
+        disabled={isRunning}
         onChange={(e) => setActionName(e.target.value)}
         fullWidth
         sx={{mb: 3}}
@@ -89,7 +80,7 @@ const TimeTracker: React.FC = () => {
         <Button variant="contained" color="primary" onClick={handleStart} disabled={isRunning}>
           Start
         </Button>
-        <Button variant="contained" onClick={handleStop} disabled={!isRunning}>
+        <Button variant="contained" onClick={handleStop} disabled={ !isRunning || elapsedTime < 1}>
           Stop
         </Button>
         <Typography variant="h6" className="ml-4 text-blue-800">
