@@ -1,7 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Net;
 
-namespace Time_Tracker.Services;
+namespace Time_Tracker.Services.Mail;
 
 public class EmailService : IEmailService
 {
@@ -19,8 +19,6 @@ public class EmailService : IEmailService
     }
     public async Task SendEmail(MailMessage mailMessage)
     {
-        mailMessage.From = new MailAddress(_userName);
-
         var smtpClient = new SmtpClient(_host)
         {
             Port = 587,

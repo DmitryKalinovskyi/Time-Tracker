@@ -13,7 +13,7 @@ public class UserMutation : ObjectGraphType
 {
     public UserMutation(IUsersRepository userRepository,
         IActivationCodeRepository activationCodeRepository,
-        IEmailService emailService,
+        EmailSender emailSender,
         HashingService hashingService)
     {
         Field<UserGraphType>("createUser")
@@ -37,12 +37,7 @@ public class UserMutation : ObjectGraphType
 
                 if (user == null) throw new ExecutionError("User not found.");
 
-                MailMessage message = new MailMessage();
-                message.To.Add(user.Email);
-                message.Subject = "TimeTracker activation code";
-                message.Body = @$"TimeTracker activation code for your account: {code.Value}";
-
-                await emailService.SendEmail(message);
+                await emailSender.SendActivationCodeAsync(user.Email, code.Value.ToString());
 
                 return user;
             });
