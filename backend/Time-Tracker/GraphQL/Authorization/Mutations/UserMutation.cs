@@ -88,7 +88,6 @@ public class UserMutation : ObjectGraphType
 
                 user.FullName = userInput.FullName;
                 user.Email = userInput.Email;
-                user.RoleId = userInput.RoleId;
                 user.IsActive = userInput.IsActive;
 
                 await userRepository.UpdateAsync(user);

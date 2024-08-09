@@ -37,7 +37,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<TokenService>();
 
-builder.Services.AddSingleton<IRolesRepository, RolesRepository>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 builder.Services.AddSingleton<IActivationCodeRepository, ActivationCodeRepository>();
 
