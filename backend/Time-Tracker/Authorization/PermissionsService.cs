@@ -8,7 +8,7 @@ namespace Time_Tracker.Authorization
     {
         public List<string> GetPermissions(int userId)
         {
-            var user = usersRepository.Find(userId);
+            var user = usersRepository.FindAsync(userId).Result;
 
             return user?.Permissions ?? [];
         }

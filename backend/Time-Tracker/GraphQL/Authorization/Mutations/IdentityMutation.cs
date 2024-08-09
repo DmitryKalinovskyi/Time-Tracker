@@ -19,7 +19,7 @@ public class IdentityMutation : ObjectGraphType
         {
             LoginRequestDto query = context.GetArgument<LoginRequestDto>("input");
 
-            var user = usersRepository.FindByEmail(query.Email);
+            var user = await usersRepository.FindByEmailAsync(query.Email);
 
             if (user is null || !user.IsActive) throw new ExecutionError("Wrong email or password.");
 
@@ -50,7 +50,7 @@ public class IdentityMutation : ObjectGraphType
                     return new RefreshTokenResponseDto(null, null);
                 }
 
-                var user = usersRepository.Find((int)userId);
+                var user = await usersRepository.FindAsync((int)userId);
                 if(user == null 
                 || user.RefreshToken == null
                 || user.RefreshTokenDateExpires == null 
