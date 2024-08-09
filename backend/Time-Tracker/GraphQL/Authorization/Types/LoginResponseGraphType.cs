@@ -9,8 +9,9 @@ public class LoginResponseGraphType : ObjectGraphType<LoginResponseDto>
 {
     public LoginResponseGraphType(IUsersRepository usersRepository)
     {
-        Field(l => l.UserId, nullable: false);
+        Field(l => l.UserId);
         Field(l => l.AccessToken, nullable: true, type: typeof(TokenGraphType));
+        Field(l => l.RefreshToken, nullable: true, type: typeof(TokenGraphType));
         Field<NonNullGraphType<UserGraphType>>("user")
             .Resolve(context => usersRepository.Find(context.Source.UserId));
     }

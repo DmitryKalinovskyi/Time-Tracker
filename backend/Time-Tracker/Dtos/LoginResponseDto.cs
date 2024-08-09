@@ -2,4 +2,4 @@
 
 namespace Time_Tracker.Dtos;
 
-public record LoginResponseDto(int UserId, TokenDto AccessToken);
+public record LoginResponseDto(int UserId, TokenDto AccessToken, TokenDto RefreshToken);
