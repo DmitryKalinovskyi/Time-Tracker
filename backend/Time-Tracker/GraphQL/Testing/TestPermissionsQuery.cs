@@ -10,8 +10,8 @@ namespace Time_Tracker.GraphQL.Testing
         public TestPermissionsQuery()
         {
             Field<StringGraphType>("test")
-                .AuthorizeWithPolicy("pol1")
-                //.RequirePermission(Permissions.ManageUsers)
+                .Authorize()
+                .RequirePermission(Permissions.ManageUsers)
                 .Resolve((context) => "ok");
         }
     }
