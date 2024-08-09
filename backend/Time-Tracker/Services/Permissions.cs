@@ -2,9 +2,8 @@
 {
     public static class Permissions
     {
-        public const string ManageUsers = "MANAGE_USERS";
-        public const string ReadTestQuery = "READ_TEST_QUERY";
-        public const string ManageRoles = "MANAGE_ROLES";
+        public const string ManageUsers = "ManageUsers";
+        public const string ManageUsersPermissions = "ManageUsersPermissions";
 
         public static List<string> GetAllPermissions()
         {

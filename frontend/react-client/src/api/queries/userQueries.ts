@@ -4,7 +4,6 @@ export interface authUserQueryResponse{
   identityQuery: {
     login: {
       accessToken: Token,
-      user: User
     }
   }
 }
@@ -27,16 +26,7 @@ export const authUserQuery = (
                        value,
                        dateIssued,
                        dateExpires
-                      },
-                      user{
-                        fullName,
-                        email,
-                        role{
-                          id,
-                          name,
-                          permissions
-                        }
-                      }
+                      }, userId
                     }
                 }
             }
@@ -57,12 +47,7 @@ export const regUserQuery = (
                 id
                 fullName
                 email
-                roleId
-                role {
-                  id
-                  name
-                  permissions
-                }
+                permissions
               }
               }
           }

@@ -10,6 +10,52 @@ namespace Time_Tracker.Repositories
 {
     public class UsersRepository : IUsersRepository
     {
+        private class DBUser
+        {
+            public int Id { get; set; }
+
+            public string FullName { get; set; }
+
+            public string Email { get; set; }
+
+            public string HashedPassword { get; set; }
+
+            public string Salt { get; set; }
+
+            public bool IsActive { get; set; } = false;
+
+            public string? Permissions { get; set; }
+
+            public static User Deserialize(DBUser dbUser)
+            {
+                return new User
+                {
+                    Id = dbUser.Id,
+                    FullName = dbUser.FullName,
+                    Email = dbUser.Email,
+                    HashedPassword = dbUser.HashedPassword,
+                    Salt = dbUser.Salt,
+                    IsActive = dbUser.IsActive,
+                    Permissions = dbUser.Permissions?.Split(" ").ToList() ?? []
+                };
+            }
+
+            public static DBUser Serialize(User user)
+            {
+                return new DBUser
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    HashedPassword = user.HashedPassword,
+                    Salt = user.Salt,
+                    IsActive = user.IsActive,
+                    Permissions = string.Join(" ", user.Permissions)
+                };
+            }
+        }
+
+
         private string _connectionString;
 
         public UsersRepository(IConfiguration configuration)
@@ -41,8 +87,8 @@ namespace Time_Tracker.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var users = await connection.QueryAsync<User>(sql.ToString(), new { topCount = first ?? last ?? 10, afterId, beforeId }); // Default to 10 if neither first nor last is provided
-                return users.AsList();
+                var dbUsers = await connection.QueryAsync<DBUser>(sql.ToString(), new { topCount = first ?? last ?? 10, afterId, beforeId }); // Default to 10 if neither first nor last is provided
+                return dbUsers.Select(DBUser.Deserialize).AsList();
             }
         }
 
@@ -66,7 +112,9 @@ namespace Time_Tracker.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                return connection.QueryFirstOrDefault<User>(sql, new { userId });
+                var dbUser = connection.QueryFirstOrDefault<DBUser>(sql, new { userId });
+                if (dbUser == null) return null;
+                return DBUser.Deserialize(dbUser);
             }
         }
 
@@ -76,7 +124,9 @@ namespace Time_Tracker.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                return connection.QueryFirstOrDefault<User>(sql, new { email });
+                var dbUser = connection.QueryFirstOrDefault<DBUser>(sql, new { email });
+                if (dbUser == null) return null;
+                return DBUser.Deserialize(dbUser);
             }
         }
 
@@ -96,25 +146,25 @@ namespace Time_Tracker.Repositories
 
         public async Task UpdateAsync(User user)
         {
+            var dbUser = DBUser.Serialize(user);
+
             string query = $@"UPDATE Users SET 
                             FullName = @FullName, 
                             Email = @Email, 
-                            RoleId = @RoleId, 
                             HashedPassword = @HashedPassword, 
                             Salt = @Salt,
-                            IsActive = @IsActive
+                            IsActive = @IsActive,
+                            Permissions = @Permissions
                             WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);
 
-            await connection.ExecuteAsync(query, user);
+            await connection.ExecuteAsync(query, dbUser);
         }
 
         public async Task DeleteAsync(int userId)
         {
             throw new NotImplementedException();
         }
-
-
     }
 }

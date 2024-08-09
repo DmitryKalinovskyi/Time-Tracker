@@ -12,8 +12,8 @@
 
         public string Salt { get; set; }
 
-        public int? RoleId { get; set; } 
-
         public bool IsActive { get; set; } = false;
+
+        public required List<string> Permissions { get; set; }
     }
 }

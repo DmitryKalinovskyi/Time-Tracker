@@ -4,24 +4,18 @@ import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 import authReducer from "./features/authentification/authSlice.ts";
 import regReducer from "./features/registration/regSlice.ts";
 import verifReducer  from "./features/verification/verifSlice.ts";
-import rolesReducer from "./features/roles/rolesSlice.ts";
 
 import { authUserEpic } from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
-import {addRoleEpic, deleteRoleEpic, getRolesEpic, updateRoleEpic} from "./features/roles/rolesEpics.ts";
 
 
 
 const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, void, any>(
-    getRolesEpic,
     authUserEpic,
     regUserEpic,
     verifUserEpic,
-    addRoleEpic,
-    updateRoleEpic,
-    deleteRoleEpic
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, void, any>();
@@ -32,7 +26,6 @@ export const store = configureStore({
         auth: authReducer,
         reg: regReducer,
         verif: verifReducer,
-        roles: rolesReducer
     },
     middleware: () => new Tuple(epicMiddleware)
 })
