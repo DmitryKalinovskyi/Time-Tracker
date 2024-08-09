@@ -2,10 +2,10 @@
 {
     public interface IPermissionsService
     {
-        public bool HasRequiredPermissions(int userId, List<string> permissions);
+        public Task<bool> HasRequiredPermissions(int userId, List<string> permissions);
 
-        public bool HasRequiredPermission(int userId, string permissions);
+        public Task<bool> HasRequiredPermission(int userId, string permissions);
 
-        public List<string> GetPermissions(int userId);
+        public Task<List<string>> GetPermissions(int userId);
     }
 }

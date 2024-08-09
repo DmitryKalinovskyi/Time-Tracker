@@ -6,21 +6,21 @@ namespace Time_Tracker.Authorization
 {
     public class PermissionsService(IUsersRepository usersRepository) : IPermissionsService
     {
-        public List<string> GetPermissions(int userId)
+        public async Task<List<string>> GetPermissions(int userId)
         {
-            var user = usersRepository.FindAsync(userId).Result;
+            var user = await usersRepository.FindAsync(userId);
 
             return user?.Permissions ?? [];
         }
 
-        public bool HasRequiredPermission(int userId, string permission)
+        public async Task<bool> HasRequiredPermission(int userId, string permission)
         {
-            return GetPermissions(userId).Contains(permission);
+            return (await GetPermissions(userId)).Contains(permission);
         }
 
-        public bool HasRequiredPermissions(int userId, List<string> permissions)
+        public async Task<bool> HasRequiredPermissions(int userId, List<string> permissions)
         {
-            var userPermissions = GetPermissions(userId);
+            var userPermissions = await GetPermissions(userId);
 
             foreach (var permission in permissions)
                 if (!userPermissions.Contains(permission)) return false;
