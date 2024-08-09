@@ -1,7 +1,9 @@
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Time_Tracker.Authorization;
 using Time_Tracker.GraphQL;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
@@ -46,6 +48,7 @@ builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<EmailSender>();
 
 builder.Services.AddSingleton<HashingService>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 
 // Configure GraphQL
 builder.Services.AddGraphQL(b => b
@@ -54,7 +57,12 @@ builder.Services.AddGraphQL(b => b
     .AddAuthorizationRule()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = true)
     .AddGraphTypes(typeof(RootSchema).Assembly)
-);
+).AddAuthorization(options =>
+{
+    foreach (var permission in Permissions.GetAllPermissions())
+        options.AddPolicy(permission, p => p.AddRequirements(new PermissionRequirement(permission)));
+});
+
 
 var app = builder.Build();
 

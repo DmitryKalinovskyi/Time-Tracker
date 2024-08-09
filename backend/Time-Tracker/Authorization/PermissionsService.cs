@@ -2,7 +2,7 @@
 using System.Security;
 using Time_Tracker.Repositories;
 
-namespace Time_Tracker.Services
+namespace Time_Tracker.Authorization
 {
     public class PermissionsService(IUsersRepository usersRepository) : IPermissionsService
     {
@@ -21,9 +21,9 @@ namespace Time_Tracker.Services
         public bool HasRequiredPermissions(int userId, List<string> permissions)
         {
             var userPermissions = GetPermissions(userId);
-            
-            foreach(var permission in permissions)
-                if(!userPermissions.Contains(permission)) return false;
+
+            foreach (var permission in permissions)
+                if (!userPermissions.Contains(permission)) return false;
 
             return true;
         }

@@ -1,5 +1,5 @@
 ﻿using GraphQL.Types;
-using Time_Tracker.Services;
+using Time_Tracker.Authorization;
 
 namespace Time_Tracker.GraphQL.Authorization.Queries
 {
