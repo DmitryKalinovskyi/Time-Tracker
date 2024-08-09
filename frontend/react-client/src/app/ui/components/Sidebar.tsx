@@ -1,10 +1,14 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import {Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography} from '@mui/material';
 import { Dashboard as DashboardIcon, AccessTime as AccessTimeIcon, DateRange as DateRangeIcon, Settings as SettingsIcon } from '@mui/icons-material';
-
+import {useDispatch} from "react-redux";
+import {logout} from "../../features/authentification/authSlice.ts";
+import LogoutIcon from '@mui/icons-material/Logout';
 const drawerWidth = 280;
 
 const Sidebar: React.FC = () => {
+    const dispatch = useDispatch();
+
   return (
     <Drawer
       variant="permanent"
@@ -27,11 +31,17 @@ const Sidebar: React.FC = () => {
             { text: 'Calendar', icon: <DateRangeIcon /> },
             { text: 'Settings', icon: <SettingsIcon /> },
           ].map((item, index) => (
-            <ListItem button key={index} className="hover:bg-gray-700 transition duration-300 ease-in-out">
+            <ListItemButton key={index} className="hover:bg-gray-700 transition duration-300 ease-in-out">
               <ListItemIcon sx={{color: 'white'}}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
-            </ListItem>
+            </ListItemButton>
           ))}
+            <ListItemButton className="hover:bg-gray-700 transition duration-300 ease-in-out"
+                      onClick={() => dispatch(logout())}
+            >
+                <ListItemIcon sx={{color: 'white'}}><LogoutIcon/></ListItemIcon>
+                <ListItemText primary="Log out" />
+            </ListItemButton>
         </List>
       </div>
     </Drawer>

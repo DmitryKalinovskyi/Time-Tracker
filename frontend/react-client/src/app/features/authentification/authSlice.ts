@@ -63,10 +63,23 @@ const authSlice = createSlice({
             state.loading = false;
             
             localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
+        },
+
+        logout: (state, action: PayloadAction) => {
+            state.accessToken = null;
+            state.user = null;
+            state.error = null;
+            state.success = false;
+            state.loading = false;
+            localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
+
         }
     }
 })
 
-export const {authUser, authUserSuccess, authUserFailure} = authSlice.actions;
+export const {authUser,
+    authUserSuccess,
+    authUserFailure,
+    logout} = authSlice.actions;
 
 export default authSlice.reducer;
