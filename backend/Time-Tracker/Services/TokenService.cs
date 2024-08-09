@@ -53,10 +53,13 @@ public class TokenService
         var validation = new TokenValidationParameters
         {
             IssuerSigningKey = key,
+            ValidateLifetime = false,
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
-            ValidateLifetime = false
+
+            ValidIssuer = _configuration["JWT:Issuer"],
+            ValidAudience = _configuration["JWT:Audience"],
         };
 
         return new JwtSecurityTokenHandler().ValidateToken(accessToken, validation, out _);

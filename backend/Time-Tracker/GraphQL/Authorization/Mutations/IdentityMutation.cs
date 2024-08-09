@@ -32,6 +32,8 @@ public class IdentityMutation : ObjectGraphType
             user.RefreshToken = refreshToken.Value;
             user.RefreshTokenDateExpires = refreshToken.DateExpires;
 
+            await usersRepository.UpdateAsync(user);
+
             return new LoginResponseDto(user.Id, accessToken, refreshToken);
         });
 
@@ -55,7 +57,7 @@ public class IdentityMutation : ObjectGraphType
                 || user.RefreshToken == null
                 || user.RefreshTokenDateExpires == null 
                 || user.RefreshToken != input.RefreshToken
-                || user.RefreshTokenDateExpires > DateTime.UtcNow)
+                || user.RefreshTokenDateExpires < DateTime.UtcNow)
                 {
                     return new RefreshTokenResponseDto(null, null);
                 }
