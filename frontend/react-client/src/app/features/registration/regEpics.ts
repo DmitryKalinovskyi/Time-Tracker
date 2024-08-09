@@ -26,9 +26,17 @@ export const regUserEpic = (action$: Observable<Action>) =>
                       throw new Error('[REGISTRATION] Unexpected response format or missing user data');
                     }
                   }),
-                  catchError((error: any) =>
-                    of(regUserFailure(error.message || 'An unexpected error occurred'))
-                  ) 
+                catchError((error: any) => {
+                    let errorMessage = 'An unexpected error occurred';
+
+                    if (error.status === 0) {
+                        errorMessage = 'Connection time out';
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+
+                    return of(regUserFailure(errorMessage));
+                })
             )
         })
     );

@@ -34,9 +34,17 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                             throw new Error('[AUTHENTICATION] Unexpected response format or missing login data');
                         }
                     }),
-                    catchError((error) =>
-                        of(authUserFailure(error.message || 'An unexpected error occurred'))
-                    )
+                    catchError((error: any) => {
+                        let errorMessage = 'An unexpected error occurred';
+
+                        if (error.status === 0) {
+                            errorMessage = 'Connection time out';
+                        } else if (error.message) {
+                            errorMessage = error.message;
+                        }
+
+                        return of(authUserFailure(errorMessage));
+                    })
                 )
             )
     )

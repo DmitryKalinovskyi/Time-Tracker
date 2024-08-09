@@ -63,10 +63,12 @@ const LoginPage: React.FC = () => {
             <Box
                 sx={{
                     my: 8,
-                    mx: 4,
+                    mx: 'auto',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    maxWidth: '550px',
+                    width: '100%'
                 }}
             >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -75,7 +77,7 @@ const LoginPage: React.FC = () => {
                 <Typography component="h1" variant="h5">
                     Sign In
                 </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
                     <TextField
                         margin="normal"
                         required
