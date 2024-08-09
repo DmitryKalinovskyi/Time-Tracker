@@ -7,10 +7,6 @@ import Navbar from "../components/Navbar.tsx";
 import Footer from "../components/Footer.tsx";
 
 export default function HomePage(){
-    const isAuthenticated = useIsAuthenticated();
-
-    if(!isAuthenticated) return <Navigate to={"/login"}/>
-
     return (
         <>
           <CssBaseline />
