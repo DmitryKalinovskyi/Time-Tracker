@@ -66,7 +66,7 @@ const AccountVerificationPage: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    maxWidth: '400px',
+                    maxWidth: '550px',
                     width: '100%'
                 }}
             >

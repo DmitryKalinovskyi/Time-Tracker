@@ -54,7 +54,7 @@ const CreateUserPage: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                maxWidth: '500px',
+                maxWidth: '550px',
                 width: '100%',
             }}
         >
