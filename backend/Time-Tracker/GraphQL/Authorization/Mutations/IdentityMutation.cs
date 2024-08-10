@@ -55,7 +55,7 @@ public class IdentityMutation : ObjectGraphType
                 var user = await usersRepository.FindAsync((int)userId);
                 if(user == null 
                 || user.RefreshToken == null
-                || user.RefreshTokenDateExpires == null 
+                || user.RefreshTokenDateExpires == null
                 || user.RefreshToken != input.RefreshToken
                 || user.RefreshTokenDateExpires < DateTime.UtcNow)
                 {
@@ -66,7 +66,6 @@ public class IdentityMutation : ObjectGraphType
                 var refreshToken = tokenService.GenerateRefreshToken();
 
                 user.RefreshToken = refreshToken.Value;
-                user.RefreshTokenDateExpires = refreshToken.DateExpires;
 
                 await usersRepository.UpdateAsync(user);
 
