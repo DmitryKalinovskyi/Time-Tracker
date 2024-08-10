@@ -77,7 +77,7 @@ public class UserMutation : ObjectGraphType
 
                 var user = await userRepository.FindAsync(userInput.Id) ?? throw new ExecutionError("User not found.");
 
-                var emailCheckUser = userRepository.FindByEmailAsync(userInput.Email);
+                var emailCheckUser = await userRepository.FindByEmailAsync(userInput.Email);
 
                 if (emailCheckUser is not null && emailCheckUser.Id != userInput.Id) throw new ExecutionError("User with this email already exists.");
 
