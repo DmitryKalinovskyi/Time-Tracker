@@ -48,7 +48,7 @@ public class IdentityMutation : ObjectGraphType
 
                 if(userId == null)
                 {
-                    return new RefreshTokenResponseDto(null, null);
+                    return new RefreshTokenResponseDto(null, null, null);
                 }
 
                 var user = await usersRepository.FindAsync((int)userId);
@@ -58,7 +58,7 @@ public class IdentityMutation : ObjectGraphType
                 || user.RefreshToken != input.RefreshToken
                 || user.RefreshTokenDateExpires < DateTime.UtcNow)
                 {
-                    return new RefreshTokenResponseDto(null, null);
+                    return new RefreshTokenResponseDto(null, null, null);
                 }
 
                 var accessToken = tokenService.GenerateAccessToken((int)userId);
@@ -68,7 +68,7 @@ public class IdentityMutation : ObjectGraphType
 
                 await usersRepository.UpdateAsync(user);
 
-                return new RefreshTokenResponseDto(accessToken, refreshToken);
+                return new RefreshTokenResponseDto(user.Id, accessToken, refreshToken);
             });
 
         Field<NonNullGraphType<StringGraphType>>("logout")
