@@ -22,7 +22,7 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                if (userRepository.FindByEmailAsync(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
+                if (await userRepository.FindByEmailAsync(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
 
                 var userId = await userRepository.AddAsync(userInput);
 

@@ -13,6 +13,6 @@ public class LoginResponseGraphType : ObjectGraphType<LoginResponseDto>
         Field(l => l.AccessToken, nullable: true, type: typeof(TokenGraphType));
         Field(l => l.RefreshToken, nullable: true, type: typeof(TokenGraphType));
         Field<NonNullGraphType<UserGraphType>>("user")
-            .Resolve(context => usersRepository.FindAsync(context.Source.UserId));
+            .ResolveAsync(async context => await usersRepository.FindAsync(context.Source.UserId));
     }
 }

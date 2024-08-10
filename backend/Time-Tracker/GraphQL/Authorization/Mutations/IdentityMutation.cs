@@ -1,6 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Microsoft.AspNetCore.Identity.Data;
 using Time_Tracker.Dtos;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.Helpers;
@@ -70,6 +69,24 @@ public class IdentityMutation : ObjectGraphType
                 await usersRepository.UpdateAsync(user);
 
                 return new RefreshTokenResponseDto(accessToken, refreshToken);
+            });
+
+        Field<NonNullGraphType<StringGraphType>>("logout")
+            .Authorize()
+            .ResolveAsync(async context =>
+            {
+                var userId = context.User.GetUserId();
+
+                if (userId == null) throw new ExecutionError("Invalid payload.");
+
+                var user = await usersRepository.FindAsync((int)userId);
+
+                if(user == null) throw new ExecutionError("User not founded.");
+
+                user.RefreshToken = null;
+                user.RefreshTokenDateExpires = null;
+
+                return "ok";
             });
     }
 }
