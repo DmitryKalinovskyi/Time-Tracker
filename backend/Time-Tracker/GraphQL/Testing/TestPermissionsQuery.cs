@@ -1,7 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Time_Tracker.Authorization;
 using Time_Tracker.GraphQL.Authorization;
-using Time_Tracker.Services;
 
 namespace Time_Tracker.GraphQL.Testing
 {
@@ -10,9 +10,11 @@ namespace Time_Tracker.GraphQL.Testing
         public TestPermissionsQuery()
         {
             Field<StringGraphType>("test")
-                .Authorize()
                 .RequirePermission(Permissions.ManageUsers)
-                .Resolve((context) => "ok");
+                .Resolve((context) =>
+                {
+                    return "ok";
+                });
         }
     }
 }

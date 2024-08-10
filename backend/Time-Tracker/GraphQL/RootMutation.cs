@@ -8,6 +8,7 @@ namespace Time_Tracker.GraphQL
         public RootMutation()
         {
             Field<UserMutation>("userMutation").Resolve(context => new { });
+            Field<IdentityMutation>("identityMutation").Resolve(context => new { });
         }
     }
 }

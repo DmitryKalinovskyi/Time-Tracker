@@ -22,7 +22,7 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                if (userRepository.FindByEmail(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
+                if (await userRepository.FindByEmailAsync(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
 
                 var userId = await userRepository.AddAsync(userInput);
 
@@ -33,7 +33,7 @@ public class UserMutation : ObjectGraphType
 
                 _ = await activationCodeRepository.AddAsync(code);
 
-                var user = userRepository.Find(userId);
+                var user = await userRepository.FindAsync(userId);
 
                 if (user == null) throw new ExecutionError("User not found.");
 
@@ -52,7 +52,7 @@ public class UserMutation : ObjectGraphType
 
                 if (activationCode == null) throw new ExecutionError("Activation code not found.");
 
-                var user = userRepository.Find(activationCode.UserId);
+                var user = await userRepository.FindAsync(activationCode.UserId);
 
                 if (user == null) throw new ExecutionError("User not found.");
 
@@ -75,9 +75,9 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User not found.");
+                var user = await userRepository.FindAsync(userInput.Id) ?? throw new ExecutionError("User not found.");
 
-                var emailCheckUser = userRepository.FindByEmail(userInput.Email);
+                var emailCheckUser = await userRepository.FindByEmailAsync(userInput.Email);
 
                 if (emailCheckUser is not null && emailCheckUser.Id != userInput.Id) throw new ExecutionError("User with this email already exists.");
 

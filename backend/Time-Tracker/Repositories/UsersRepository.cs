@@ -26,6 +26,10 @@ namespace Time_Tracker.Repositories
 
             public string? Permissions { get; set; }
 
+            public string? RefreshToken { get; set; }
+
+            public DateTime? RefreshTokenDateExpires { get; set; }
+
             public static User Deserialize(DBUser dbUser)
             {
                 return new User
@@ -36,7 +40,9 @@ namespace Time_Tracker.Repositories
                     HashedPassword = dbUser.HashedPassword,
                     Salt = dbUser.Salt,
                     IsActive = dbUser.IsActive,
-                    Permissions = dbUser.Permissions?.Split(" ").ToList() ?? []
+                    Permissions = dbUser.Permissions?.Split(" ").ToList() ?? [],
+                    RefreshToken = dbUser.RefreshToken,
+                    RefreshTokenDateExpires = dbUser.RefreshTokenDateExpires,
                 };
             }
 
@@ -50,7 +56,9 @@ namespace Time_Tracker.Repositories
                     HashedPassword = user.HashedPassword,
                     Salt = user.Salt,
                     IsActive = user.IsActive,
-                    Permissions = string.Join(" ", user.Permissions)
+                    Permissions = string.Join(" ", user.Permissions),
+                    RefreshToken = user.RefreshToken,
+                    RefreshTokenDateExpires = user.RefreshTokenDateExpires,
                 };
             }
         }
@@ -106,25 +114,25 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public User? Find(int userId)
+        public async Task<User?> FindAsync(int userId)
         {
             var sql = "SELECT * FROM Users WHERE Users.Id = @userId";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var dbUser = connection.QueryFirstOrDefault<DBUser>(sql, new { userId });
+                var dbUser = await connection.QueryFirstOrDefaultAsync<DBUser>(sql, new { userId });
                 if (dbUser == null) return null;
                 return DBUser.Deserialize(dbUser);
             }
         }
 
-        public User? FindByEmail(string email)
+        public async Task<User?> FindByEmailAsync(string email)
         {
             var sql = "SELECT * FROM Users WHERE Users.Email = @email";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var dbUser = connection.QueryFirstOrDefault<DBUser>(sql, new { email });
+                var dbUser = await connection.QueryFirstOrDefaultAsync<DBUser>(sql, new { email });
                 if (dbUser == null) return null;
                 return DBUser.Deserialize(dbUser);
             }
@@ -154,7 +162,9 @@ namespace Time_Tracker.Repositories
                             HashedPassword = @HashedPassword, 
                             Salt = @Salt,
                             IsActive = @IsActive,
-                            Permissions = @Permissions
+                            Permissions = @Permissions,
+                            RefreshToken = @RefreshToken,
+                            RefreshTokenDateExpires = @RefreshTokenDateExpires
                             WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);

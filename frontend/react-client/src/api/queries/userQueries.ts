@@ -1,7 +1,7 @@
 import User from "../../app/types/User.ts";
 import Token from "../../app/types/Token.ts";
 export interface authUserQueryResponse{
-  identityQuery: {
+  identityMutation: {
     login: {
       accessToken: Token,
     }
@@ -19,8 +19,8 @@ export const authUserQuery = (
     password: string, 
   ) => {
     const query = `
-      query Login{
-                  identityQuery{
+      mutation Login{
+                  identityMutation{
                     login(input: {email: "${email}", password: "${password}"}){
                       accessToken{
                        value,

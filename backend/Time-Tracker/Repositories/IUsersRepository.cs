@@ -7,9 +7,9 @@ namespace Time_Tracker.Repositories
     {
         public Task<List<User>> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId);
         public Task<int> GetTotalUsersCount();
-        public User? Find(int id);    
+        public Task<User?> FindAsync(int id);    
 
-        public User? FindByEmail(string email);
+        public Task<User?> FindByEmailAsync(string email);
 
         Task<int> AddAsync(User user);
         Task UpdateAsync(User user);

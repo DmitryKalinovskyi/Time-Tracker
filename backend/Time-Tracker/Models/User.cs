@@ -14,6 +14,10 @@
 
         public bool IsActive { get; set; } = false;
 
+        public string? RefreshToken { get; set; }
+
+        public DateTime? RefreshTokenDateExpires { get; set; }
+
         public required List<string> Permissions { get; set; }
     }
 }

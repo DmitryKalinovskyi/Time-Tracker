@@ -14,7 +14,7 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
         {
             Field<UserGraphType>("user")
                 .Argument<NonNullGraphType<IntGraphType>>("userId")
-                .Resolve(context => usersRepository.Find(context.GetArgument<int>("userId")));
+                .ResolveAsync(async context => await usersRepository.FindAsync(context.GetArgument<int>("userId")));
 
             Connection<UserGraphType>("users")
             .Bidirectional()
