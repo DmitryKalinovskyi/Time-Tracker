@@ -22,10 +22,10 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                             return authUserFailure(errors[0].message);
                         }
         
-                        if (data && data.identityQuery && data.identityQuery.login) {
+                        if (data && data.identityMutation && data.identityMutation.login) {
                             return authUserSuccess({
-                                accessToken: data.identityQuery.login.accessToken,
-                                user: data.identityQuery.login.user,
+                                accessToken: data.identityMutation.login.accessToken,
+                                user: data.identityMutation.login.user,
                                 loading: false,
                                 error: null,
                                 success: true,
