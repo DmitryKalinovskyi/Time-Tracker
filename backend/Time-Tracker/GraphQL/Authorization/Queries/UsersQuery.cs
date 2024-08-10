@@ -30,7 +30,29 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
 
 
                 var users = await usersRepository.GetUsersAsync(first, after, last, before);
+
+                if (last.HasValue && before.HasValue)
+                {
+                    users.Reverse();
+                }
+
                 var totalCount = await usersRepository.GetTotalUsersCount();
+
+                if (!users.Any())
+                {
+                    return new Connection<User>
+                    {
+                        Edges = new List<Edge<User>>(),
+                        PageInfo = new PageInfo
+                        {
+                            HasNextPage = last.HasValue,
+                            HasPreviousPage = first.HasValue,
+                            StartCursor = null,
+                            EndCursor = null
+                        },
+                        TotalCount = totalCount,
+                    };
+                }
 
                 var edges = users.Select(u => new Edge<User>
                 {
@@ -38,22 +60,22 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
                     Cursor = u.Id.ToCursor()
                 }).ToList();
 
-                var hasNextPage = edges.Count < totalCount;
-                var hasPreviousPage = before.HasValue || (after.HasValue && edges.First().Node?.Id > 10); ;
+                bool hasNextPage = (before.HasValue || (after.HasValue && edges.Count >= (first ?? 0)));
+                bool hasPreviousPage = (after.HasValue || (before.HasValue && edges.Count >= (last ?? 0)));
 
                 var pageInfo = new PageInfo
                 {
-                    HasNextPage = !last.HasValue ? hasNextPage : hasPreviousPage,
+                    HasNextPage = hasNextPage,
                     StartCursor = edges.First().Cursor,
                     EndCursor = edges.Last().Cursor,
-                    HasPreviousPage = !last.HasValue ? hasPreviousPage : hasNextPage,
+                    HasPreviousPage = hasPreviousPage
                 };
 
                 return new Connection<User>
                 {
                     Edges = edges,
                     PageInfo = pageInfo,
-                    TotalCount = edges.Count,
+                    TotalCount = totalCount,
                 };
             });
         }

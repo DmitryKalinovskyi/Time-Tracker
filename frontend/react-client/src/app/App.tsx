@@ -8,6 +8,7 @@ import HomePage from "./ui/pages/HomePage.tsx";
 import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
+import UsersPage from "./ui/pages/UsersPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
           element: <RequireAuth />, children: [
             { path: "/", element: <HomePage /> },
             { path: "/home", element: <HomePage /> },
+            { path: "/users", element: <UsersPage /> },
             { path: "/register", element: <RegisterUserPage /> },
           ]
         }
