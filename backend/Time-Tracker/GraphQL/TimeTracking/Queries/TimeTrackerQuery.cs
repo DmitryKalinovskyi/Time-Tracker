@@ -9,8 +9,8 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
     {
         public TimeTrackerQuery(IWorkSessionRepository workSessionRepository) 
         {
-            Field<WorkSessionGraphType>("getWorkSessionById")
-                .Argument<IntGraphType>("id")
+            Field<WorkSessionGraphType>("workSession")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
                     var inputId = context.GetArgument<int>("id");
