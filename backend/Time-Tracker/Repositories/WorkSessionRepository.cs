@@ -1,10 +1,12 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using Time_Tracker.Models;
+using static Time_Tracker.Repositories.IWorkSessionRepository;
 
 namespace Time_Tracker.Repositories
 {
-    public class WorkSessionRepository : IWorkSessionsRepository
+    public class WorkSessionRepository : IWorkSessionRepository
     {
         private string _connectionString;
 
@@ -14,18 +16,20 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<int> AddWorkSessionAsync(WorkSession workSession)
+        public async Task<WorkSessionInsertResult> AddWorkSessionAsync(WorkSession workSession)
         {
+
+            if (workSession == null)
+                throw new ArgumentNullException(nameof(workSession));
+
             string sql = $@"INSERT INTO WorkSessions 
-                            (UserId, StartTime, SessionOriginId, EditedBy) 
-                            OUTPUT INSERTED.Id
-                            VALUES (@UserId, GETUTCDATE(), @SessionOriginId, @EditedBy)";
+                            (UserId, StartTime, EndTime, SessionOriginId, EditedBy) 
+                            OUTPUT INSERTED.Id, INSERTED.StartTime, INSERTED.EndTime
+                            VALUES (@UserId, COALESCE(@StartTime, GETUTCDATE()), @EndTime, @SessionOriginId, @EditedBy)";
 
             using var connection = new SqlConnection(_connectionString);
 
-            int workSessionId = await connection.QuerySingleAsync<int>(sql, workSession);
-
-            return workSessionId;
+            return await connection.QuerySingleAsync<WorkSessionInsertResult>(sql, workSession);
         }
 
         public async Task DeleteWorkSessionAsync(int id)
@@ -35,13 +39,20 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            await connection.QuerySingleAsync<int>(sql, id);
+            await connection.QuerySingleAsync(sql, id);
 
         }
 
-        public Task<WorkSession> GetWorkSessionByIdAsync(int id)
+        public async Task<WorkSession?> GetWorkSessionByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var sql = $@"SELECT *
+                    FROM WorkSessions
+                    WHERE Id = @id";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            return await connection.QueryFirstOrDefaultAsync<WorkSession>(sql, new { id });
+
         }
 
         public Task<List<WorkSession>> GetWorkSessionsWithSortingAsync(int? first, int? last, int? before, int? after)
