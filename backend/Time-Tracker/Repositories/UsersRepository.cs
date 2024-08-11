@@ -172,9 +172,15 @@ namespace Time_Tracker.Repositories
             await connection.ExecuteAsync(query, dbUser);
         }
 
-        public async Task DeleteAsync(int userId)
+        public async Task<IDictionary<int?, User>> GetUsersByIdAsync(List<int?> userIds)
         {
-            throw new NotImplementedException();
+            var sql = "SELECT * FROM Users WHERE Id IN @UserIds";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            var users = await connection.QueryAsync<User>(sql, new { UserIds = userIds });
+
+            return (IDictionary<int?, User>)users.ToDictionary(u => u.Id);
         }
     }
 }

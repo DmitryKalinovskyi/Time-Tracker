@@ -57,6 +57,7 @@ builder.Services.AddGraphQL(b => b
     .AddAuthorizationRule()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = true)
     .AddGraphTypes(typeof(RootSchema).Assembly)
+    .AddDataLoader()
 ).AddAuthorization(options =>
 {
     foreach (var permission in Permissions.GetAllPermissions())
