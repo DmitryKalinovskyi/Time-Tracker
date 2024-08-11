@@ -28,9 +28,15 @@ namespace Time_Tracker.Repositories
             return workSessionId;
         }
 
-        public Task DeleteWorkSessionAsync(int id)
+        public async Task DeleteWorkSessionAsync(int id)
         {
-            throw new NotImplementedException();
+            string sql = $@"DELETE FROM WorkSessions
+                        WHERE Id = @Id";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            await connection.QuerySingleAsync<int>(sql, id);
+
         }
 
         public Task<WorkSession> GetWorkSessionByIdAsync(int id)
