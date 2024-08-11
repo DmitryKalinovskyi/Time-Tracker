@@ -172,7 +172,7 @@ namespace Time_Tracker.Repositories
             await connection.ExecuteAsync(query, dbUser);
         }
 
-        public async Task<IDictionary<int?, User>> GetUsersByIdAsync(List<int?> userIds)
+        public async Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds)
         {
             var sql = "SELECT * FROM Users WHERE Id IN @UserIds";
 
@@ -180,7 +180,7 @@ namespace Time_Tracker.Repositories
 
             var users = await connection.QueryAsync<User>(sql, new { UserIds = userIds });
 
-            return (IDictionary<int?, User>)users.ToDictionary(u => u.Id);
+            return users.ToDictionary(u => u.Id);
         }
     }
 }
