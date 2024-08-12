@@ -101,9 +101,41 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                 });
 
             Field<WorkSessionGraphType>("updateSession")
+                .Argument<NonNullGraphType<IntGraphType>>("editorId")
+                .Argument<UpdateSessionInputGraphType>("input")
                 .ResolveAsync(async context =>
                 {
-                    throw new NotImplementedException();
+                    var inputSession = context.GetArgument<WorkSession>("input");
+                    var editorId = context.GetArgument<int>("editorId");
+                    var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(inputSession.Id);
+                    
+                    if (currentWorkSession is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"Work session with id = {inputSession.Id} does not exist."));
+                        return null;
+                    }
+
+                    if (inputSession.StartTime.Value.Kind != DateTimeKind.Utc ||
+                      inputSession.EndTime.Value.Kind != DateTimeKind.Utc)
+                    {
+                        context.Errors.Add(new ExecutionError("StartTime and EndTime have to be in UTC time format."));
+                        return null;
+                    }
+
+                    if (await userRepository.FindAsync(editorId) is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"Editor with id = {editorId} does not exist."));
+                        return null;
+                    }
+
+                    currentWorkSession.SessionOriginId = (int)WorkSessionOrigins.Edited;
+                    currentWorkSession.EditedBy = editorId;
+                    currentWorkSession.StartTime = inputSession.StartTime;
+                    currentWorkSession.EndTime = inputSession.EndTime;
+
+                    var updatedWorkSession = await workSessionRepository.UpdateWorkSessionAsync(currentWorkSession);
+
+                    return updatedWorkSession;
                 });
 
             Field<StringGraphType>("deleteSession")
