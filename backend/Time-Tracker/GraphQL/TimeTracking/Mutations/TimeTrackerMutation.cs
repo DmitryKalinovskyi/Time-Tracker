@@ -10,7 +10,8 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
     public class TimeTrackerMutation : ObjectGraphType
     {
         public TimeTrackerMutation(IWorkSessionRepository workSessionRepository,
-                                   IUsersRepository userRepository)
+                                   IUsersRepository userRepository,
+                                   ISessionOriginRepository sessionOriginRepository)
         {
             Field<StartSessionResponseGraphType>("startSession")
                 .Argument<NonNullGraphType<IntGraphType>>("userId")
@@ -51,7 +52,8 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                         context.Errors.Add(new ExecutionError($"Works session with id = {workSessionId} does not exist."));
                         return null;
                     }  
-                    else if(currentWorkSession.EndTime is not null)
+                    
+                    if(currentWorkSession.EndTime is not null)
                     {
                         context.Errors.Add(new ExecutionError($"Works session with id = {workSessionId} alredy stopped."));
                         return null;
@@ -60,6 +62,42 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                     var updatedWorkSession = await workSessionRepository.UpdateWorkSessionAsync(currentWorkSession);
 
                     return updatedWorkSession;
+                });
+
+            Field<WorkSessionGraphType>("addSession")
+                .Argument<NonNullGraphType<AddSessionInputGraphType>>("input")
+                .ResolveAsync(async context =>
+                {
+                    var inputSession = context.GetArgument<WorkSession>("input");
+
+                    if(await userRepository.FindAsync(inputSession.UserId) is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"User with id = {inputSession.UserId} does not exist."));
+                        return null;
+                    }
+
+                    if(inputSession.StartTime.Value.Kind != DateTimeKind.Utc ||
+                       inputSession.EndTime.Value.Kind != DateTimeKind.Utc)
+                    {
+                        context.Errors.Add(new ExecutionError("StartTime and EndTime have to be in UTC time format."));
+                        return null;
+                    }
+
+                    if(await sessionOriginRepository.GetSessionOriginByIdAsync(inputSession.SessionOriginId) is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"Invalid Session Origin id = {inputSession.SessionOriginId}"));
+                        return null;
+                    }
+
+                    if (inputSession.EditedBy is not null && await userRepository.FindAsync((int)inputSession.EditedBy) is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"[Edited By] User with id = {inputSession.EditedBy} does not exist."));
+                        return null;
+                    }
+
+                    var newWorkSession = await workSessionRepository.AddWorkSessionAsync(inputSession);
+
+                    return newWorkSession;
                 });
         }
     }

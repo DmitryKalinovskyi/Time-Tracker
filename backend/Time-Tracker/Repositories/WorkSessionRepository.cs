@@ -22,7 +22,16 @@ namespace Time_Tracker.Repositories
 
             string sql = $@"INSERT INTO WorkSessions 
                             (UserId, StartTime, EndTime, SessionOriginId, EditedBy) 
-                            OUTPUT INSERTED.Id, INSERTED.StartTime, INSERTED.EndTime
+                            OUTPUT 
+                                INSERTED.Id,
+                                INSERTED.UserId,
+                                INSERTED.StartTime, 
+                                INSERTED.EndTime,
+                                INSERTED.Duration,
+                                INSERTED.SessionOriginId,
+                                INSERTED.EditedBy,
+                                INSERTED.CreatedAt,
+                                INSERTED.LastUpdatedAt
                             VALUES (@UserId, COALESCE(@StartTime, GETUTCDATE()), @EndTime, @SessionOriginId, @EditedBy)";
 
             using var connection = new SqlConnection(_connectionString);
