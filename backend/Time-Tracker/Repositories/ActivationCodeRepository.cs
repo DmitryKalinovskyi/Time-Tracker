@@ -13,6 +13,19 @@ public class ActivationCodeRepository : IActivationCodeRepository
         _connectionString = configuration.GetConnectionString("MSSQL")
             ?? throw new Exception("MSSQL connection string not seted.");
     }
+    
+    public async Task<ActivationCode?> FindByUserIdAsync(int userId)
+    {
+        var sql = @"SELECT a.Id,
+                a.Value,
+                a.UserId
+                FROM ActivationCodes a 
+                WHERE UserId = @userId";
+
+        using var connection = new SqlConnection(_connectionString);
+
+        return await connection.QueryFirstOrDefaultAsync<ActivationCode>(sql, new { userId });
+    }
 
     public async Task<ActivationCode?> Find(int id)
     {
