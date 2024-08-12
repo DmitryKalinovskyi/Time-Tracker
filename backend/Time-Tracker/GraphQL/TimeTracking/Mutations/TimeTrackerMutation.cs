@@ -99,6 +99,30 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
 
                     return newWorkSession;
                 });
+
+            Field<WorkSessionGraphType>("updateSession")
+                .ResolveAsync(async context =>
+                {
+                    throw new NotImplementedException();
+                });
+
+            Field<StringGraphType>("deleteSession")
+                .Argument<IntGraphType>("workSessionId")
+                .ResolveAsync(async context =>
+                {
+                    int workSessionId = context.GetArgument<int>("workSessionId");
+
+                    if(await workSessionRepository.GetWorkSessionByIdAsync(workSessionId) is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"Work session with id = {workSessionId} does not exist."));
+                        return null;
+                    }
+
+                    await workSessionRepository.DeleteWorkSessionAsync(workSessionId);
+
+                    return $"Work session with id = {workSessionId} has been successfully deleted.";
+
+                }); 
         }
     }
 }

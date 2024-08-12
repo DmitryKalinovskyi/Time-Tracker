@@ -46,7 +46,7 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            await connection.QuerySingleAsync(sql, id);
+            await connection.ExecuteAsync(sql, new {Id = id});
 
         }
 
