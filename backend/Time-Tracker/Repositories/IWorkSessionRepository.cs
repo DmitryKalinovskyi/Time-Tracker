@@ -4,14 +4,8 @@ namespace Time_Tracker.Repositories
 {
     public interface IWorkSessionRepository
     {
-        public class WorkSessionInsertResult
-        {
-            public int Id { get; set; }
-            public DateTime StartTime { get; set; }
-            public DateTime EndTime { get; set; }
-        }
 
-        Task<WorkSessionInsertResult> AddWorkSessionAsync(WorkSession workSession);
+        Task<WorkSession> AddWorkSessionAsync(WorkSession workSession);
 
         Task UpdateWorkSessionAsync(WorkSession workSession);
 

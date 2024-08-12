@@ -9,12 +9,12 @@ namespace Time_Tracker.GraphQL.TimeTracking.Types
     public class WorkSessionGraphType: ObjectGraphType<WorkSession>
     {
         public WorkSessionGraphType(IUsersRepository userRepository,
+                                    ISessionOriginRepository sessionOriginRepository,
                                      IDataLoaderContextAccessor accessor)
         {
             Field(t => t.Id);
             Field(t => t.StartTime, nullable: true);
             Field(t => t.EndTime, nullable: true);
-            Field(t => t.SessionOriginId);
             Field(t => t.Duration, nullable: true);
             Field(t => t.CreatedAt);
             Field(t => t.LastUpdatedAt);
@@ -33,6 +33,16 @@ namespace Time_Tracker.GraphQL.TimeTracking.Types
                     
                     var loader = accessor.Context?.GetOrAddBatchLoader<int, User>("GetUsersByIdAsync", userRepository.GetUsersByIdAsync);
                     return loader.LoadAsync((int)editedById);
+                });
+
+            Field<SessionOriginGraphType, SessionOrigin>("sessionOrigin")
+                .ResolveAsync(context =>
+                {
+                    var sessionOriginId = context.Source.SessionOriginId;
+
+                    var loader = accessor.Context?.GetOrAddBatchLoader<int, SessionOrigin>("GetSessionOriginsByIdAsync", sessionOriginRepository.GetSessionOriginsByIdAsync);
+                    
+                    return loader.LoadAsync(sessionOriginId);
                 });
 
         }

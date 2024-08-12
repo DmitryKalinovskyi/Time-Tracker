@@ -16,7 +16,7 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<WorkSessionInsertResult> AddWorkSessionAsync(WorkSession workSession)
+        public async Task<WorkSession> AddWorkSessionAsync(WorkSession workSession)
         {
 
             if (workSession == null)
@@ -29,7 +29,7 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            return await connection.QuerySingleAsync<WorkSessionInsertResult>(sql, workSession);
+            return await connection.QuerySingleAsync<WorkSession>(sql, workSession);
         }
 
         public async Task DeleteWorkSessionAsync(int id)

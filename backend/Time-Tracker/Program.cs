@@ -41,6 +41,7 @@ builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 builder.Services.AddSingleton<IWorkSessionRepository, WorkSessionRepository>();
+builder.Services.AddSingleton<ISessionOriginRepository, SessionOriginRepository>();
 builder.Services.AddSingleton<IActivationCodeRepository, ActivationCodeRepository>();
 
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();

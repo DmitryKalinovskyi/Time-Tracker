@@ -1,27 +1,53 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Time_Tracker.GraphQL.Authorization.Types;
+using Time_Tracker.Enums;
 using Time_Tracker.GraphQL.TimeTracking.Types;
 using Time_Tracker.Models;
 using Time_Tracker.Repositories;
-using Time_Tracker.Services;
 
 namespace Time_Tracker.GraphQL.TimeTracking.Mutations
 {
     public class TimeTrackerMutation : ObjectGraphType
     {
-        public TimeTrackerMutation(IWorkSessionRepository workSessionRepository)
+        public TimeTrackerMutation(IWorkSessionRepository workSessionRepository,
+                                   IUsersRepository userRepository)
         {
             Field<StartSessionResponseGraphType>("startSession")
-                .Argument<NonNullGraphType<StartSessionInputGraphType>>("input")
+                .Argument<NonNullGraphType<IntGraphType>>("userId")
                 .ResolveAsync(async context =>
                 {
-                    var sessionInput = context.GetArgument<WorkSession>("input");
+                    var userId = context.GetArgument<int>("userId");
+
+                    if (await userRepository.FindAsync(userId) is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"User with id = {userId} does not exist."));
+                        return null;
+                    }
+
+                    var newWorkSession = new WorkSession()
+                    {
+                        UserId = userId,
+                        StartTime = null,
+                        EndTime = null,
+                        SessionOriginId = (int)WorkSessionOrigins.Manual,
+                        EditedBy = null,
+                    };
+
+                    var workSessionInsertResult = await workSessionRepository.AddWorkSessionAsync(newWorkSession);
+
+                    return workSessionInsertResult;
+                });
+
+/*            Field<StartSessionResponseGraphType>("stopSession")
+                .Argument<NonNullGraphType<IntGraphType>>("workSessionId")
+                .ResolveAsync(async context =>
+                {
+                    var workSessionId = context.GetArgument<int>("workSessionId");
 
                     var workSessionInsertResult = await workSessionRepository.AddWorkSessionAsync(sessionInput);
 
                     return workSessionInsertResult;
-                });
+                });*/
         }
     }
 }
