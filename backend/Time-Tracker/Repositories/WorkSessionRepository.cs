@@ -51,7 +51,7 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            return await connection.QueryFirstOrDefaultAsync<WorkSession>(sql, new { id });
+            return await connection.QueryFirstOrDefaultAsync<WorkSession?>(sql, new { id });
 
         }
 
