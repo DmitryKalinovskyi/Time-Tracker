@@ -57,12 +57,23 @@ namespace Time_Tracker.Repositories
 
         public Task<List<WorkSession>> GetWorkSessionsWithSortingAsync(int? first, int? last, int? before, int? after)
         {
+
             throw new NotImplementedException();
+
         }
 
-        public Task UpdateWorkSessionAsync(WorkSession workSession)
+        public async Task UpdateWorkSessionAsync(WorkSession workSession)
         {
-            throw new NotImplementedException();
+            var sql = $@"UPDATE WorkSessions SET
+                         UserId = @UserId
+                         StartTime = @StartTime
+                         EndTime = COALESCE(@EndTime, GETUTCDATE())
+                         SessionOriginId = @SessionOriginId
+                         EditedBy = @EditedBy";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            await connection.ExecuteAsync(sql, workSession);
         }
     }
 }
