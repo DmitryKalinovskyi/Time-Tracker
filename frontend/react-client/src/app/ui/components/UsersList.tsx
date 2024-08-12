@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../features/users/usersEpics";
 import { RootState } from "../../store";
+import { useNavigate } from 'react-router-dom';
 
 export default function UsersList() {
+    const navigate = useNavigate();
     const [itemsPerPage, setItemsPerPage] = useState<number>(5);
 
     const usersPage = useSelector((state: RootState) => state.users.usersPage);
@@ -51,7 +53,7 @@ export default function UsersList() {
                                                     {node.node.email}
                                                 </Typography>
                                             </Box>
-                                            <Button size="small" variant="outlined">View Profile</Button>
+                                            <Button size="small" variant="outlined" onClick={() => navigate("/user/" + node.node.id)}>View Profile</Button>
                                         </CardContent>
                                     </Card>
                                 </Grid>

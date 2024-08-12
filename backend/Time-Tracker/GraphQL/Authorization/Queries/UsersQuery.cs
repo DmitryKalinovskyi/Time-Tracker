@@ -60,8 +60,8 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
                     Cursor = u.Id.ToCursor()
                 }).ToList();
 
-                bool hasNextPage = (before.HasValue || (after.HasValue && edges.Count >= (first ?? 0)));
-                bool hasPreviousPage = (after.HasValue || (before.HasValue && edges.Count >= (last ?? 0)));
+                bool hasNextPage = before.HasValue ||  edges.Count >= (first ?? 0);
+                bool hasPreviousPage = after.HasValue || (before.HasValue && edges.Count >= (last ?? 0));
 
                 var pageInfo = new PageInfo
                 {

@@ -100,3 +100,20 @@ export const getUsersQuery = () => {
 `;
   return query;
 }
+
+export const getUserQuery = () => {
+  const query = `
+  query usersQuery($userId: Int!){
+  usersQuery {
+    user(userId: $userId) {
+      id
+      fullName
+      email
+      permissions
+      isActive
+    }
+  }
+}
+`;
+  return query;
+}

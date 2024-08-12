@@ -28,7 +28,6 @@ export const getUsersEpic = (action$: Observable<Action>) =>
         }))
         .pipe(
           map((ajaxResponse: any) => {
-            console.log(ajaxResponse);
             const errors = ajaxResponse.response.errors;
             const data = ajaxResponse.response.data;
 

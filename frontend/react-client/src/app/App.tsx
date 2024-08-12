@@ -9,6 +9,7 @@ import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
 import UsersPage from "./ui/pages/UsersPage.tsx";
+import UserPage from "./ui/pages/UserPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
             { path: "/", element: <HomePage /> },
             { path: "/home", element: <HomePage /> },
             { path: "/users", element: <UsersPage /> },
+            { path: "/user/:UserId", element: <UserPage /> },
             { path: "/register", element: <RegisterUserPage /> },
           ]
         }
