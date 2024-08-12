@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
 import HomePage from "./ui/pages/HomePage.tsx";
 import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
+import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
 
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     },
     { path: "/login", element: <LoginPage /> },
     { path: "/verification", element: <AccountVerificationPage /> },
+    { path: "/reset", element: <ResetUserPasswordPage /> },
     ]
   }
 ])

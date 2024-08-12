@@ -117,11 +117,11 @@ const LoginPage: React.FC = () => {
                     >
                         Sign In
                     </Button>
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#" variant="body2">
-                                Forgot password?
-                            </Link>
+                    <Grid container justifyContent="space-between">
+                        <Grid item>
+                            <MuiLink component={RouterLink} to="/reset" variant="body2">
+                                {"Forgot password?"}
+                            </MuiLink>
                         </Grid>
                         <Grid item>
                             <MuiLink component={RouterLink} to="/verification" variant="body2">
