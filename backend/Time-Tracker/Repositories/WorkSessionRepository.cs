@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.IdentityModel.Tokens;
 using Time_Tracker.Models;
-using static Time_Tracker.Repositories.IWorkSessionRepository;
 
 namespace Time_Tracker.Repositories
 {
@@ -62,18 +60,32 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task UpdateWorkSessionAsync(WorkSession workSession)
+        public async Task<WorkSession> UpdateWorkSessionAsync(WorkSession workSession)
         {
-            var sql = $@"UPDATE WorkSessions SET
-                         UserId = @UserId
-                         StartTime = @StartTime
-                         EndTime = COALESCE(@EndTime, GETUTCDATE())
-                         SessionOriginId = @SessionOriginId
-                         EditedBy = @EditedBy";
+            var sql = @"
+                        UPDATE WorkSessions SET
+                            UserId = @UserId,
+                            StartTime = @StartTime,
+                            EndTime = COALESCE(@EndTime, GETUTCDATE()),
+                            SessionOriginId = @SessionOriginId,
+                            EditedBy = @EditedBy,
+                            LastUpdatedAt = GETUTCDATE()
+                        OUTPUT 
+                            INSERTED.Id,
+                            INSERTED.UserId,
+                            INSERTED.StartTime,
+                            INSERTED.EndTime,
+                            INSERTED.Duration,
+                            INSERTED.SessionOriginId,
+                            INSERTED.EditedBy,
+                            INSERTED.CreatedAt,
+                            INSERTED.LastUpdatedAt
+                        WHERE Id = @Id;
+                    ";
 
             using var connection = new SqlConnection(_connectionString);
 
-            await connection.ExecuteAsync(sql, workSession);
+            return await connection.QuerySingleAsync<WorkSession>(sql, workSession);
         }
     }
 }

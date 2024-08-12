@@ -178,9 +178,9 @@ namespace Time_Tracker.Repositories
 
             using var connection = new SqlConnection(_connectionString);
 
-            var users = await connection.QueryAsync<User>(sql, new { UserIds = userIds });
+            var users = await connection.QueryAsync<DBUser>(sql, new { UserIds = userIds });
 
-            return users.ToDictionary(u => u.Id);
+            return users.Select(DBUser.Deserialize).ToDictionary(u => u.Id);
         }
     }
 }

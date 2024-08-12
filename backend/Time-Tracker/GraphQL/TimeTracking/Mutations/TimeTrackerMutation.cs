@@ -38,16 +38,29 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                     return workSessionInsertResult;
                 });
 
-/*            Field<StartSessionResponseGraphType>("stopSession")
+            Field<WorkSessionGraphType>("stopSession")
                 .Argument<NonNullGraphType<IntGraphType>>("workSessionId")
                 .ResolveAsync(async context =>
                 {
                     var workSessionId = context.GetArgument<int>("workSessionId");
 
-                    var workSessionInsertResult = await workSessionRepository.AddWorkSessionAsync(sessionInput);
+                    var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(workSessionId);
 
-                    return workSessionInsertResult;
-                });*/
+                    if (currentWorkSession is null)
+                    {
+                        context.Errors.Add(new ExecutionError($"Works session with id = {workSessionId} does not exist."));
+                        return null;
+                    }  
+                    else if(currentWorkSession.EndTime is not null)
+                    {
+                        context.Errors.Add(new ExecutionError($"Works session with id = {workSessionId} alredy stopped."));
+                        return null;
+                    }
+
+                    var updatedWorkSession = await workSessionRepository.UpdateWorkSessionAsync(currentWorkSession);
+
+                    return updatedWorkSession;
+                });
         }
     }
 }

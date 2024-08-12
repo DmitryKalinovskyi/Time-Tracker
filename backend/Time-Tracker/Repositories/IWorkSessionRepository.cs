@@ -7,7 +7,7 @@ namespace Time_Tracker.Repositories
 
         Task<WorkSession> AddWorkSessionAsync(WorkSession workSession);
 
-        Task UpdateWorkSessionAsync(WorkSession workSession);
+        Task<WorkSession> UpdateWorkSessionAsync(WorkSession workSession);
 
         Task DeleteWorkSessionAsync(int id);
 
