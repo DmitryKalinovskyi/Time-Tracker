@@ -89,5 +89,35 @@ public class UserMutation : ObjectGraphType
 
                 return "User updated successfully";
             });
+        
+        Field<StringGraphType>("resetPassword")
+            .Argument<NonNullGraphType<ResetPasswordInputGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                var userInput = context.GetArgument<User>("user");
+
+                var user = await userRepository.FindByEmailAsync(userInput.Email);
+                if (user is null) 
+                    throw new ExecutionError("There is no user with this email address.");
+
+                var existingCode = await activationCodeRepository.FindByUserIdAsync(user.Id);
+                if (existingCode is not null)
+                    await activationCodeRepository.RemoveAsync(existingCode);
+
+                var code = new ActivationCode()
+                {
+                    UserId = user.Id,
+                    Value = Guid.NewGuid()
+                };
+
+                _ = await activationCodeRepository.AddAsync(code);
+
+                await emailSender.SendActivationCodeAsync(user.Email, code.Value.ToString());
+
+                return "Activation code successfully created and sent to the user's email.";
+            });
+
+
+
     }
 }
