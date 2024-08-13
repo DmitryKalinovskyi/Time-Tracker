@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Text;
 using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
@@ -62,10 +63,88 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public Task<List<WorkSession>> GetWorkSessionsWithSortingAsync(int? first, int? last, int? before, int? after)
+        public async Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage)> GetWorkSessionsWithPagination(int? first, int? last, int? beforeId, int? afterId)
         {
+            var sql = @"WITH FilteredCTE AS (
+                            SELECT 
+                                *,
+                                ROW_NUMBER() OVER (ORDER BY Id ASC) AS RowAsc,
+                                ROW_NUMBER() OVER (ORDER BY Id DESC) AS RowDesc
+                            FROM 
+                                WorkSessions
+                            WHERE 
+                                (@afterId IS NULL OR Id > @afterId) AND 
+                                (@beforeId IS NULL OR Id < @beforeId)
+                        ),
+                        PagedResults AS (
+                            SELECT 
+                                *
+                            FROM 
+                                FilteredCTE
+                            WHERE
+                                (@first IS NOT NULL AND RowAsc <= @first) OR
+                                (@last IS NOT NULL AND RowDesc <= @last)
+                        ),
+                        CheckNextPage AS (
+                            SELECT 1 AS HasNextPage 
+                            FROM FilteredCTE
+                            WHERE
+                                (@first IS NOT NULL AND RowAsc > @first) OR
+                                (@last IS NOT NULL AND RowDesc > @last)
+                        ),
+                        CheckPrevPage AS (
+                            SELECT 1 AS HasPrevPage
+                            FROM FilteredCTE
+                            WHERE
+                                (@afterId IS NOT NULL AND RowAsc > 1) OR
+                                (@beforeId IS NOT NULL AND RowDesc > 1)
+                        )
+                        SELECT 
+                               Id,
+                               UserId,
+                               StartTime,
+                               EndTime,
+                               SessionOriginId,
+                               Duration,
+                               EditedBy,
+                               CreatedAt,
+                               LastUpdatedAt,
+                            ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
+                            ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
+                        FROM 
+                            PagedResults
+                        ORDER BY Id ASC;";
 
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var parameters = new
+                {
+                    first,
+                    last,
+                    beforeId,
+                    afterId
+                };
+
+                var result = await connection.QueryAsync<dynamic>(sql, parameters);
+
+                var items = result.Select(r => new WorkSession
+                {
+                    Id = (int)r.Id,
+                    UserId = (int)r.UserId,
+                    StartTime = (DateTime?)r.StartTime,
+                    EndTime = (DateTime?)r.EndTime,
+                    SessionOriginId = (int)r.SessionOriginId,
+                    Duration = (long?)r.Duration,
+                    EditedBy = (int?)r.EditedBy,
+                    CreatedAt = (DateTime)r.CreatedAt,
+                    LastUpdatedAt = (DateTime)r.LastUpdatedAt
+                }).ToList();
+
+                bool hasNextPage = result.Any() && (int)result.First().HasNextPage == 1;
+                bool hasPrevPage = result.Any() && (int)result.First().HasPrevPage == 1;
+
+                return (items, hasNextPage, hasPrevPage);
+            }
 
         }
 

@@ -13,7 +13,7 @@ namespace Time_Tracker.Repositories
 
         Task<WorkSession?> GetWorkSessionByIdAsync(int id);
 
-        Task<List<WorkSession>> GetWorkSessionsWithSortingAsync(int? first, int? last, int? before, int? after);
+        Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage)> GetWorkSessionsWithPagination(int? first, int? last, int? beforeId, int? afterId);
 
 
     }
