@@ -20,33 +20,43 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
             .Bidirectional()
             .ResolveAsync(async context =>
             {
-                int? first = context.GetArgument<int?>("first");
-                string afterCursor = context.GetArgument<string>("after");
-                int? after = !string.IsNullOrEmpty(afterCursor) ? CursorHelper.FromCursor(afterCursor) : (int?)null;
+                var paginationArgs = BasePaginationHelper.GetBasePaginationArgs(context);
 
-                int? last = context.GetArgument<int?>("last");
-                string beforeCursor = context.GetArgument<string>("before");
-                int? before = !string.IsNullOrEmpty(beforeCursor) ? CursorHelper.FromCursor(beforeCursor) : (int?)null;
+                if (paginationArgs.First is not null && paginationArgs.Last is not null)
+                {
+                    context.Errors.Add(new ExecutionError("Last and First could not be specified together."));
+                    return null;
+                }
 
+                if (paginationArgs.Before is not null && paginationArgs.After is not null)
+                {
+                    context.Errors.Add(new ExecutionError("Before and After could not be specified together."));
+                    return null;
+                }
 
-                var users = await usersRepository.GetUsersAsync(first, after, last, before);
-                var totalCount = await usersRepository.GetTotalUsersCount();
+                if (paginationArgs.Before is null && paginationArgs.After is null
+                      && paginationArgs.First is null && paginationArgs.Last is null)
+                {
+                    context.Errors.Add(new ExecutionError("You need to specify at least one argument."));
+                    return null;
+                }
 
+                var (users, hasNextPage, hasPrevPage) = await usersRepository.GetUsersAsync(paginationArgs.First, paginationArgs.After, 
+                                                                paginationArgs.Last, paginationArgs.Before);
+
+ 
                 var edges = users.Select(u => new Edge<User>
                 {
                     Node = u,
                     Cursor = u.Id.ToCursor()
                 }).ToList();
 
-                var hasNextPage = edges.Count < totalCount;
-                var hasPreviousPage = before.HasValue || (after.HasValue && edges.First().Node?.Id > 10); ;
-
                 var pageInfo = new PageInfo
                 {
-                    HasNextPage = !last.HasValue ? hasNextPage : hasPreviousPage,
-                    StartCursor = edges.First().Cursor,
-                    EndCursor = edges.Last().Cursor,
-                    HasPreviousPage = !last.HasValue ? hasPreviousPage : hasNextPage,
+                    HasNextPage = hasNextPage,
+                    StartCursor = edges.FirstOrDefault()?.Cursor,
+                    EndCursor = edges.LastOrDefault()?.Cursor,
+                    HasPreviousPage = hasPrevPage
                 };
 
                 return new Connection<User>
