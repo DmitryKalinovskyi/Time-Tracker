@@ -17,7 +17,7 @@ public class TokenService
         _configuration = configuration;
     }
 
-    public TokenDto GenerateAccessToken(int userId)
+    public TokenDto GenerateToken(int userId)
     {
 
         var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:Key"]);
@@ -46,7 +46,7 @@ public class TokenService
         return new TokenDto(value, DateIssued, DateExpires);
     }
 
-    public ClaimsPrincipal? GetAccessTokenClaimsPrincipal(string accessToken)
+    public ClaimsPrincipal? GetTokenClaimsPrincipal(string accessToken)
     {
         var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:Key"]);
 
@@ -64,18 +64,5 @@ public class TokenService
 
         return new JwtSecurityTokenHandler().ValidateToken(accessToken, validation, out _);
 
-    }
-
-    public TokenDto GenerateRefreshToken()
-    {
-        var randomNumber = new byte[64];
-
-        using var numberGenerator = RandomNumberGenerator.Create();
-        numberGenerator.GetBytes(randomNumber);
-
-        DateTime DateIssued = DateTime.UtcNow;
-        DateTime DateExpires = DateIssued.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenLifeTimeInMinutes"]));
-
-        return new TokenDto(Convert.ToBase64String(randomNumber), DateIssued, DateExpires);
     }
 }
