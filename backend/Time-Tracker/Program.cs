@@ -40,6 +40,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+builder.Services.AddSingleton<IWorkSessionRepository, WorkSessionRepository>();
+builder.Services.AddSingleton<ISessionOriginRepository, SessionOriginRepository>();
 builder.Services.AddSingleton<IActivationCodeRepository, ActivationCodeRepository>();
 
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
@@ -57,6 +59,7 @@ builder.Services.AddGraphQL(b => b
     .AddAuthorizationRule()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = true)
     .AddGraphTypes(typeof(RootSchema).Assembly)
+    .AddDataLoader()
 ).AddAuthorization(options =>
 {
     foreach (var permission in Permissions.GetAllPermissions())
