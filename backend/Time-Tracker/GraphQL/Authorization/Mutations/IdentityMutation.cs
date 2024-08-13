@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Time_Tracker.Dtos;
+using Time_Tracker.GraphQL.Authorization.Exceptions;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
@@ -20,10 +21,10 @@ public class IdentityMutation : ObjectGraphType
 
             var user = await usersRepository.FindByEmailAsync(query.Email);
 
-            if (user is null || !user.IsActive) throw new ExecutionError("Wrong email or password.");
+            if (user is null || !user.IsActive) throw new InvalidCredentialsExecutionError("Wrong email or password.");
 
             if (hashingService.ComputeHash(query.Password, user.Salt) != user.HashedPassword)
-                throw new ExecutionError("Wrong email or password.");
+                throw new InvalidCredentialsExecutionError("Wrong email or password.");
 
             var accessToken = tokenService.GenerateAccessToken(user.Id);
             var refreshToken = tokenService.GenerateRefreshToken();
@@ -46,22 +47,18 @@ public class IdentityMutation : ObjectGraphType
                 // If they match and refresh token is not expired, create new acccess and refresh tokens.
                 var userId = tokenService.GetAccessTokenClaimsPrincipal(input.AccessToken).GetUserId();
 
-                if(userId == null)
-                {
-                    return new RefreshTokenResponseDto(null, null, null);
-                }
+                var user = await usersRepository.FindAsync(userId) ??
+                    throw new UserNotFoundedExecutionError("User not founded.");
 
-                var user = await usersRepository.FindAsync((int)userId);
-                if(user == null 
-                || user.RefreshToken == null
+                if (user.RefreshToken == null
                 || user.RefreshTokenDateExpires == null
                 || user.RefreshToken != input.RefreshToken
                 || user.RefreshTokenDateExpires < DateTime.UtcNow)
                 {
-                    return new RefreshTokenResponseDto(null, null, null);
+                    throw new InvalidRefreshTokenExecutionError("Refresh token is invalid or expired.");
                 }
 
-                var accessToken = tokenService.GenerateAccessToken((int)userId);
+                var accessToken = tokenService.GenerateAccessToken(userId);
                 var refreshToken = tokenService.GenerateRefreshToken();
 
                 user.RefreshToken = refreshToken.Value;
@@ -77,11 +74,8 @@ public class IdentityMutation : ObjectGraphType
             {
                 var userId = context.User.GetUserId();
 
-                if (userId == null) throw new ExecutionError("Invalid payload.");
-
-                var user = await usersRepository.FindAsync((int)userId);
-
-                if(user == null) throw new ExecutionError("User not founded.");
+                var user = await usersRepository.FindAsync(userId) ?? 
+                    throw new UserNotFoundedExecutionError("User not founded.");
 
                 user.RefreshToken = null;
                 user.RefreshTokenDateExpires = null;
