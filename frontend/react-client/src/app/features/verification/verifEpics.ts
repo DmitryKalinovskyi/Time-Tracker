@@ -4,17 +4,16 @@ import { ajax } from "rxjs/ajax";
 import { VerifPayload, verifUserRequest, verifUserSuccess, verifUserFailure } from "./verifSlice";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
-import {createRequest} from "../../misc/RequestCreator";
+import { createRequest } from "../../misc/RequestCreator";
 import { verifUserQuery } from "../../../api/queries/userQueries";
 
 export const verifUserEpic = (action$: Observable<Action>) =>
     action$.pipe(
         ofType(verifUserRequest.type),
-        mergeMap((action: PayloadAction<VerifPayload>) => {
+            mergeMap((action: PayloadAction<VerifPayload>) => {
             return ajax(createRequest(verifUserQuery(action.payload.code, action.payload.password), null))
             .pipe(
                 map((ajaxResponse: any) => {
-                    console.log(ajaxResponse);
                     const errors = ajaxResponse.response.errors;
                     const data = ajaxResponse.response.data;
 
