@@ -1,9 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Client;
-using System.Text;
-using System.Threading.Tasks;
-using Time_Tracker.Dtos;
 using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
@@ -72,31 +68,88 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<List<User>> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
+        public async Task<(IEnumerable<User>, bool HasNextPage, bool HasPrevPage)> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
         {
-            var sql = new StringBuilder("SELECT TOP (@topCount) * FROM Users WHERE 1=1");
 
-            if (afterId.HasValue)
-            {
-                sql.Append(" AND Id > @afterId");
-            }
-
-            if (beforeId.HasValue)
-            {
-                sql.Append(" AND Id < @beforeId");
-            }
-
-            var orderBy = "Id ASC";
-            if (last.HasValue)
-            {
-                orderBy = "Id DESC";
-            }
-            sql.Append($" ORDER BY {orderBy}");
+            var sql = @"WITH FilteredCTE AS (
+                            SELECT 
+                                *,
+                                ROW_NUMBER() OVER (ORDER BY Id ASC) AS RowAsc,
+                                ROW_NUMBER() OVER (ORDER BY Id DESC) AS RowDesc
+                            FROM 
+                                Users
+                            WHERE 
+                                (@afterId IS NULL OR Id > @afterId) AND 
+                                (@beforeId IS NULL OR Id < @beforeId)
+                        ),
+                        PagedResults AS (
+                            SELECT 
+                                *
+                            FROM 
+                                FilteredCTE
+                            WHERE
+                                (@first IS NOT NULL AND RowAsc <= @first) OR
+                                (@last IS NOT NULL AND RowDesc <= @last)
+                        ),
+                        CheckNextPage AS (
+                            SELECT 1 AS HasNextPage 
+                            FROM FilteredCTE
+                            WHERE
+                                (@first IS NOT NULL AND RowAsc > @first) OR
+                                (@last IS NOT NULL AND RowDesc > @last)
+                        ),
+                        CheckPrevPage AS (
+                            SELECT 1 AS HasPrevPage
+                            FROM FilteredCTE
+                            WHERE
+                                (@afterId IS NOT NULL AND RowAsc > 1) OR
+                                (@beforeId IS NOT NULL AND RowDesc > 1)
+                        )
+                        SELECT 
+                               Id,
+                               Email,
+                               FullName,
+                               HashedPassword,
+                               Salt,
+                               IsActive,
+                               Permissions,
+                               RefreshToken,
+                               RefreshTokenDateExpires,
+                            ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
+                            ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
+                        FROM 
+                            PagedResults
+                        ORDER BY Id ASC;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var dbUsers = await connection.QueryAsync<DBUser>(sql.ToString(), new { topCount = first ?? last ?? 10, afterId, beforeId }); // Default to 10 if neither first nor last is provided
-                return dbUsers.Select(DBUser.Deserialize).AsList();
+                var parameters = new
+                {
+                    first,
+                    last,
+                    beforeId,
+                    afterId,
+                };
+
+                var result = await connection.QueryAsync<dynamic>(sql, parameters);
+
+                var items = result.Select(r => new DBUser
+                {
+                    Id = (int)r.Id,
+                    FullName = (string)r.FullName,
+                    Email = (string)r.Email,
+                    HashedPassword = (string)r.HashedPassword,
+                    Salt = (string)r.Salt,
+                    IsActive = r.IsActive,
+                    Permissions = r.Permissions,
+                    RefreshToken = (string?)r.RefreshToken,
+                    RefreshTokenDateExpires = (DateTime?)r.RefreshTokenDateExpires
+                }).Select(DBUser.Deserialize).ToList();
+
+                bool hasNextPage = result.Any() && (int)result.First().HasNextPage == 1;
+                bool hasPrevPage = result.Any() && (int)result.First().HasPrevPage == 1;
+
+                return (items, hasNextPage, hasPrevPage);
             }
         }
 
@@ -172,9 +225,15 @@ namespace Time_Tracker.Repositories
             await connection.ExecuteAsync(query, dbUser);
         }
 
-        public async Task DeleteAsync(int userId)
+        public async Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds)
         {
-            throw new NotImplementedException();
+            var sql = "SELECT * FROM Users WHERE Id IN @UserIds";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            var users = await connection.QueryAsync<DBUser>(sql, new { UserIds = userIds });
+
+            return users.Select(DBUser.Deserialize).ToDictionary(u => u.Id);
         }
     }
 }
