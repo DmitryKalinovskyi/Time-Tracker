@@ -1,6 +1,6 @@
 import User from "../../app/types/User.ts";
 import Token from "../../app/types/Token.ts";
-export interface authUserQueryResponse{
+export interface authUserQueryResponse {
   identityQuery: {
     login: {
       accessToken: Token,
@@ -8,17 +8,17 @@ export interface authUserQueryResponse{
   }
 }
 
-export interface regUserQueryResponse{
+export interface regUserQueryResponse {
   userMutation: {
     createUser: User
   }
 }
 
 export const authUserQuery = (
-    email: string, 
-    password: string, 
-  ) => {
-    const query = `
+  email: string,
+  password: string,
+) => {
+  const query = `
       query Login{
                   identityQuery{
                     login(input: {email: "${email}", password: "${password}"}){
@@ -31,14 +31,14 @@ export const authUserQuery = (
                 }
             }
     `;
-  
-    return query;
+
+  return query;
 };
 
 
 export const regUserQuery = (
-  fullName: string, 
-  email: string, 
+  fullName: string,
+  email: string,
 ) => {
   const query = `
       mutation Registration{
@@ -112,6 +112,28 @@ export const getUserQuery = () => {
       permissions
       isActive
     }
+  }
+}
+`;
+  return query;
+}
+
+export const updateUserMutation = () => {
+  const query = `
+  mutation userMutation($id: Int!, $fullName: String!, $email: String!){
+  userMutation {
+    updateUser(user: { id: $id, fullName: $fullName, email: $email })
+  }
+}
+`;
+  return query;
+}
+
+export const updateUserActiveStatusMutation = () => {
+  const query = `
+  mutation userMutation($id: Int!, $isActive: Boolean!){
+  userMutation {
+    updateUserActiveSatus(id: $id, isActive: $isActive)
   }
 }
 `;

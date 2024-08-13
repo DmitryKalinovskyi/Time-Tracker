@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
 import { getUsersEpic } from "./features/users/usersEpics.ts";
-import { getUserEpic } from "./features/user/userEpics.ts";
+import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic } from "./features/user/userEpics.ts";
 
 
 
@@ -21,7 +21,9 @@ const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, v
     regUserEpic,
     verifUserEpic,
     getUsersEpic,
-    getUserEpic
+    getUserEpic,
+    updateUserEpic,
+    updateUserActiveStatusEpic
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, void, any>();
