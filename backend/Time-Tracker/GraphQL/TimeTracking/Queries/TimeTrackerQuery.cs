@@ -26,9 +26,12 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
 
             Connection<WorkSessionGraphType>("workSessions")
                 .Bidirectional()
+                .Argument<IntGraphType>("year")
+                .Argument<IntGraphType>("month")
+                .Argument<IntGraphType>("day")
                 .ResolveAsync(async context =>
                 {
-                    var paginationArgs = PaginationHelper.GetPaginationArgs(context);
+                    var paginationArgs = ExtendedPaginationHelper.GetExtendedPaginationArgs(context);
 
                     if(paginationArgs.First is not null && paginationArgs.Last is not null)
                     {
@@ -49,7 +52,32 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                         return null;
                     }
 
-                    var (workSessions, hasNextPage, hasPrevPage) = await workSessionRepository.GetWorkSessionsWithSortingAsync(paginationArgs.First, paginationArgs.Last, paginationArgs.Before, paginationArgs.After);
+                    if (paginationArgs.Year is not null && paginationArgs.Day is not null && paginationArgs.Month is null)
+                    {
+                        context.Errors.Add(new ExecutionError("You need to specify month to paginate using days."));
+                        return null;
+                    }
+
+                    if (paginationArgs.Year is null && paginationArgs.Day is not null && paginationArgs.Month is not null)
+                    {
+                        context.Errors.Add(new ExecutionError("You need to specify year to paginate using days."));
+                        return null;
+                    }
+
+                    if (paginationArgs.Year is null && paginationArgs.Day is not null && paginationArgs.Month is null)
+                    {
+                        context.Errors.Add(new ExecutionError("You need to specify year and month to paginate using days."));
+                        return null;
+                    }
+
+                    if (paginationArgs.Year is null && paginationArgs.Day is null && paginationArgs.Month is not null)
+                    {
+                        context.Errors.Add(new ExecutionError("You need to specify year to paginate using months."));
+                        return null;
+                    }
+
+                    var (workSessions, hasNextPage, hasPrevPage) = await workSessionRepository.GetWorkSessionsWithPagination(paginationArgs.First, paginationArgs.Last, paginationArgs.Before, paginationArgs.After,
+                                                                                                                             paginationArgs.Year, paginationArgs.Month, paginationArgs.Day);
 
                     var edges = workSessions.Select(w => new Edge<WorkSession>
                     {
@@ -60,8 +88,8 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                     var pageInfo = new PageInfo
                     {
                         HasNextPage = hasNextPage,
-                        StartCursor = edges.First().Cursor,
-                        EndCursor = edges.Last().Cursor,
+                        StartCursor = edges.FirstOrDefault()?.Cursor,
+                        EndCursor = edges.LastOrDefault()?.Cursor,
                         HasPreviousPage = hasPrevPage,
                     };
 

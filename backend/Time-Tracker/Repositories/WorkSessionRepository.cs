@@ -63,7 +63,13 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage)> GetWorkSessionsWithPagination(int? first, int? last, int? beforeId, int? afterId)
+        public async Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage)> GetWorkSessionsWithPagination(int? first, 
+            int? last, 
+            int? beforeId, 
+            int? afterId,
+            int? year,
+            int? month,
+            int? day)
         {
             var sql = @"WITH FilteredCTE AS (
                             SELECT 
@@ -73,6 +79,9 @@ namespace Time_Tracker.Repositories
                             FROM 
                                 WorkSessions
                             WHERE 
+                                (@year IS NULL OR YEAR(StartTime) = @year) AND
+                                (@month IS NULL OR MONTH(StartTime) = @month) AND
+                                (@day IS NULL OR DAY(StartTime) = @day) AND
                                 (@afterId IS NULL OR Id > @afterId) AND 
                                 (@beforeId IS NULL OR Id < @beforeId)
                         ),
@@ -122,7 +131,10 @@ namespace Time_Tracker.Repositories
                     first,
                     last,
                     beforeId,
-                    afterId
+                    afterId,
+                    year,
+                    month,
+                    day
                 };
 
                 var result = await connection.QueryAsync<dynamic>(sql, parameters);

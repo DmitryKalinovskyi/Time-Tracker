@@ -2,7 +2,7 @@
 
 namespace Time_Tracker.Helpers
 {
-    public class PaginationArgs
+    public class BasePaginationArgs
     {
         public int? First { get; set; }
         public int? Last { get; set; }
@@ -10,9 +10,9 @@ namespace Time_Tracker.Helpers
         public int? Before { get; set; }
     }
 
-    public class PaginationHelper
+    public class BasePaginationHelper
     {
-            public static PaginationArgs GetPaginationArgs<TSource>(IResolveFieldContext<TSource> context)
+            public static BasePaginationArgs GetBasePaginationArgs<TSource>(IResolveFieldContext<TSource> context)
             {
                 var first = context.GetArgument<int?>("first");
                 var afterCursor = context.GetArgument<string>("after");
@@ -22,7 +22,7 @@ namespace Time_Tracker.Helpers
                 var beforeCursor = context.GetArgument<string>("before");
                 var before = !string.IsNullOrEmpty(beforeCursor) ? CursorHelper.FromCursor(beforeCursor) : null;
 
-                return new PaginationArgs
+                return new BasePaginationArgs
                 {
                     First = first,
                     Last = last,
