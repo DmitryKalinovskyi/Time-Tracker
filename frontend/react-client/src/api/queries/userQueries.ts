@@ -4,6 +4,17 @@ export interface authUserQueryResponse{
   identityMutation: {
     login: {
       accessToken: Token,
+      refreshToken: Token
+    }
+  }
+}
+
+export interface refreshTokenQueryResponse{
+  identityMutation:{
+    refreshToken:{
+      user: User,
+      accessToken: Token,
+      refreshToken: Token
     }
   }
 }
@@ -34,6 +45,32 @@ export const authUserQuery = (
   
     return query;
 };
+
+export const refreshTokenQuery = () =>
+    `
+    mutation RefreshToken($input: RefreshTokenRequest!){
+  identityMutation{
+    refreshToken(input: $input){
+      user{
+        id,
+        fullName,
+        email,
+        permissions
+      },
+      accessToken{
+        value,
+        dateIssued,
+        dateExpires
+      },
+      refreshToken{
+        value,
+        dateIssued,
+        dateExpires
+      }
+    }
+  }
+}
+    `
 
 
 export const regUserQuery = (

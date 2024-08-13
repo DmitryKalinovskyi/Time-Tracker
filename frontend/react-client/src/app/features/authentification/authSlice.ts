@@ -1,6 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import User from "../../types/User.ts";
-import { ACCESS_TOKEN_KEY_NAME } from "../../config.ts";
 import Token from "../../types/Token.ts";
 
 export interface AuthType {
@@ -18,7 +17,7 @@ export interface AuthPayload {
 
 const initialState: AuthType =
 {
-    accessToken: JSON.parse(localStorage.getItem(ACCESS_TOKEN_KEY_NAME) as string) ?? null,
+    accessToken: null,
     user: null,
     loading: false,
     error: null,
@@ -30,27 +29,15 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         authUser : (state, _action: PayloadAction<AuthPayload>) => {
-            state.accessToken = null;
-            state.user = null;
             state.loading = true;
-            state.error = null;
-            state.success = null;
         },
 
         authUserSuccess: (state, action: PayloadAction<AuthType>) => {
-
-            console.log(action.payload)
-            console.log("Authenticated.")
-
             state.accessToken = action.payload.accessToken;
             state.user = action.payload.user;
             state.success = action.payload.success;
             state.loading = false;
             state.error = null;
-
-            localStorage.setItem(ACCESS_TOKEN_KEY_NAME, JSON.stringify(
-                action.payload.accessToken
-            ));
         },
 
         authUserFailure: (state, action: PayloadAction<any>) => {
@@ -61,8 +48,6 @@ const authSlice = createSlice({
             state.error = action.payload.toString();
             state.success = false;
             state.loading = false;
-            
-            localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
         },
 
         logout: (state, action: PayloadAction) => {
@@ -71,8 +56,6 @@ const authSlice = createSlice({
             state.error = null;
             state.success = false;
             state.loading = false;
-            localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
-
         }
     }
 })

@@ -1,11 +1,12 @@
-import {API_URL, ACCESS_TOKEN_KEY_NAME} from "../config";
-import Token from "../types/Token.ts";
+import {API_URL} from "../config";
+import {store} from "../store.ts";
+import {AuthType} from "../features/authentification/authSlice.ts";
 
 function getAccessToken() {
-  const accessToken: Token | null = JSON.parse(localStorage.getItem(ACCESS_TOKEN_KEY_NAME) ?? "null");
-  return accessToken?.value ?? "";
-}
+  const authState: AuthType = store.getState().auth;
 
+  return authState.accessToken?.value ?? "";
+}
 export const createRequest = (query: string, variables: object = {}) => ({
   url: `${API_URL}/graphql`,
   method: 'POST',
