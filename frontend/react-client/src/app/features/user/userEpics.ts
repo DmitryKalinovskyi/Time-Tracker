@@ -1,12 +1,11 @@
-import { PayloadAction } from "@reduxjs/toolkit";
-import { catchError, map, mapTo, mergeMap, Observable, of } from "rxjs";
-import { ajax } from "rxjs/ajax";
-import { Action } from "@reduxjs/toolkit";
+import { Action, PayloadAction } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
+import { catchError, map, mergeMap, Observable, of } from "rxjs";
+import { ajax } from "rxjs/ajax";
+import { getUserQuery, updateUserActiveStatusMutation, updateUserMutation, updateUserPermissionsMutation } from "../../../api/queries/userQueries";
 import { createRequest } from "../../misc/RequestCreator";
-import { getUserQuery, updateUserActiveStatusMutation, updateUserMutation } from "../../../api/queries/userQueries";
-import { fetchUserFailure, fetchUserSuccess } from "./userSlice";
 import { ShowFailure, ShowSuccess } from "../../misc/SnackBarHelper";
+import { fetchUserFailure, fetchUserSuccess } from "./userSlice";
 
 export const fetchUser = (userId: number) => ({ type: "FETCH_USER", payload: userId });
 export const getUserEpic = (action$: Observable<Action>) =>
@@ -121,3 +120,41 @@ export const updateUserActiveStatusEpic = (action$: Observable<Action>) =>
         )
     })
   );
+
+  export interface UpdateUserPermissionsPayload {
+    id: number,
+    permissions: string[]
+  }
+  
+  export const updateUserPermissions = (user: UpdateUserPermissionsPayload) => ({ type: "UPDATE_USER_PERMISSIONS", payload: user });
+  export const updateUserPermissionsEpic = (action$: Observable<Action>) =>
+    action$.pipe(
+      ofType("UPDATE_USER_PERMISSIONS"),
+      mergeMap((action: PayloadAction<UpdateUserPermissionsPayload>) => {
+        return ajax(createRequest(updateUserPermissionsMutation(),
+          {
+            "id": action.payload.id,
+            "permissions": action.payload.permissions
+          }))
+          .pipe(
+            mergeMap((ajaxResponse: any) => {
+              const errors = ajaxResponse.response.errors;
+              const data = ajaxResponse.response.data;
+  
+              if (errors && errors.length > 0) {
+                throw new Error(errors[0].message);
+              }
+              if (data && data.userMutation) {
+                ShowSuccess(data.userMutation.updateUserPermissions);
+                return of(fetchUser(action.payload.id));
+              }
+              return of();
+            }),
+            catchError((error: any) => {
+              let message = error.message || 'An unexpected error occurred';
+              ShowFailure(message)
+              return of(fetchUserFailure(message))
+            })
+          )
+      })
+    );

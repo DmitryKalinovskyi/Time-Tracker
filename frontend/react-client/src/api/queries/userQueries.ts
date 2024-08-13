@@ -139,3 +139,16 @@ export const updateUserActiveStatusMutation = () => {
 `;
   return query;
 }
+
+
+export const updateUserPermissionsMutation = () => {
+  const query = `
+  mutation userMutation($id: Int!, $permissions: [String]){
+  userMutation {
+    updateUserPermissions(user: { id: $id, permissions: $permissions })
+  }
+}
+`;
+  return query;
+}
+

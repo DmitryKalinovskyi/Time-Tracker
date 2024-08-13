@@ -2,16 +2,19 @@ import { Box } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchUser, updateUser, updateUserActiveStatus } from "../../features/user/userEpics";
+import { fetchUser, updateUser, updateUserActiveStatus, updateUserPermissions } from "../../features/user/userEpics";
 import { RootState } from "../../store";
 import UserProfile from '../components/UserProfile';
 import User from "../../types/User";
+import { fetchPermissions } from "../../features/permissions/permissionsEpics";
 
 export default function UserPage() {
     const { UserId } = useParams();
 
     const user = useSelector((state: RootState) => state.user.user);
     const error = useSelector((state: RootState) => state.user.error);
+    const permisisons = useSelector((state: RootState) => state.permissions.permissions);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -37,11 +40,29 @@ export default function UserPage() {
         ));
     };
 
+    const HandleGetPermissions = () => {
+        dispatch(fetchPermissions());
+    };
+
+    const HandleSaveUserPermissions = (permissions: string[]) => {
+        dispatch(updateUserPermissions(
+            {
+                id: user.id,
+                permissions: permissions
+            }
+        ))
+    };
+
     return (
         <>
             <Box sx={{ p: 1 }} >
                 {user.id ?
-                    <UserProfile user={user} onSave={HandleSaveUserProfile} onUpdateUserActiveStatus={HandleUpdateUserActiveStatus} />
+                    <UserProfile user={user} 
+                    onSaveProfile={HandleSaveUserProfile} 
+                    onSavePermissions={HandleSaveUserPermissions} 
+                    onUpdateUserActiveStatus={HandleUpdateUserActiveStatus} 
+                    getPermissions={HandleGetPermissions}
+                    availablePermissions={permisisons}/>
                     : error}
             </Box>
         </>

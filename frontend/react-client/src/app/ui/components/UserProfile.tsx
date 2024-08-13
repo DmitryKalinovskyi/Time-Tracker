@@ -1,5 +1,5 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Button, Card, Chip, Divider, Grid, IconButton, MenuItem, TextField, Typography } from "@mui/material";
+import { Button, Card, Chip, Divider, Grid, IconButton, MenuItem, Switch, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import User from "../../types/User";
 import { StyledMenu } from './StyledMenu';
@@ -7,12 +7,15 @@ import { StyledMenu } from './StyledMenu';
 
 interface UserProfileProps {
     user: User;
-    onSave: (updatedUser: User) => void;
+    onSaveProfile: (updatedUser: User) => void;
+    onSavePermissions: (permissions: string[]) => void;
     onUpdateUserActiveStatus: (isActive: boolean) => void;
+    getPermissions: () => void;
+    availablePermissions: string[];
 }
 
 export default function UserProfile(props: UserProfileProps) {
-    const { user, onSave, onUpdateUserActiveStatus } = props;
+    const { user, onSaveProfile, onSavePermissions, onUpdateUserActiveStatus, getPermissions, availablePermissions } = props;
 
     // Edit profile
     const [editProfileMode, setEditProfileMode] = useState(false);
@@ -24,7 +27,7 @@ export default function UserProfile(props: UserProfileProps) {
     };
 
     const handleSaveProfile = () => {
-        onSave(editedUser);
+        onSaveProfile(editedUser);
         setEditProfileMode(false);
     };
 
@@ -40,14 +43,40 @@ export default function UserProfile(props: UserProfileProps) {
         setAnchorEl(null);
     };
 
-    const handleEditClick = () => {
+    const handleEditProfileClick = () => {
         setEditProfileMode(true);
+        handleMenuClose();
+    };
+
+    const handleEditPermissionsClick = () => {
+        setEditPermissionsMode(true);
+        getPermissions();
         handleMenuClose();
     };
 
     const handleEnableDisableClick = () => {
         onUpdateUserActiveStatus(!user.isActive);
         handleMenuClose();
+    };
+
+    // Edit permissions
+    const [editPermissionsMode, setEditPermissionsMode] = useState(false);
+    const [editedPermissions, setEditedPermissions] = useState<string[]>(user.permissions);
+
+
+    const handlePermissionChange = (permission: string) => {
+        const includes = editedPermissions.includes(permission);
+
+        if (includes) {
+            setEditedPermissions(editedPermissions.filter(p => p !== permission));
+        } else {
+            setEditedPermissions([...editedPermissions, permission]);
+        }
+    };
+
+    const handleSavePermissoins = () => {
+        onSavePermissions(editedPermissions);
+        setEditPermissionsMode(false);
     };
 
     if (editProfileMode) {
@@ -82,6 +111,40 @@ export default function UserProfile(props: UserProfileProps) {
                     </Grid>
                 </Grid>
             </Card>
+        )
+    }
+
+
+    if (editPermissionsMode) {
+
+        return (<Card sx={{ margin: '20px auto', padding: 2 }}>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <Typography variant='h6'>Edit Permissions</Typography>
+                    {availablePermissions.map(permission => (
+                        <Grid key={permission} container alignItems="center">
+                            <Grid item xs={4}>
+                                <Typography>{permission}</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Switch
+                                    checked={editedPermissions.includes(permission)}
+                                    onClick={() => handlePermissionChange(permission)}
+                                />
+                            </Grid>
+                        </Grid>
+                    ))}
+                </Grid>
+                <Grid item xs={12}>
+                    <Button variant="contained" size='small' onClick={handleSavePermissoins} sx={{ mr: "5px" }}>
+                        Save
+                    </Button>
+                    <Button variant="contained" size='small' onClick={() => setEditPermissionsMode(false)}>
+                        Cancel
+                    </Button>
+                </Grid>
+            </Grid>
+        </Card>
         )
     }
 
@@ -148,8 +211,8 @@ export default function UserProfile(props: UserProfileProps) {
                             <MoreVertIcon />
                         </IconButton>
                         <StyledMenu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-                            <MenuItem onClick={handleEditClick}>Edit Profile</MenuItem>
-                            <MenuItem onClick={handleEditClick}>Edit Permissions</MenuItem>
+                            <MenuItem onClick={handleEditProfileClick}>Edit Profile</MenuItem>
+                            <MenuItem onClick={handleEditPermissionsClick}>Edit Permissions</MenuItem>
                             <MenuItem onClick={handleEnableDisableClick}>Enable/Disable</MenuItem>
                         </StyledMenu>
                     </Grid>
