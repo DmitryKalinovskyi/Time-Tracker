@@ -30,6 +30,8 @@ export const getUserEpic = (action$: Observable<Action>) =>
             }
             if (data && data.usersQuery.user) {
               return fetchUserSuccess(data.usersQuery.user);
+            } else {
+              throw new Error('[FETCH_USERS] Unexpected response format or missing user data');
             }
           }),
           catchError((error: any) =>
@@ -67,12 +69,15 @@ export const updateUserEpic = (action$: Observable<Action>) =>
             if (data && data.userMutation) {
               ShowSuccess(data.userMutation.updateUser);
               return of(fetchUser(action.payload.id));
+            } else {
+              throw new Error('[FETCH_USERS] Unexpected response format or missing user data');
             }
-            return of();
           }),
-          catchError((error: any) =>
-            of(ShowFailure(error.message || 'An unexpected error occurred'))
-          )
+          catchError((error: any) => {
+            let message = error.message || 'An unexpected error occurred';
+            ShowFailure(message)
+            return of(fetchUserFailure(message))
+          })
         )
     })
   );
@@ -108,9 +113,11 @@ export const updateUserActiveStatusEpic = (action$: Observable<Action>) =>
             }
             return of();
           }),
-          catchError((error: any) =>
-            of(ShowFailure(error.message || 'An unexpected error occurred'))
-          )
+          catchError((error: any) => {
+            let message = error.message || 'An unexpected error occurred';
+            ShowFailure(message)
+            return of(fetchUserFailure(message))
+          })
         )
     })
   );
