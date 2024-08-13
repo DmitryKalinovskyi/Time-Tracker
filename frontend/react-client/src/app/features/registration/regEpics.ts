@@ -5,7 +5,7 @@ import { RegPayload, regUserFailure, regUserRequest, regUserSuccess } from "./re
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { createRequest } from "../../misc/RequestCreator";
-import { regUserQuery, regUserQueryResponse } from "../../../api/queries/userQueries";
+import { regUserQuery, regUserQueryResponse } from "./api/registrationQueries.ts";
 
 export const regUserEpic = (action$: Observable<Action>) =>
     action$.pipe(

@@ -6,7 +6,7 @@ import regReducer from "./features/registration/regSlice.ts";
 import verifReducer  from "./features/verification/verifSlice.ts";
 import resetReducer  from "./features/resetPassword/resetSlice.ts";
 
-import { authUserEpic } from "./features/authentification/authEpics.ts";
+import {authUserEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
@@ -15,6 +15,7 @@ import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
 
 
 const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, void, any>(
+    refreshTokenEpic,
     authUserEpic,
     regUserEpic,
     verifUserEpic,

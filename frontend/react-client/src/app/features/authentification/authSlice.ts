@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import User from "../../types/User.ts";
 import Token from "../../types/Token.ts";
+import {saveRefreshToken} from "./refreshTokenManager.ts";
 
 export interface AuthType {
     accessToken: Token | null,
@@ -32,6 +33,11 @@ const authSlice = createSlice({
             state.loading = true;
         },
 
+        refreshToken : (state, action: PayloadAction<{user: User, accessToken: Token}>) => {
+            state.accessToken = action.payload.accessToken;
+            state.user = action.payload.user;
+        },
+
         authUserSuccess: (state, action: PayloadAction<AuthType>) => {
             state.accessToken = action.payload.accessToken;
             state.user = action.payload.user;
@@ -61,6 +67,7 @@ const authSlice = createSlice({
 })
 
 export const {authUser,
+    refreshToken,
     authUserSuccess,
     authUserFailure,
     logout} = authSlice.actions;

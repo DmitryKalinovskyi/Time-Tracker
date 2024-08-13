@@ -1,6 +1,6 @@
 import LoginPage from "../app/ui/pages/LoginPage.tsx";
 import AccountVerificationPage from "../app/ui/pages/AccountVerificationPage.tsx";
-import { Provider } from "react-redux";
+import {Provider, useDispatch} from "react-redux";
 import { store } from "./store.ts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
@@ -9,7 +9,7 @@ import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
-import {useEffect} from "react";
+import {useEffect, useLayoutEffect} from "react";
 
 const router = createBrowserRouter([
   {

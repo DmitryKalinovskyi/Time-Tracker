@@ -4,6 +4,7 @@ import User from "../../../types/User.ts";
 export interface authUserQueryResponse{
     identityMutation: {
         login: {
+            user: User,
             accessToken: Token,
             refreshToken: Token
         }
@@ -33,7 +34,18 @@ export const authUserQuery = (
                        value,
                        dateIssued,
                        dateExpires
-                      }, userId
+                      }, 
+                      refreshToken{
+                        value,
+                        dateIssued,
+                        dateExpires
+                      },
+                      user{
+                        id,
+                        fullName,
+                        email,
+                        permissions
+                      }
                     }
                 }
             }
@@ -67,3 +79,11 @@ export const refreshTokenQuery = () =>
   }
 }
     `
+
+export const logoutQuery =() => `
+mutation Logout{
+  identityMutation{
+    logout
+  }
+}
+`
