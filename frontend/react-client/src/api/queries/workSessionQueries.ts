@@ -1,5 +1,6 @@
 import { WorkSession } from "../../app/types/WorkSession";
 import { AddSessionPayload, PaginationPayload, UpdateSessionPayload } from "../../app/features/timeTracking/timeTrackingSlice";
+import { PaginatedWorkSessions } from "../../app/types/PaginatedWorkSessions";
 
 export interface StartSessionResponse{
     timeTrackerMutation:{
@@ -36,19 +37,7 @@ export interface WorkSessionByIdResponse{
 
 export interface WorkSessionsWithPaginationResponse{
     timeTrackerQuery:{
-        workSessions:{
-            totalCount: number,
-            pageInfo:{
-                hasNextPage: boolean,
-                hasPrevPage: boolean,
-                startCursor: string | null,
-                endCursor: string | null
-            },
-            edges: Array<{
-                cursor: string,
-                node: WorkSession
-            }>
-        }
+        workSessions: PaginatedWorkSessions
     }
 }
 
@@ -284,7 +273,6 @@ export const getWorkSessionsWithPagination = (payload: PaginationPayload) => {
                 endCursor
             }
             edges {
-            cursor
             node {
                 id
                 startTime

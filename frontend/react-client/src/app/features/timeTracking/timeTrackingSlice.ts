@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
+import { PaginatedWorkSessions } from "../../types/PaginatedWorkSessions";
 
 export interface TimeTrackerType {
-    workSessions: WorkSession[];
+    workSessions: PaginatedWorkSessions;
     currentSessionId: number | null;
     isTracking: boolean;
     currentSessionDuration: number;
@@ -38,7 +39,16 @@ export interface PaginationPayload{
 }
 
 const initialState: TimeTrackerType = {
-    workSessions: [],
+    workSessions: {
+        totalCount: 0,
+        pageInfo:{
+            hasNextPage: false,
+            hasPrevPage: false,
+            startCursor: null,
+            endCursor: null
+        },
+        edges: []
+    },
     currentSessionId: null,
     isTracking: false,
     currentSessionDuration: 0,
@@ -63,6 +73,20 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
+        getSessions(state, _action: PayloadAction<PaginationPayload>)
+        {
+            state.workSessions = initialState.workSessions;
+            state.loading = true;
+            state.error = null;
+        },
+
+        getSessionsSuccessful(state, action: PayloadAction<PaginatedWorkSessions>)
+        {
+            state.loading = false;
+            state.error = null;
+            state.workSessions = action.payload;
+        },
+        
         startSuccessful(state, action: PayloadAction<number>) {
             state.currentSessionId= action.payload
             state.isTracking = true;
@@ -70,7 +94,7 @@ const timeTrackerSlice = createSlice({
         },
 
         stopSuccessful(state, action: PayloadAction<WorkSession>) {
-            state.workSessions.unshift(action.payload)
+            state.workSessions.edges.unshift(action.payload)
             state.loading = false;
         },
 
@@ -78,7 +102,7 @@ const timeTrackerSlice = createSlice({
         {
             state.loading = action.payload;
         },
-        
+
         setError(state, action: PayloadAction<string | null>)
         {
             state.loading = false;
@@ -90,8 +114,10 @@ const timeTrackerSlice = createSlice({
 export const {
     startSession,
     stopSession,
+    getSessions,
     startSuccessful,
     stopSuccessful,
+    getSessionsSuccessful,
     setError,
     setLoading
 } = timeTrackerSlice.actions;
