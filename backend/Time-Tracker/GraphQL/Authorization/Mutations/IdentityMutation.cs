@@ -26,8 +26,8 @@ public class IdentityMutation : ObjectGraphType
             if (hashingService.ComputeHash(query.Password, user.Salt) != user.HashedPassword)
                 throw new InvalidCredentialsExecutionError("Wrong email or password.");
 
-            var accessToken = tokenService.GenerateToken(user.Id);
-            var refreshToken = tokenService.GenerateToken(user.Id);
+            var accessToken = tokenService.GenerateAccessToken(user.Id);
+            var refreshToken = tokenService.GenerateRefreshToken(user.Id);
 
             user.RefreshToken = refreshToken.Value;
             user.RefreshTokenDateExpires = refreshToken.DateExpires;
@@ -45,7 +45,7 @@ public class IdentityMutation : ObjectGraphType
 
                 // Get payload from accessToken get user id and validate refresh token.
                 // If they match and refresh token is not expired, create new acccess and refresh tokens.
-                var userId = tokenService.GetTokenClaimsPrincipal(input.RefreshToken).GetUserId();
+                var userId = tokenService.GetRefreshTokenClaimsPrincipal(input.RefreshToken).GetUserId();
 
                 var user = await usersRepository.FindAsync(userId) ??
                     throw new UserNotFoundedExecutionError("User not founded.");
@@ -58,8 +58,8 @@ public class IdentityMutation : ObjectGraphType
                     throw new InvalidRefreshTokenExecutionError("Refresh token is invalid or expired.");
                 }
 
-                var accessToken = tokenService.GenerateToken(userId);
-                var refreshToken = tokenService.GenerateToken(userId);
+                var accessToken = tokenService.GenerateAccessToken(userId);
+                var refreshToken = tokenService.GenerateAccessToken(userId);
 
                 user.RefreshToken = refreshToken.Value;
 

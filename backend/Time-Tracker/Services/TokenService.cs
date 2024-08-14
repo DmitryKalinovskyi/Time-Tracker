@@ -17,10 +17,19 @@ public class TokenService
         _configuration = configuration;
     }
 
-    public TokenDto GenerateToken(int userId)
+    public TokenDto GenerateAccessToken(int userId)
     {
+        return GenerateTokenWithKey(userId, _configuration["Jwt:Key"]);
+    }
 
-        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:Key"]);
+    public TokenDto GenerateRefreshToken(int userId)
+    {
+        return GenerateTokenWithKey(userId, _configuration["Jwt:RefreshKey"]);
+    }
+
+    private TokenDto GenerateTokenWithKey(int userId, string KEY)
+    {
+        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(KEY);
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -46,9 +55,9 @@ public class TokenService
         return new TokenDto(value, DateIssued, DateExpires);
     }
 
-    public ClaimsPrincipal? GetTokenClaimsPrincipal(string accessToken)
+    public ClaimsPrincipal? GetRefreshTokenClaimsPrincipal(string refreshToken)
     {
-        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:Key"]);
+        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:RefreshKey"]);
 
         var validation = new TokenValidationParameters
         {
@@ -62,7 +71,7 @@ public class TokenService
             ValidAudience = _configuration["JWT:Audience"],
         };
 
-        return new JwtSecurityTokenHandler().ValidateToken(accessToken, validation, out _);
+        return new JwtSecurityTokenHandler().ValidateToken(refreshToken, validation, out _);
 
     }
 }
