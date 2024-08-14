@@ -10,7 +10,7 @@ export const resetUserPasswordEpic = (action$: Observable<Action>) =>
     action$.pipe(
         ofType(resetUserPasswordRequest.type),
         mergeMap((action: PayloadAction<ResetPlayload>) => {
-            return ajax(createRequest(resetUserPasswordQuery(action.payload.email), null))
+            return ajax(createRequest(resetUserPasswordQuery(action.payload.email)))
                 .pipe(
                     map((ajaxResponse: any) => {
                         const errors = ajaxResponse.response.errors;
