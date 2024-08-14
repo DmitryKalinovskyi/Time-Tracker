@@ -1,14 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
 
-
 export interface TimeTrackerType {
     workSessions: WorkSession[];
-    sessionId: string | null;
+    currentSessionId: number | null;
     isTracking: boolean;
-    searchingLastSession: boolean;
-    currentTime: number;
+    currentSessionDuration: number;
+    loading: boolean;
+    error: string | null;
 }
 
 export interface AddSessionPayload{
@@ -39,28 +39,61 @@ export interface PaginationPayload{
 
 const initialState: TimeTrackerType = {
     workSessions: [],
-    sessionId: null,
+    currentSessionId: null,
     isTracking: false,
-    searchingLastSession: false,
-    currentTime: 0,
+    currentSessionDuration: 0,
+    loading: false,
+    error: null,
 }
 
 const timeTrackerSlice = createSlice({
     name: "timeTracker",
     initialState,
     reducers: {
-        startSuccessful(state, action) {
-            state.sessionId = action.payload.id
+        startSession(state, _action: PayloadAction<number>)
+        {
+            state.loading = true; 
+            state.currentSessionId = null;
+            state.error = null;
         },
-        stopSuccessful(state, action) {
+
+        stopSession(state)
+        {
+            state.loading = true;
+            state.error = null;
+        },
+
+        startSuccessful(state, action: PayloadAction<number>) {
+            state.currentSessionId= action.payload
+            state.isTracking = true;
+            state.loading = false;
+        },
+
+        stopSuccessful(state, action: PayloadAction<WorkSession>) {
             state.workSessions.unshift(action.payload)
+            state.loading = false;
         },
+
+        setLoading(state, action: PayloadAction<boolean>)
+        {
+            state.loading = action.payload;
+        },
+        
+        setError(state, action: PayloadAction<string | null>)
+        {
+            state.loading = false;
+            state.error = action.payload;
+        }
     },
 })
 
 export const {
+    startSession,
+    stopSession,
     startSuccessful,
     stopSuccessful,
+    setError,
+    setLoading
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;
