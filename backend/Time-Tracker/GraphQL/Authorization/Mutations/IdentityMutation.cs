@@ -55,11 +55,12 @@ public class IdentityMutation : ObjectGraphType
                 || user.RefreshToken != input.RefreshToken
                 || user.RefreshTokenDateExpires < DateTime.UtcNow)
                 {
+                    
                     throw new InvalidRefreshTokenExecutionError("Refresh token is invalid or expired.");
                 }
 
                 var accessToken = tokenService.GenerateAccessToken(userId);
-                var refreshToken = tokenService.GenerateAccessToken(userId);
+                var refreshToken = tokenService.GenerateRefreshToken(userId);
 
                 user.RefreshToken = refreshToken.Value;
 
