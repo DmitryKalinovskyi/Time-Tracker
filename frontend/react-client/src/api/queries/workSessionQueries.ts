@@ -113,8 +113,8 @@ export const addSessionQuery = (payload: AddSessionPayload) => {
                 addSession(input: 
                                 { 
                                     userId: ${payload.userId}, 
-                                    startTime: ${payload.startTime.toISOString()},
-                                    endTime: ${payload.endTime.toISOString()}, 
+                                    startTime: "${payload.startTime.toISOString()}",
+                                    endTime: "${payload.endTime.toISOString()}", 
                                     sessionOriginId: ${payload.sessionOriginId}
                                 }
                             ) 

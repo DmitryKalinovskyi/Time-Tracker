@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
 import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
-import { deleteSessionEpic, getSessionsEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
+import { addSessionEpic, deleteSessionEpic, getSessionsEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
 
 
 
@@ -25,7 +25,8 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     stopSessionEpic,
     getSessionsEpic,
     updateSessionEpic,
-    deleteSessionEpic
+    deleteSessionEpic,
+    addSessionEpic
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, any, any>();
