@@ -9,7 +9,7 @@ import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
-import {useEffect, useLayoutEffect} from "react";
+import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +36,9 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </Provider>
   )
 }

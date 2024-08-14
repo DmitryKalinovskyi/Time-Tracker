@@ -1,54 +1,67 @@
 import {ofType} from "redux-observable";
-import {map, from, catchError, of, mergeMap, Observable, tap, filter} from "rxjs";
+import {map, from, catchError, of, mergeMap, Observable, tap, filter, concat, delay} from "rxjs";
 import {ajax} from "rxjs/ajax";
-import {authUserSuccess, authUserFailure, AuthPayload, refreshToken} from "./authSlice.ts";
+import {authUserSuccess, authUserFailure, AuthPayload, refreshToken, refreshTokenReject} from "./authSlice.ts";
 import { createRequest } from "../../misc/RequestCreator.ts";
 import {authUserQuery, authUserQueryResponse, refreshTokenQuery, refreshTokenQueryResponse} from "./api/authQueries.ts"
 import { authUser } from "./authSlice.ts";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
 import { store } from "../../store.ts"
 import {isTokenExpired} from "../../misc/tokenValidation.ts";
-import {getRefreshToken, saveRefreshToken} from "./refreshTokenManager.ts";
+import {getAvailableRefreshToken, saveRefreshToken} from "./refreshTokenManager.ts";
 export const refreshTokenEpic = (action$) => action$.pipe(
     filter(() => {
-        console.log("Refresh epic invoked.")
-        const refreshToken = getRefreshToken();
-        if(refreshToken == null) {
-            // console.log("Refresh token is not setup.")
-            return false;
-        }
+        const token = getAvailableRefreshToken();
 
-        if(isTokenExpired(refreshToken)) {
-            // console.log("Refresh Token is expired")
+        if(token == null){
+            // we can't update our access token without actual refresh token.
             return false;
         }
 
         // we invoke action when we have valid refresh token and expired access token.
         const auth = store.getState().auth;
-        return auth.accessToken == null || isTokenExpired(auth.accessToken);
+        if(auth.refreshRejects >= 5){
+            console.log("Too many refreshes. Refresh will not be completed.");
+            return false;
+        }
 
+        return auth.accessToken == null || isTokenExpired(auth.accessToken);
     }),
-    tap(() => console.log('Token expired. We need to make request with refresh to receive new access.')),
+    delay(1000),
+    tap(() => console.log('Access token expired. We need to make request with our refresh to receive new access.')),
     mergeMap((action) => from(
         ajax(createRequest(refreshTokenQuery(),
             {
                 input: {
-                    refreshToken: getRefreshToken()?.value,
-                    accessToken:  store.getState().auth.accessToken?.value
+                    refreshToken: getAvailableRefreshToken()?.value,
                 }})).pipe(
             map((ajaxResponse) => {
                 const data: refreshTokenQueryResponse = ajaxResponse.response.data;
 
-                saveRefreshToken(data.identityMutation.refreshToken.refreshToken);
+                if(data && data.identityMutation && data.identityMutation.refreshToken && data.identityMutation.refreshToken.refreshToken){
+                    console.log("Received valid data");
+                    console.log(data);
+                }
+                else{
+                    console.log(data)
+                    console.log(ajaxResponse.response)
+                    throw new Error("Unexpected response format.");
+                }
 
                 return refreshToken({
                     user: data.identityMutation.refreshToken.user,
-                    accessToken: data.identityMutation.refreshToken.accessToken
+                    accessToken: data.identityMutation.refreshToken.accessToken,
+                    refreshToken: data.identityMutation.refreshToken.refreshToken
                 });
             }),
+            mergeMap(resultAction => {
+                return of(resultAction, action);
+            }),
             catchError(error => {
+                console.log(error)
                 console.log("Refresh token error.");
-                return of(action);
+
+                return concat(of(refreshTokenReject()), of(action));
             })
         )
     ))
@@ -69,9 +82,6 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                             return authUserSuccess({
                                 accessToken: data.identityMutation.login.accessToken,
                                 user: data.identityMutation.login.user,
-                                loading: false,
-                                error: null,
-                                success: true,
                             });
                         } else {
                             throw new Error('[AUTHENTICATION] Unexpected response format or missing login data');
