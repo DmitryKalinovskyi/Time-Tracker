@@ -80,6 +80,21 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
+        updateSession(state, _action: PayloadAction<UpdateSessionPayload>)
+        {
+            state.loading = true;
+            state.error = null;
+        },
+
+        updateSessionSuccessful(state, action: PayloadAction<WorkSession>)
+        {
+            state.loading = false;
+            state.workSessions.edges = state.workSessions.edges.map(session => 
+                session.id === action.payload.id ? action.payload : session
+            );
+            state.error = null;
+        },
+
         getSessionsSuccessful(state, action: PayloadAction<PaginatedWorkSessions>)
         {
             state.loading = false;
@@ -115,9 +130,11 @@ export const {
     startSession,
     stopSession,
     getSessions,
+    updateSession,
     startSuccessful,
     stopSuccessful,
     getSessionsSuccessful,
+    updateSessionSuccessful,
     setError,
     setLoading
 } = timeTrackerSlice.actions;

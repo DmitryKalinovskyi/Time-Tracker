@@ -17,13 +17,13 @@ export interface StopSessionResponse{
     }
 }
 
-export interface addSessionResponse{
+export interface AddSessionResponse{
     timeTrackerMutation: {
         addSession: WorkSession
     }
 }
 
-export interface updateSessionResponse{
+export interface UpdateSessionResponse{
     timeTrackerMutation: {
         updateSession: WorkSession
     }
@@ -160,8 +160,8 @@ export const updateSessionQuery = (payload: UpdateSessionPayload) => {
                             input: 
                             { 
                                 id: ${payload.id},
-                                startTime: ${payload.startTime}, 
-                                endTime ${payload.endTime}:
+                                startTime: "${payload.startTime.toISOString()}", 
+                                endTime: "${payload.endTime.toISOString()}"
                             }
                         ) 
             {
