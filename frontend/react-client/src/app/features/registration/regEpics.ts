@@ -11,7 +11,7 @@ export const regUserEpic = (action$: Observable<Action>) =>
     action$.pipe(
         ofType(regUserRequest.type),
         mergeMap((action: PayloadAction<RegPayload>) => {
-            return ajax(createRequest(regUserQuery(action.payload.fullName, action.payload.email), null))
+            return ajax(createRequest(regUserQuery(action.payload.fullName, action.payload.email)))
             .pipe(
                 map((ajaxResponse: any) => {
                     const errors = ajaxResponse.response.errors;
