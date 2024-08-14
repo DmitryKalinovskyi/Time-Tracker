@@ -4,6 +4,7 @@ export interface authUserQueryResponse{
   identityMutation: {
     login: {
       accessToken: Token,
+      user: User
     }
   }
 }
@@ -26,7 +27,13 @@ export const authUserQuery = (
                        value,
                        dateIssued,
                        dateExpires
-                      }, userId
+                      },
+                      user{
+                      id,
+                      fullName,
+                      email,
+                      permissions
+                      }
                     }
                 }
             }

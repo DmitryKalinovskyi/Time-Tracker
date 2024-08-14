@@ -2,7 +2,18 @@ import useAuth from "./useAuth.ts";
 import Token from "../types/Token.ts";
 
 function isTokenExpired(token: Token) {
-    return new Date(token.dateExpires) < Date.now()
+    let expiryDate = new Date(token.dateExpires);
+
+    const tokenExpiryTime = Date.UTC(
+        expiryDate.getUTCFullYear(),
+        expiryDate.getUTCMonth(),
+        expiryDate.getUTCDate(),
+        expiryDate.getUTCHours(),
+        expiryDate.getUTCMinutes(),
+        expiryDate.getUTCSeconds()
+    );
+
+    return tokenExpiryTime < Date.now();
 }
 
 
