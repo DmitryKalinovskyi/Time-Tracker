@@ -1,10 +1,10 @@
 import { catchError, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
 import { ofType, StateObservable } from "redux-observable";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
-import { getSessions, getSessionsSuccessful, PaginationPayload, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, } from "./timeTrackingSlice";
+import { deleteSession, deleteSessionSuccessful, getSessions, getSessionsSuccessful, PaginationPayload, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, } from "./timeTrackingSlice";
 import { ajax } from "rxjs/ajax";
 import { createRequest } from "../../misc/RequestCreator";
-import { getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse } from "../../../api/queries/workSessionQueries";
+import { deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse } from "../../../api/queries/workSessionQueries";
 import { RootState } from "../../store.ts";
 
 
@@ -143,6 +143,43 @@ export const updateSessionEpic = (action$: Observable<Action>) => action$.pipe(
                             return updateSessionSuccessful(data.timeTrackerMutation.updateSession);
                         } else {
                             throw new Error('[Session updating] Unexpected response format or missing login data');
+                        }
+                    }),
+                    catchError((error: any) => {
+                        let errorMessage = 'An unexpected error occurred';
+
+                        if (error.status === 0) {
+                            errorMessage = 'Connection time out';
+                        } else if (error.message) {
+                            errorMessage = error.message;
+                        }
+
+                        return of(setError(errorMessage));
+                    })
+                )
+            )
+    )
+);
+
+export const deleteSessionEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(deleteSession.type),
+    switchMap((action: PayloadAction<number>) =>
+        from(
+            ajax(createRequest(deleteSessionQuery(action.payload)))
+                .pipe(
+                    map((ajaxResponse: any) => {
+                        console.log(ajaxResponse.data)
+                        const errors = ajaxResponse.response.errors;
+                        const data: any = ajaxResponse.response.data;
+        
+                        if (errors && errors.length > 0) {
+                            return setError(errors[0].message);
+                        }
+        
+                        if (data && data.timeTrackerMutation && data.timeTrackerMutation.deleteSession) {
+                            return deleteSessionSuccessful(action.payload);
+                        } else {
+                            throw new Error('[Session deleting] Unexpected response format or missing login data');
                         }
                     }),
                     catchError((error: any) => {
