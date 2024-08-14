@@ -4,7 +4,7 @@ import { ResetPlayload, resetUserPasswordRequest, resetUserPasswordSuccess, rese
 import { ofType } from "redux-observable";
 import {ajax} from "rxjs/ajax";
 import {createRequest} from "../../misc/RequestCreator.ts";
-import {resetUserPasswordQuery} from "../../../api/queries/userQueries.ts";
+import {resetUserPasswordQuery} from "./api/resetPasswordQueries.ts";
 
 export const resetUserPasswordEpic = (action$: Observable<Action>) =>
     action$.pipe(

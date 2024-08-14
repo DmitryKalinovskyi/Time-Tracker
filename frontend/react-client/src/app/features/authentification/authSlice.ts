@@ -1,14 +1,15 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import User from "../../types/User.ts";
-import { ACCESS_TOKEN_KEY_NAME } from "../../config.ts";
 import Token from "../../types/Token.ts";
+import {removeRefreshToken, saveRefreshToken} from "./refreshTokenManager.ts";
 
 export interface AuthType {
     accessToken: Token | null,
     user: User | null
     loading: boolean,
     error: string | null
-    success: boolean | null
+    refreshRejects: number,
+    isRefreshed: boolean
 }
 
 export interface AuthPayload {
@@ -18,66 +19,61 @@ export interface AuthPayload {
 
 const initialState: AuthType =
 {
-    accessToken: JSON.parse(localStorage.getItem(ACCESS_TOKEN_KEY_NAME) as string) ?? null,
+    accessToken: null,
     user: null,
     loading: false,
     error: null,
-    success: null
+    refreshRejects: 0,
+    isRefreshed: false
 };
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        authUser : (state, _action: PayloadAction<AuthPayload>) => {
-            state.accessToken = null;
-            state.user = null;
+        authUser : (state) => {
             state.loading = true;
-            state.error = null;
-            state.success = null;
         },
-
-        authUserSuccess: (state, action: PayloadAction<AuthType>) => {
-
-            console.log(action.payload)
-            console.log("Authenticated.")
-
+        refreshToken : (state, action: PayloadAction<{user: User, accessToken: Token, refreshToken: Token}>) => {
             state.accessToken = action.payload.accessToken;
             state.user = action.payload.user;
-            state.success = action.payload.success;
-            state.loading = false;
-            state.error = null;
-
-            localStorage.setItem(ACCESS_TOKEN_KEY_NAME, JSON.stringify(
-                action.payload.accessToken
-            ));
+            state.isRefreshed = true;
+            saveRefreshToken(action.payload.refreshToken);
+        },
+        refreshTokenReject: (state)=> {
+            state.isRefreshed = true;
+            state.refreshRejects++;
         },
 
+        authUserSuccess: (state, action: PayloadAction<{user: User, accessToken: Token}>) => {
+            state.accessToken = action.payload.accessToken;
+            state.user = action.payload.user;
+            state.loading = false;
+            state.error = null;
+            state.refreshRejects = 0;
+        },
         authUserFailure: (state, action: PayloadAction<any>) => {
             console.log(`Error while authentification user: ${action.payload} `);
             
             state.accessToken = null;
             state.user = null;
             state.error = action.payload.toString();
-            state.success = false;
             state.loading = false;
-            
-            localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
         },
 
-        logout: (state, action: PayloadAction) => {
+        logout: (state) => {
             state.accessToken = null;
             state.user = null;
             state.error = null;
-            state.success = false;
             state.loading = false;
-            localStorage.removeItem(ACCESS_TOKEN_KEY_NAME);
-
+            removeRefreshToken();
         }
     }
 })
 
 export const {authUser,
+    refreshToken,
+    refreshTokenReject,
     authUserSuccess,
     authUserFailure,
     logout} = authSlice.actions;

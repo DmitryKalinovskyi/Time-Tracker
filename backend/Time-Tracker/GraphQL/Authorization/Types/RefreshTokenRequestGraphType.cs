@@ -7,7 +7,6 @@ namespace Time_Tracker.GraphQL.Authorization.Types
     {
         public RefreshTokenRequestGraphType()
         {
-            Field(x => x.AccessToken);
             Field(x => x.RefreshToken);
         }
     }

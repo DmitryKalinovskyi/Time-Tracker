@@ -1,9 +1,5 @@
 import useAuth from "./useAuth.ts";
-import Token from "../types/Token.ts";
-
-function isTokenExpired(token: Token) {
-    return new Date(token.dateExpires) < Date.now()
-}
+import {isTokenExpired} from "../misc/tokenValidation.ts";
 
 
 export default function useIsAuthenticated(){
@@ -11,8 +7,6 @@ export default function useIsAuthenticated(){
     if(!auth.accessToken) return false;
 
     if(isTokenExpired(auth.accessToken)){
-        // TODO: use refresh token to receive new access token.
-
         return false;
     }
 

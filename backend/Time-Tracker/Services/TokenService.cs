@@ -19,8 +19,17 @@ public class TokenService
 
     public TokenDto GenerateAccessToken(int userId)
     {
+        return GenerateTokenWithKey(userId, _configuration["Jwt:Key"]);
+    }
 
-        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:Key"]);
+    public TokenDto GenerateRefreshToken(int userId)
+    {
+        return GenerateTokenWithKey(userId, _configuration["Jwt:RefreshKey"]);
+    }
+
+    private TokenDto GenerateTokenWithKey(int userId, string KEY)
+    {
+        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(KEY);
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -46,9 +55,9 @@ public class TokenService
         return new TokenDto(value, DateIssued, DateExpires);
     }
 
-    public ClaimsPrincipal? GetAccessTokenClaimsPrincipal(string accessToken)
+    public ClaimsPrincipal? GetRefreshTokenClaimsPrincipal(string refreshToken)
     {
-        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:Key"]);
+        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["JWT:RefreshKey"]);
 
         var validation = new TokenValidationParameters
         {
@@ -62,20 +71,7 @@ public class TokenService
             ValidAudience = _configuration["JWT:Audience"],
         };
 
-        return new JwtSecurityTokenHandler().ValidateToken(accessToken, validation, out _);
+        return new JwtSecurityTokenHandler().ValidateToken(refreshToken, validation, out _);
 
-    }
-
-    public TokenDto GenerateRefreshToken()
-    {
-        var randomNumber = new byte[64];
-
-        using var numberGenerator = RandomNumberGenerator.Create();
-        numberGenerator.GetBytes(randomNumber);
-
-        DateTime DateIssued = DateTime.UtcNow;
-        DateTime DateExpires = DateIssued.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenLifeTimeInMinutes"]));
-
-        return new TokenDto(Convert.ToBase64String(randomNumber), DateIssued, DateExpires);
     }
 }

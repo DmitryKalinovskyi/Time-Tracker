@@ -1,6 +1,6 @@
 import LoginPage from "../app/ui/pages/LoginPage.tsx";
 import AccountVerificationPage from "../app/ui/pages/AccountVerificationPage.tsx";
-import { Provider } from "react-redux";
+import {Provider, useDispatch} from "react-redux";
 import { store } from "./store.ts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
@@ -9,15 +9,16 @@ import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
+import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
 
 const router = createBrowserRouter([
   {
     path: '/',
     errorElement: <NotFoundPage />,
     children: [{
-      element: <Root />, children: [
+      element: <RequireAuth />, children: [
         {
-          element: <RequireAuth />, children: [
+          element: <Root />, children: [
             { path: "/", element: <HomePage /> },
             { path: "/home", element: <HomePage /> },
             { path: "/register", element: <RegisterUserPage /> },
@@ -35,7 +36,9 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </Provider>
   )
 }
