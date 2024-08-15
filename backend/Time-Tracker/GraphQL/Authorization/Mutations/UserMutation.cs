@@ -83,7 +83,6 @@ public class UserMutation : ObjectGraphType
 
                 user.FullName = userInput.FullName;
                 user.Email = userInput.Email;
-                user.IsActive = userInput.IsActive;
 
                 await userRepository.UpdateAsync(user);
 
@@ -119,5 +118,37 @@ public class UserMutation : ObjectGraphType
 
 
 
+
+        Field<StringGraphType>("updateUserPermissions")
+            .Argument<NonNullGraphType<UpdateUserPermissionsInputGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                var userInput = context.GetArgument<User>("user");
+
+                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User not found.");
+
+                user.Permissions = userInput.Permissions;
+
+                await userRepository.UpdateAsync(user);
+
+                return "User permissions updated successfully";
+            });
+
+        Field<StringGraphType>("updateUserActiveSatus")
+            .Argument<NonNullGraphType<IntGraphType>>("id")
+            .Argument<NonNullGraphType<BooleanGraphType>>("isActive")
+            .ResolveAsync(async context =>
+            {
+                var id = context.GetArgument<int>("id");
+                var isActive = context.GetArgument<bool>("isActive");
+
+                var user = userRepository.Find(id) ?? throw new ExecutionError("User not found.");
+
+                user.IsActive = isActive;
+
+                await userRepository.UpdateAsync(user);
+
+                return "User status updated successfully";
+            });
     }
 }

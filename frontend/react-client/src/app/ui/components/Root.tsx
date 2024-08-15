@@ -1,4 +1,4 @@
-import { Box, CssBaseline, Toolbar } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import Footer from "../components/Footer.tsx";
 import Navbar from "../components/Navbar.tsx";
@@ -12,8 +12,7 @@ export default function Root(){
             <Navbar />
             <Box sx={{ display: 'flex', flexGrow: 1 }}>
               <Sidebar />
-              <Box component="main" sx={{ flexGrow: 1, p: 3 }} className="bg-gray-100 min-h-screen">
-                <Toolbar />
+              <Box component="main" sx={{ flexGrow: 1 }} className="bg-gray-100 min-h-screen">
                 <Outlet />
               </Box>
             </Box>

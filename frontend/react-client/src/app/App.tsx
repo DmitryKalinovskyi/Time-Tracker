@@ -1,15 +1,20 @@
-import LoginPage from "../app/ui/pages/LoginPage.tsx";
-import AccountVerificationPage from "../app/ui/pages/AccountVerificationPage.tsx";
-import {Provider, useDispatch} from "react-redux";
-import { store } from "./store.ts";
+import { SnackbarProvider } from 'notistack';
+import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
+import AccountVerificationPage from "../app/ui/pages/AccountVerificationPage.tsx";
+import LoginPage from "../app/ui/pages/LoginPage.tsx";
+import RequireAuth from "./gates/RequireAuth.tsx";
+import { store } from "./store.ts";
+import Root from "./ui/components/Root.tsx";
 import HomePage from "./ui/pages/HomePage.tsx";
+import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
 import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import Root from "./ui/components/Root.tsx";
 import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
+import UserPage from "./ui/pages/UserPage.tsx";
+import UsersPage from "./ui/pages/UsersPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +26,8 @@ const router = createBrowserRouter([
           element: <Root />, children: [
             { path: "/", element: <HomePage /> },
             { path: "/home", element: <HomePage /> },
+            { path: "/users", element: <UsersPage /> },
+            { path: "/user/:UserId", element: <UserPage /> },
             { path: "/register", element: <RegisterUserPage /> },
           ]
         }
@@ -36,8 +43,10 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider store={store}>
-      <AuthProvider>
-        <RouterProvider router={router} />
+          <AuthProvider>
+              <SnackbarProvider>
+                  <RouterProvider router={router} />
+              </SnackbarProvider>
       </AuthProvider>
     </Provider>
   )
