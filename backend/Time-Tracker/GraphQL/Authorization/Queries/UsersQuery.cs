@@ -14,45 +14,38 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
         {
             Field<UserGraphType>("user")
                 .Argument<NonNullGraphType<IntGraphType>>("userId")
-                .Resolve(context => usersRepository.Find(context.GetArgument<int>("userId")));
+                .ResolveAsync(async context => await usersRepository.FindAsync(context.GetArgument<int>("userId")));
 
             Connection<UserGraphType>("users")
             .Bidirectional()
             .ResolveAsync(async context =>
             {
-                int? first = context.GetArgument<int?>("first");
-                string afterCursor = context.GetArgument<string>("after");
-                int? after = !string.IsNullOrEmpty(afterCursor) ? CursorHelper.FromCursor(afterCursor) : (int?)null;
+                var paginationArgs = BasePaginationHelper.GetBasePaginationArgs(context);
 
-                int? last = context.GetArgument<int?>("last");
-                string beforeCursor = context.GetArgument<string>("before");
-                int? before = !string.IsNullOrEmpty(beforeCursor) ? CursorHelper.FromCursor(beforeCursor) : (int?)null;
+                if (paginationArgs.First is not null && paginationArgs.Last is not null)
+                {
+                    context.Errors.Add(new ExecutionError("Last and First could not be specified together."));
+                    return null;
+                }
 
+                if (paginationArgs.Before is not null && paginationArgs.After is not null)
+                {
+                    context.Errors.Add(new ExecutionError("Before and After could not be specified together."));
+                    return null;
+                }
+
+                if (paginationArgs.Before is null && paginationArgs.After is null
+                      && paginationArgs.First is null && paginationArgs.Last is null)
+                {
+                    context.Errors.Add(new ExecutionError("You need to specify at least one argument."));
+                    return null;
+                }
+
+                var (users, hasNextPage, hasPrevPage) = await usersRepository.GetUsersAsync(paginationArgs.First, paginationArgs.After, 
+                                                                paginationArgs.Last, paginationArgs.Before);
 
                 var users = await usersRepository.GetUsersAsync(first, after, last, before);
-
-                if (last.HasValue && before.HasValue)
-                {
-                    users.Reverse();
-                }
-
                 var totalCount = await usersRepository.GetTotalUsersCount();
-
-                if (!users.Any())
-                {
-                    return new Connection<User>
-                    {
-                        Edges = new List<Edge<User>>(),
-                        PageInfo = new PageInfo
-                        {
-                            HasNextPage = last.HasValue,
-                            HasPreviousPage = first.HasValue,
-                            StartCursor = null,
-                            EndCursor = null
-                        },
-                        TotalCount = totalCount,
-                    };
-                }
 
                 var edges = users.Select(u => new Edge<User>
                 {
@@ -60,15 +53,12 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
                     Cursor = u.Id.ToCursor()
                 }).ToList();
 
-                bool hasNextPage = before.HasValue ||  edges.Count >= (first ?? 0);
-                bool hasPreviousPage = after.HasValue || (before.HasValue && edges.Count >= (last ?? 0));
-
                 var pageInfo = new PageInfo
                 {
                     HasNextPage = hasNextPage,
-                    StartCursor = edges.First().Cursor,
-                    EndCursor = edges.Last().Cursor,
-                    HasPreviousPage = hasPreviousPage
+                    StartCursor = edges.FirstOrDefault()?.Cursor,
+                    EndCursor = edges.LastOrDefault()?.Cursor,
+                    HasPreviousPage = hasPrevPage
                 };
 
                 return new Connection<User>

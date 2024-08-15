@@ -1,4 +1,4 @@
-﻿namespace Time_Tracker.Services
+﻿namespace Time_Tracker.Authorization
 {
     public static class Permissions
     {

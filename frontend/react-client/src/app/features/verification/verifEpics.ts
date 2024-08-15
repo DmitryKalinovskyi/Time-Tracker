@@ -4,17 +4,16 @@ import { ajax } from "rxjs/ajax";
 import { VerifPayload, verifUserRequest, verifUserSuccess, verifUserFailure } from "./verifSlice";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
-import {createRequest} from "../../misc/RequestCreator";
-import { verifUserQuery } from "../../../api/queries/userQueries";
+import { createRequest } from "../../misc/RequestCreator";
+import { verifUserQuery } from "./api/verifQueries.ts";
 
 export const verifUserEpic = (action$: Observable<Action>) =>
     action$.pipe(
         ofType(verifUserRequest.type),
-        mergeMap((action: PayloadAction<VerifPayload>) => {
+            mergeMap((action: PayloadAction<VerifPayload>) => {
             return ajax(createRequest(verifUserQuery(action.payload.code, action.payload.password), null))
             .pipe(
                 map((ajaxResponse: any) => {
-                    console.log(ajaxResponse);
                     const errors = ajaxResponse.response.errors;
                     const data = ajaxResponse.response.data;
 
@@ -27,9 +26,17 @@ export const verifUserEpic = (action$: Observable<Action>) =>
                       throw new Error('[VERIFICATION] Unexpected response format or missing user data');
                     }
                   }),
-                  catchError((error: any) =>
-                    of(verifUserFailure(error.message || 'An unexpected error occurred'))
-                  ) 
+                catchError((error: any) => {
+                    let errorMessage = 'An unexpected error occurred';
+
+                    if (error.status === 0) {
+                        errorMessage = 'Connection time out';
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+
+                    return of(verifUserFailure(errorMessage));
+                })
             )
         })
     );

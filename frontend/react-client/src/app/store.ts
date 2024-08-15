@@ -7,11 +7,13 @@ import verifReducer  from "./features/verification/verifSlice.ts";
 import usersReducer from "./features/users/usersSlice.ts";
 import userReducer from "./features/user/userSlice.ts";
 import permissionsReducer from "./features/permissions/permissionsSlice.ts";
+import resetReducer  from "./features/resetPassword/resetSlice.ts";
 
-import { authUserEpic } from "./features/authentification/authEpics.ts";
+import {authUserEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
+import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
 import { getUsersEpic } from "./features/users/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
 import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
@@ -19,6 +21,7 @@ import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
 
 
 const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, void, any>(
+    refreshTokenEpic,
     authUserEpic,
     regUserEpic,
     verifUserEpic,
@@ -28,6 +31,7 @@ const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, v
     updateUserActiveStatusEpic,
     updateUserPermissionsEpic,
     getPermissionsEpic
+    resetUserPasswordEpic,
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, void, any>();
@@ -41,6 +45,7 @@ export const store = configureStore({
         users: usersReducer,
         user: userReducer,
         permissions: permissionsReducer
+        reset: resetReducer,
     },
     middleware: () => new Tuple(epicMiddleware)
 })

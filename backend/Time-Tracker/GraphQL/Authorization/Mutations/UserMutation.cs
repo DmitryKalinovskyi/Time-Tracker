@@ -22,7 +22,7 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                if (userRepository.FindByEmail(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
+                if (await userRepository.FindByEmailAsync(userInput.Email) is not null) throw new ExecutionError("User with this email already exists.");
 
                 var userId = await userRepository.AddAsync(userInput);
 
@@ -33,7 +33,7 @@ public class UserMutation : ObjectGraphType
 
                 _ = await activationCodeRepository.AddAsync(code);
 
-                var user = userRepository.Find(userId);
+                var user = await userRepository.FindAsync(userId);
 
                 if (user == null) throw new ExecutionError("User not found.");
 
@@ -52,7 +52,7 @@ public class UserMutation : ObjectGraphType
 
                 if (activationCode == null) throw new ExecutionError("Activation code not found.");
 
-                var user = userRepository.Find(activationCode.UserId);
+                var user = await userRepository.FindAsync(activationCode.UserId);
 
                 if (user == null) throw new ExecutionError("User not found.");
 
@@ -75,9 +75,9 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User not found.");
+                var user = await userRepository.FindAsync(userInput.Id) ?? throw new ExecutionError("User not found.");
 
-                var emailCheckUser = userRepository.FindByEmail(userInput.Email);
+                var emailCheckUser = await userRepository.FindByEmailAsync(userInput.Email);
 
                 if (emailCheckUser is not null && emailCheckUser.Id != userInput.Id) throw new ExecutionError("User with this email already exists.");
 
@@ -88,6 +88,36 @@ public class UserMutation : ObjectGraphType
 
                 return "User updated successfully";
             });
+        
+        Field<StringGraphType>("resetPassword")
+            .Argument<NonNullGraphType<ResetPasswordInputGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                var userInput = context.GetArgument<User>("user");
+
+                var user = await userRepository.FindByEmailAsync(userInput.Email);
+                if (user is null) 
+                    throw new ExecutionError("There is no user with this email address.");
+
+                var existingCode = await activationCodeRepository.FindByUserIdAsync(user.Id);
+                if (existingCode is not null)
+                    await activationCodeRepository.RemoveAsync(existingCode);
+
+                var code = new ActivationCode()
+                {
+                    UserId = user.Id,
+                    Value = Guid.NewGuid()
+                };
+
+                _ = await activationCodeRepository.AddAsync(code);
+
+                await emailSender.SendActivationCodeAsync(user.Email, code.Value.ToString());
+
+                return "Activation code successfully created and sent to the user's email.";
+            });
+
+
+
 
         Field<StringGraphType>("updateUserPermissions")
             .Argument<NonNullGraphType<UpdateUserPermissionsInputGraphType>>("user")

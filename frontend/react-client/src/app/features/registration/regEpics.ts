@@ -5,7 +5,7 @@ import { RegPayload, regUserFailure, regUserRequest, regUserSuccess } from "./re
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { createRequest } from "../../misc/RequestCreator";
-import { regUserQuery, regUserQueryResponse } from "../../../api/queries/userQueries";
+import { regUserQuery, regUserQueryResponse } from "./api/registrationQueries.ts";
 
 export const regUserEpic = (action$: Observable<Action>) =>
     action$.pipe(
@@ -26,9 +26,17 @@ export const regUserEpic = (action$: Observable<Action>) =>
                       throw new Error('[REGISTRATION] Unexpected response format or missing user data');
                     }
                   }),
-                  catchError((error: any) =>
-                    of(regUserFailure(error.message || 'An unexpected error occurred'))
-                  ) 
+                catchError((error: any) => {
+                    let errorMessage = 'An unexpected error occurred';
+
+                    if (error.status === 0) {
+                        errorMessage = 'Connection time out';
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+
+                    return of(regUserFailure(errorMessage));
+                })
             )
         })
     );

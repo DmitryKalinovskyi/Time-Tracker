@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Time_Tracker.Helpers;
-using Time_Tracker.Services;
 
 namespace Time_Tracker.Authorization
 {
     public class PermissionHandler(IPermissionsService permissionsService) : AuthorizationHandler<PermissionRequirement>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
             int? userId = context.User.GetUserId();
-            if(userId == null || !permissionsService.HasRequiredPermission((int)userId, requirement.Permission))
+            if(userId == null || !await permissionsService.HasRequiredPermission((int)userId, requirement.Permission))
             {
                 context.Fail();
-                return Task.CompletedTask;
+                return;
             }
+
             context.Succeed(requirement);
-            return Task.CompletedTask;
         }
     }
 }

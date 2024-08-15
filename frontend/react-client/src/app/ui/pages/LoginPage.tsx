@@ -63,10 +63,12 @@ const LoginPage: React.FC = () => {
             <Box
                 sx={{
                     my: 8,
-                    mx: 4,
+                    mx: 'auto',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    maxWidth: '550px',
+                    width: '100%'
                 }}
             >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -75,7 +77,7 @@ const LoginPage: React.FC = () => {
                 <Typography component="h1" variant="h5">
                     Sign In
                 </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
                     <TextField
                         margin="normal"
                         required
@@ -100,13 +102,6 @@ const LoginPage: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                {(auth.success !== null) && 
-                <Typography
-                    color={auth.success !== false ? "success.main" : "error.main"}
-                    sx={{ width: '100%', textAlign: 'center' }}>
-                    {auth.success !== false ? 'Authenticated successfully!' : auth.error}
-                </Typography>
-                }
                     <Button
                         type="submit"
                         fullWidth
@@ -115,11 +110,11 @@ const LoginPage: React.FC = () => {
                     >
                         Sign In
                     </Button>
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#" variant="body2">
-                                Forgot password?
-                            </Link>
+                    <Grid container justifyContent="space-between">
+                        <Grid item>
+                            <MuiLink component={RouterLink} to="/reset" variant="body2">
+                                {"Forgot password?"}
+                            </MuiLink>
                         </Grid>
                         <Grid item>
                             <MuiLink component={RouterLink} to="/verification" variant="body2">
