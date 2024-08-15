@@ -1,4 +1,4 @@
-import {combineEpics, createEpicMiddleware, Epic} from "redux-observable";
+import {combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 
 import authReducer from "./features/authentification/authSlice.ts";
@@ -8,20 +8,21 @@ import usersReducer from "./features/users/usersSlice.ts";
 import userReducer from "./features/user/userSlice.ts";
 import permissionsReducer from "./features/permissions/permissionsSlice.ts";
 import resetReducer  from "./features/resetPassword/resetSlice.ts";
+import timeTrackerReducer from './features/timeTracking/timeTrackingSlice.ts';
 
 import {authUserEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
 import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
+import { addSessionEpic, deleteSessionEpic, getSessionsEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
 import { getUsersEpic } from "./features/users/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
 import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
 
 
 
-const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, void, any>(
-    refreshTokenEpic,
+const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, any, any>(
     authUserEpic,
     regUserEpic,
     verifUserEpic,
@@ -30,11 +31,18 @@ const rootEpic: Epic<Action, Action, void, any> = combineEpics<Action, Action, v
     updateUserEpic,
     updateUserActiveStatusEpic,
     updateUserPermissionsEpic,
-    getPermissionsEpic
+    getPermissionsEpic,
     resetUserPasswordEpic,
+    startSessionEpic,
+    stopSessionEpic,
+    getSessionsEpic,
+    updateSessionEpic,
+    deleteSessionEpic,
+    addSessionEpic,
+    refreshTokenEpic
   );
 
-const epicMiddleware = createEpicMiddleware<Action, Action, void, any>();
+const epicMiddleware = createEpicMiddleware<Action, Action, any, any>();
 
 
 export const store = configureStore({
@@ -44,8 +52,9 @@ export const store = configureStore({
         verif: verifReducer,
         users: usersReducer,
         user: userReducer,
-        permissions: permissionsReducer
+        permissions: permissionsReducer,
         reset: resetReducer,
+        timeTracker: timeTrackerReducer
     },
     middleware: () => new Tuple(epicMiddleware)
 })

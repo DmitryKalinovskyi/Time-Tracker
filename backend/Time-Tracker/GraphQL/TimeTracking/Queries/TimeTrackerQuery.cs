@@ -26,6 +26,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
 
             Connection<WorkSessionGraphType>("workSessions")
                 .Bidirectional()
+                .Argument<IntGraphType>("userId")
                 .Argument<IntGraphType>("year")
                 .Argument<IntGraphType>("month")
                 .Argument<IntGraphType>("day")
@@ -77,7 +78,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                     }
 
                     var (workSessions, hasNextPage, hasPrevPage) = await workSessionRepository.GetWorkSessionsWithPagination(paginationArgs.First, paginationArgs.Last, paginationArgs.Before, paginationArgs.After,
-                                                                                                                             paginationArgs.Year, paginationArgs.Month, paginationArgs.Day);
+                                                                                                                             paginationArgs.UserId, paginationArgs.Year, paginationArgs.Month, paginationArgs.Day);
 
                     var edges = workSessions.Select(w => new Edge<WorkSession>
                     {

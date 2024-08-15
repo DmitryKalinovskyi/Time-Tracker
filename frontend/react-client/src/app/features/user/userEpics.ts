@@ -2,7 +2,7 @@ import { Action, PayloadAction } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { catchError, map, mergeMap, Observable, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
-import { getUserQuery, updateUserActiveStatusMutation, updateUserMutation, updateUserPermissionsMutation } from "../../../api/queries/userQueries";
+import { getUserQuery, updateUserActiveStatusMutation, updateUserMutation, updateUserPermissionsMutation } from "./api/userQueries";
 import { createRequest } from "../../misc/RequestCreator";
 import { ShowFailure, ShowSuccess } from "../../misc/SnackBarHelper";
 import { fetchUserFailure, fetchUserSuccess } from "./userSlice";

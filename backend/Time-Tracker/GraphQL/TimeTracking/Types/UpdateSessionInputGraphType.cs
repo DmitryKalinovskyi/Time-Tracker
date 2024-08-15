@@ -9,7 +9,6 @@ namespace Time_Tracker.GraphQL.TimeTracking.Types
             Field<NonNullGraphType<IntGraphType>>("id");
             Field<NonNullGraphType<DateTimeGraphType>>("startTime");
             Field<NonNullGraphType<DateTimeGraphType>>("endTime");
-            Field<IntGraphType>("editedBy");
         }
     }
 }

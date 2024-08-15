@@ -4,7 +4,7 @@ import { ajax } from "rxjs/ajax";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { createRequest } from "../../misc/RequestCreator";
-import { getUsersQuery } from "../../../api/queries/userQueries";
+import { getUsersQuery } from "./api/usersQueries";
 import { fetchUsersFailure, fetchUsersSuccess } from "./usersSlice";
 
 export interface FetchUsersPayload {

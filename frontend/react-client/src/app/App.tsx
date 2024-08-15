@@ -10,8 +10,6 @@ import HomePage from "./ui/pages/HomePage.tsx";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
 import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
 import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
-import RequireAuth from "./gates/RequireAuth.tsx";
-import Root from "./ui/components/Root.tsx";
 import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
 import UserPage from "./ui/pages/UserPage.tsx";
 import UsersPage from "./ui/pages/UsersPage.tsx";

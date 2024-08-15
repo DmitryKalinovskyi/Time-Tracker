@@ -1,15 +1,16 @@
-import { Box, Typography } from "@mui/material";
-import TimeTracker from "../components/TimeTracker.tsx";
+import { Box, Container } from "@mui/material";
+import SessionControl from "../components/SessionControl.tsx";
+import SessionList from "../components/SessionList.tsx";
 
 export default function HomePage() {
   return (
     <>
-      <Box sx={{ p: 1 }} >
-        <Typography variant="h4" className="text-blue-800" sx={{ mb: 4 }}>
-          Welcome to Time Tracker
-        </Typography>
-        <TimeTracker />
-      </Box>
+      <Container>
+        <Box mt={4}>
+          <SessionControl />
+          <SessionList />
+        </Box>
+      </Container>
     </>
   );
 };

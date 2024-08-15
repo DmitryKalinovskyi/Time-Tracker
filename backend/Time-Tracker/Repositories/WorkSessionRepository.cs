@@ -67,6 +67,7 @@ namespace Time_Tracker.Repositories
             int? last, 
             int? beforeId, 
             int? afterId,
+            int? userId,
             int? year,
             int? month,
             int? day)
@@ -79,6 +80,7 @@ namespace Time_Tracker.Repositories
                             FROM 
                                 WorkSessions
                             WHERE 
+                                (@userId IS NULL OR UserId = @userId) AND
                                 (@year IS NULL OR YEAR(StartTime) = @year) AND
                                 (@month IS NULL OR MONTH(StartTime) = @month) AND
                                 (@day IS NULL OR DAY(StartTime) = @day) AND
@@ -122,7 +124,7 @@ namespace Time_Tracker.Repositories
                             ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
                         FROM 
                             PagedResults
-                        ORDER BY Id ASC;";
+                        ORDER BY StartTime DESC;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -132,6 +134,7 @@ namespace Time_Tracker.Repositories
                     last,
                     beforeId,
                     afterId,
+                    userId,
                     year,
                     month,
                     day
