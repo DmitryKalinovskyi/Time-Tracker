@@ -102,13 +102,6 @@ const LoginPage: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                {(auth.success !== null) && 
-                <Typography
-                    color={auth.success !== false ? "success.main" : "error.main"}
-                    sx={{ width: '100%', textAlign: 'center' }}>
-                    {auth.success !== false ? 'Authenticated successfully!' : auth.error}
-                </Typography>
-                }
                     <Button
                         type="submit"
                         fullWidth

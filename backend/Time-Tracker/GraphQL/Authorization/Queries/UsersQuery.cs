@@ -44,7 +44,9 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
                 var (users, hasNextPage, hasPrevPage) = await usersRepository.GetUsersAsync(paginationArgs.First, paginationArgs.After, 
                                                                 paginationArgs.Last, paginationArgs.Before);
 
- 
+                var users = await usersRepository.GetUsersAsync(first, after, last, before);
+                var totalCount = await usersRepository.GetTotalUsersCount();
+
                 var edges = users.Select(u => new Edge<User>
                 {
                     Node = u,
@@ -63,7 +65,7 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
                 {
                     Edges = edges,
                     PageInfo = pageInfo,
-                    TotalCount = edges.Count,
+                    TotalCount = totalCount,
                 };
             });
         }
