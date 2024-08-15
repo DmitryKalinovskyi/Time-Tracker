@@ -125,7 +125,7 @@ public class UserMutation : ObjectGraphType
             {
                 var userInput = context.GetArgument<User>("user");
 
-                var user = userRepository.Find(userInput.Id) ?? throw new ExecutionError("User not found.");
+                var user = await userRepository.FindAsync(userInput.Id) ?? throw new ExecutionError("User not found.");
 
                 user.Permissions = userInput.Permissions;
 
@@ -142,7 +142,7 @@ public class UserMutation : ObjectGraphType
                 var id = context.GetArgument<int>("id");
                 var isActive = context.GetArgument<bool>("isActive");
 
-                var user = userRepository.Find(id) ?? throw new ExecutionError("User not found.");
+                var user = await userRepository.FindAsync(id) ?? throw new ExecutionError("User not found.");
 
                 user.IsActive = isActive;
 

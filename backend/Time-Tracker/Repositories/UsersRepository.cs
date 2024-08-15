@@ -71,55 +71,54 @@ namespace Time_Tracker.Repositories
         public async Task<(IEnumerable<User>, bool HasNextPage, bool HasPrevPage)> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
         {
 
-            var sql = @"WITH FilteredCTE AS (
+            var sql = @"WITH SortedResults AS (
+                                SELECT 
+                                    *,
+                                    ROW_NUMBER() OVER (ORDER BY Id ASC) AS RowNum,
+                                    COUNT(*) OVER () AS TotalRows
+                                FROM 
+                                    Users
+                                WHERE 
+                                    (@afterId IS NULL OR Id > @afterId) AND 
+                                    (@beforeId IS NULL OR Id < @beforeId)
+                            ),
+                            PagedResults AS (
+                                SELECT 
+                                    *
+                                FROM 
+                                    SortedResults
+                                WHERE 
+                                    (@first IS NOT NULL AND RowNum <= @first) OR
+                                    (@last IS NOT NULL AND RowNum > (TotalRows - @last))
+                            ),
+                            CheckNextPage AS (
+                                SELECT 1 AS HasNextPage 
+                                FROM Users
+                                WHERE 
+                                    Id > (SELECT MAX(Id) FROM PagedResults)
+                            ),
+                            CheckPrevPage AS (
+                                SELECT 1 AS HasPrevPage 
+                                FROM Users
+                                WHERE 
+                                    Id < (SELECT MIN(Id) FROM PagedResults)
+                            )
                             SELECT 
-                                *,
-                                ROW_NUMBER() OVER (ORDER BY Id ASC) AS RowAsc,
-                                ROW_NUMBER() OVER (ORDER BY Id DESC) AS RowDesc
+                                Id,
+                                Email,
+                                FullName,
+                                HashedPassword,
+                                Salt,
+                                IsActive,
+                                Permissions,
+                                RefreshToken,
+                                RefreshTokenDateExpires,
+                                ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
+                                ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
                             FROM 
-                                Users
-                            WHERE 
-                                (@afterId IS NULL OR Id > @afterId) AND 
-                                (@beforeId IS NULL OR Id < @beforeId)
-                        ),
-                        PagedResults AS (
-                            SELECT 
-                                *
-                            FROM 
-                                FilteredCTE
-                            WHERE
-                                (@first IS NOT NULL AND RowAsc <= @first) OR
-                                (@last IS NOT NULL AND RowDesc <= @last)
-                        ),
-                        CheckNextPage AS (
-                            SELECT 1 AS HasNextPage 
-                            FROM FilteredCTE
-                            WHERE
-                                (@first IS NOT NULL AND RowAsc > @first) OR
-                                (@last IS NOT NULL AND RowDesc > @last)
-                        ),
-                        CheckPrevPage AS (
-                            SELECT 1 AS HasPrevPage
-                            FROM FilteredCTE
-                            WHERE
-                                (@afterId IS NOT NULL AND RowAsc > 1) OR
-                                (@beforeId IS NOT NULL AND RowDesc > 1)
-                        )
-                        SELECT 
-                               Id,
-                               Email,
-                               FullName,
-                               HashedPassword,
-                               Salt,
-                               IsActive,
-                               Permissions,
-                               RefreshToken,
-                               RefreshTokenDateExpires,
-                            ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
-                            ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
-                        FROM 
-                            PagedResults
-                        ORDER BY Id ASC;";
+                                PagedResults;
+
+                                        ";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -146,8 +145,8 @@ namespace Time_Tracker.Repositories
                     RefreshTokenDateExpires = (DateTime?)r.RefreshTokenDateExpires
                 }).Select(DBUser.Deserialize).ToList();
 
-                bool hasNextPage = result.Any() && (int)result.First().HasNextPage == 1;
-                bool hasPrevPage = result.Any() && (int)result.First().HasPrevPage == 1;
+                bool hasNextPage = result.Any() && (result.FirstOrDefault(r => r.HasNextPage != null)?.HasNextPage ?? 0) == 1;
+                bool hasPrevPage = result.Any() && (result.FirstOrDefault(r => r.HasPrevPage != null)?.HasPrevPage ?? 0) == 1;
 
                 return (items, hasNextPage, hasPrevPage);
             }
