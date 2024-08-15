@@ -43,7 +43,7 @@ const initialState: TimeTrackerType = {
         totalCount: 0,
         pageInfo:{
             hasNextPage: false,
-            hasPrevPage: false,
+            hasPreviousPage: false,
             startCursor: null,
             endCursor: null
         },
@@ -98,26 +98,29 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        addSessionSuccessful(state, action: PayloadAction<WorkSession>)
-        {
+        addSessionSuccessful(state, action: PayloadAction<WorkSession>) {
             state.loading = false;
             state.error = null;
+        
+            // Add the new session, wrapped in { node: sessionData }
             state.workSessions.edges = [
                 ...state.workSessions.edges,
-                action.payload
+                { node: action.payload }
             ];
-
+        
+            // Sort based on the startTime within the node object
             state.workSessions.edges.sort((a, b) => {
-                return a.startTime.valueOf() - b.startTime.valueOf();
+                return a.node.startTime.valueOf() - b.node.startTime.valueOf();
             });
         },
-
-        deleteSessionSuccessful(state, action: PayloadAction<number>)
-        {
+        
+        deleteSessionSuccessful(state, action: PayloadAction<number>) {
             state.loading = false;
             state.error = null;
+        
+            // Filter out the session by its id within the node object
             state.workSessions.edges = state.workSessions.edges.filter(session => 
-                session.id !== action.payload
+                session.node.id !== action.payload
             );
         },
 
@@ -125,13 +128,16 @@ const timeTrackerSlice = createSlice({
         {
             state.loading = false;
             state.workSessions.edges = state.workSessions.edges.map(session => 
-                session.id === action.payload.id ? action.payload : session
+                session.node.id === action.payload.id 
+                    ? { node: action.payload } 
+                    : session
             );
             state.error = null;
         },
 
         getSessionsSuccessful(state, action: PayloadAction<PaginatedWorkSessions>)
         {
+            console.log(action.payload);
             state.loading = false;
             state.error = null;
             state.workSessions = action.payload;
@@ -144,8 +150,9 @@ const timeTrackerSlice = createSlice({
         },
 
         stopSuccessful(state, action: PayloadAction<WorkSession>) {
-            state.workSessions.edges.unshift(action.payload)
+            state.workSessions.edges.unshift({ node: action.payload });
             state.loading = false;
+            state.isTracking = false;
         },
 
         setLoading(state, action: PayloadAction<boolean>)

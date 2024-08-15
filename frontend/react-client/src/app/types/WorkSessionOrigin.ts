@@ -1,5 +1,5 @@
 export interface WorkSessionOrigin{
     id: number;
-    name: string;
+    originName: string;
     description: string | null;
 }

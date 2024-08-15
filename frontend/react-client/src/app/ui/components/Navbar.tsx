@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   return (
-    <AppBar position="static" className="bg-blue-800 shadow-md">
+    <AppBar position="static">
       <Toolbar className="flex justify-end space-x-4">
         <Typography variant="h6" className="text-white">
           {user?.fullName}

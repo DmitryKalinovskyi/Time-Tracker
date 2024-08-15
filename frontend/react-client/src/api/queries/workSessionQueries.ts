@@ -255,8 +255,8 @@ export const getWorkSessionsWithPagination = (payload: PaginationPayload) => {
         query{
         timeTrackerQuery{
             workSessions(
-                            after: ${payload.after}, 
-                            before: ${payload.before}, 
+                            after: ${payload.after ? `"${payload.after}"` : null}, 
+                            before: ${payload.before ? `"${payload.before}"` : null}, 
                             first: ${payload.first}, 
                             last: ${payload.last}, 
                             userId: ${payload.userId}, 
