@@ -22,29 +22,31 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
             {
                 var paginationArgs = BasePaginationHelper.GetBasePaginationArgs(context);
 
-                if (paginationArgs.First is not null && paginationArgs.Last is not null)
+                if (!(paginationArgs.First is not null && paginationArgs.After is not null
+                        && paginationArgs.Last is null && paginationArgs.Before is null) &&
+
+                       !(paginationArgs.First is not null && paginationArgs.After is null
+                        && paginationArgs.Last is null && paginationArgs.Before is null) &&
+
+                       !(paginationArgs.First is null && paginationArgs.After is null
+                        && paginationArgs.Last is not null && paginationArgs.Before is not null) &&
+
+                       !(paginationArgs.First is null && paginationArgs.After is null
+                        && paginationArgs.Last is not null && paginationArgs.Before is null))
+
                 {
-                    context.Errors.Add(new ExecutionError("Last and First could not be specified together."));
+                    context.Errors.Add(new ExecutionError("You can only specify < First and After(optional) > or < Last and Before(optional) >."));
                     return null;
                 }
 
-                if (paginationArgs.Before is not null && paginationArgs.After is not null)
+                if (paginationArgs.First > 20 || paginationArgs.Last > 20)
                 {
-                    context.Errors.Add(new ExecutionError("Before and After could not be specified together."));
+                    context.Errors.Add(new ExecutionError("You can get at most 20 records in one request."));
                     return null;
                 }
 
-                if (paginationArgs.Before is null && paginationArgs.After is null
-                      && paginationArgs.First is null && paginationArgs.Last is null)
-                {
-                    context.Errors.Add(new ExecutionError("You need to specify at least one argument."));
-                    return null;
-                }
-
-                var (users, hasNextPage, hasPrevPage) = await usersRepository.GetUsersAsync(paginationArgs.First, paginationArgs.After, 
+                var (users, hasNextPage, hasPrevPage, totalNumber) = await usersRepository.GetUsersAsync(paginationArgs.First, paginationArgs.After, 
                                                                 paginationArgs.Last, paginationArgs.Before);
-
-                var totalCount = await usersRepository.GetTotalUsersCount();
 
                 var edges = users.Select(u => new Edge<User>
                 {
@@ -64,7 +66,7 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
                 {
                     Edges = edges,
                     PageInfo = pageInfo,
-                    TotalCount = totalCount,
+                    TotalCount = totalNumber,
                 };
             });
         }

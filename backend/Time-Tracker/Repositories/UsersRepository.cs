@@ -68,7 +68,7 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<(IEnumerable<User>, bool HasNextPage, bool HasPrevPage)> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
+        public async Task<(IEnumerable<User>, bool HasNextPage, bool HasPrevPage, int? totalNumber)> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
         {
 
             var sql = @"WITH SortedResults AS (
@@ -114,7 +114,8 @@ namespace Time_Tracker.Repositories
                                 RefreshToken,
                                 RefreshTokenDateExpires,
                                 ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
-                                ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
+                                ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage,
+                                (select count(*) from Users) as TotalNumber 
                             FROM 
                                 PagedResults;
 
@@ -145,25 +146,11 @@ namespace Time_Tracker.Repositories
                     RefreshTokenDateExpires = (DateTime?)r.RefreshTokenDateExpires
                 }).Select(DBUser.Deserialize).ToList();
 
-                bool hasNextPage = result.Any() && (result.FirstOrDefault(r => r.HasNextPage != null)?.HasNextPage ?? 0) == 1;
-                bool hasPrevPage = result.Any() && (result.FirstOrDefault(r => r.HasPrevPage != null)?.HasPrevPage ?? 0) == 1;
-
-                return (items, hasNextPage, hasPrevPage);
+                bool hasNextPage = result.Any() ? result.First().HasNextPage == 1 : false;
+                bool hasPrevPage = result.Any() ? result.First().HasPrevPage == 1 : false;
+                int? totalNumber = result.Any() ? result.First().TotalNumber : null;
+                return (items, hasNextPage, hasPrevPage, totalNumber);
             }
-        }
-
-
-        public async Task<int> GetTotalUsersCount()
-        {
-            var sql = "SELECT COUNT(*) FROM USERS";
-
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var totalCount = await connection.QuerySingleAsync<int>(sql);
-
-                return totalCount;
-            }
-
         }
 
         public async Task<User?> FindAsync(int userId)
