@@ -75,7 +75,8 @@ namespace Time_Tracker.Repositories
         {
             var sql = @"WITH FilteredCTE AS (
                             SELECT 
-                                *
+                                *,
+                                Count(*) over () as TotalNumber
                             FROM 
                                 WorkSessions
                             WHERE 
@@ -128,7 +129,7 @@ namespace Time_Tracker.Repositories
                             LastUpdatedAt,
                             ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
                             ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage,
-                            TotalRows as TotalNumber
+                            TotalNumber
                         FROM 
                             PagedResults";
 
