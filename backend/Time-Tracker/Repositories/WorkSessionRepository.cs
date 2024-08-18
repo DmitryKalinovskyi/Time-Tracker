@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Data.SqlClient;
 using System.Text;
 using Time_Tracker.Models;
@@ -63,7 +64,7 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage)> GetWorkSessionsWithPagination(int? first, 
+        public async Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage, int? totalNumber)> GetWorkSessionsWithPagination(int? first, 
             int? last, 
             int? beforeId, 
             int? afterId,
@@ -91,29 +92,29 @@ namespace Time_Tracker.Repositories
                             FROM 
                                 FilteredCTE
                             WHERE 
-                                (@afterId IS NULL OR Id < @afterId) AND 
-                                (@beforeId IS NULL OR Id > @beforeId + 1)
+                                (@afterId IS NULL OR StartTime < (select StartTime from WorkSessions where id = @afterId) ) AND 
+                                (@beforeId IS NULL OR StartTime > (select StartTime from WorkSessions where id = @beforeId))
                         ),
-                        PagedResults AS (
-                            SELECT 
-                                *
-                            FROM 
-                                SortedResults
-                            WHERE 
-                                (@first IS NOT NULL AND RowNum <= @first) OR
-                                (@last IS NOT NULL AND RowNum > (TotalRows - @last))
-                        ),
+						PagedResults as (
+						Select 
+							*
+						From
+							SortedResults
+						Where
+							(@first is null or RowNum <= @first) AND
+							(@last is null or RowNum > (TotalRows - @last))
+						),
                         CheckNextPage AS (
                             SELECT 1 AS HasNextPage 
                             FROM FilteredCTE
                             WHERE 
-                                Id < (SELECT MIN(Id) FROM PagedResults)
+                                StartTime < (SELECT MIN(StartTime) FROM PagedResults)
                         ),
                         CheckPrevPage AS (
                             SELECT 1 AS HasPrevPage 
                             FROM FilteredCTE
                             WHERE 
-                                Id > (SELECT MAX(Id) FROM PagedResults)
+                                StartTime > (SELECT MAX(StartTime) FROM PagedResults)
                         )
                         SELECT 
                             Id,
@@ -126,12 +127,10 @@ namespace Time_Tracker.Repositories
                             CreatedAt,
                             LastUpdatedAt,
                             ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
-                            ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage
+                            ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage,
+                            TotalRows as TotalNumber
                         FROM 
-                            PagedResults;
-
-
-                                        ";
+                            PagedResults";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -162,10 +161,11 @@ namespace Time_Tracker.Repositories
                     LastUpdatedAt = (DateTime)r.LastUpdatedAt
                 }).ToList();
 
-                bool hasNextPage = result.Any() && (result.FirstOrDefault(r => r.HasNextPage != null)?.HasNextPage ?? 0) == 1;
-                bool hasPrevPage = result.Any() && (result.FirstOrDefault(r => r.HasPrevPage != null)?.HasPrevPage ?? 0) == 1;
+                bool hasNextPage = result.Any() ? result.First().HasNextPage == 1 : false;
+                bool hasPrevPage = result.Any() ? result.First().HasPrevPage == 1 : false;
+                int? totalNumber = result.Any() ? result.First().TotalNumber : null;
 
-                return (items, hasNextPage, hasPrevPage);
+                return (items, hasNextPage, hasPrevPage, totalNumber);
             }
 
         }

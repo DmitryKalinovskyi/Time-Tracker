@@ -34,50 +34,49 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                 {
                     var paginationArgs = ExtendedPaginationHelper.GetExtendedPaginationArgs(context);
 
-                    if(paginationArgs.First is not null && paginationArgs.Last is not null)
+                    if(!(paginationArgs.First is not null && paginationArgs.After is not null 
+                        && paginationArgs.Last is null && paginationArgs.Before is null) &&
+
+                       !(paginationArgs.First is not null && paginationArgs.After is null
+                        && paginationArgs.Last is null && paginationArgs.Before is null) &&
+
+                       !(paginationArgs.First is  null && paginationArgs.After is null
+                        && paginationArgs.Last is not null && paginationArgs.Before is not null) &&
+
+                       !(paginationArgs.First is null && paginationArgs.After is null
+                        && paginationArgs.Last is not null && paginationArgs.Before is null))
+
                     {
-                        context.Errors.Add(new ExecutionError("Last and First could not be specified together."));
+                        context.Errors.Add(new ExecutionError("You can only specify < First and After(optional) > or < Last and Before(optional) >."));
                         return null;
                     }
 
-                    if (paginationArgs.Before is not null && paginationArgs.After is not null)
+                    if(paginationArgs.First > 20 || paginationArgs.Last > 20)
                     {
-                        context.Errors.Add(new ExecutionError("Before and After could not be specified together."));
+                        context.Errors.Add(new ExecutionError("You can get at most 20 records in one request."));
                         return null;
                     }
 
-                    if (paginationArgs.Before is null && paginationArgs.After is null 
-                          && paginationArgs.First is null && paginationArgs.Last is null)
+                    if (!(paginationArgs.Year is not null && paginationArgs.Month is null
+                        && paginationArgs.Day is null) &&
+
+                       !(paginationArgs.Year is not null && paginationArgs.Month is  not null
+                        && paginationArgs.Day is null) &&
+
+                       !(paginationArgs.Year is not null && paginationArgs.Month is not null
+                        && paginationArgs.Day is not null) &&
+
+                        !(paginationArgs.Year is  null && paginationArgs.Month is  null
+                        && paginationArgs.Day is  null))
+
                     {
-                        context.Errors.Add(new ExecutionError("You need to specify at least one argument."));
+                        context.Errors.Add(new ExecutionError("Inappropriate settings for year/month/day filtering."));
                         return null;
                     }
 
-                    if (paginationArgs.Year is not null && paginationArgs.Day is not null && paginationArgs.Month is null)
-                    {
-                        context.Errors.Add(new ExecutionError("You need to specify month to paginate using days."));
-                        return null;
-                    }
 
-                    if (paginationArgs.Year is null && paginationArgs.Day is not null && paginationArgs.Month is not null)
-                    {
-                        context.Errors.Add(new ExecutionError("You need to specify year to paginate using days."));
-                        return null;
-                    }
 
-                    if (paginationArgs.Year is null && paginationArgs.Day is not null && paginationArgs.Month is null)
-                    {
-                        context.Errors.Add(new ExecutionError("You need to specify year and month to paginate using days."));
-                        return null;
-                    }
-
-                    if (paginationArgs.Year is null && paginationArgs.Day is null && paginationArgs.Month is not null)
-                    {
-                        context.Errors.Add(new ExecutionError("You need to specify year to paginate using months."));
-                        return null;
-                    }
-
-                    var (workSessions, hasNextPage, hasPrevPage) = await workSessionRepository.GetWorkSessionsWithPagination(paginationArgs.First, paginationArgs.Last, paginationArgs.Before, paginationArgs.After,
+                    var (workSessions, hasNextPage, hasPrevPage, totalNumber) = await workSessionRepository.GetWorkSessionsWithPagination(paginationArgs.First, paginationArgs.Last, paginationArgs.Before, paginationArgs.After,
                                                                                                                              paginationArgs.UserId, paginationArgs.Year, paginationArgs.Month, paginationArgs.Day);
 
                     var edges = workSessions.Select(w => new Edge<WorkSession>
@@ -98,7 +97,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                     {
                         Edges = edges,
                         PageInfo = pageInfo,
-                        TotalCount = edges.Count,
+                        TotalCount = totalNumber,
                     };
                 });
 
