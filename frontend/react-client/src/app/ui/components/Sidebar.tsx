@@ -1,51 +1,120 @@
-import React from 'react';
-import {Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography} from '@mui/material';
-import { Dashboard as DashboardIcon, AccessTime as AccessTimeIcon, DateRange as DateRangeIcon, Settings as SettingsIcon } from '@mui/icons-material';
-import {useDispatch} from "react-redux";
-import {logout} from "../../features/authentification/authSlice.ts";
-import LogoutIcon from '@mui/icons-material/Logout';
-const drawerWidth = 280;
+import { AccessTime, BarChart, CalendarToday, DataSaverOff } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
+import { RootState } from "../../store";
+import { useSelector } from "react-redux";
+import { formatDuration } from "./SessionList";
+import ListItemButton from "@mui/material/ListItemButton";
+import Link from "@mui/material/Link";
 
 const Sidebar: React.FC = () => {
-    const dispatch = useDispatch();
+  const currentSessionDuration = useSelector((state : RootState) => state.timeTracker.currentSessionDuration);
+  const buttonSx = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 2, // Space between children
+    padding: '10px', // Add padding to the button
+    height: '50px', // Set a consistent height for the button
+  };
 
+  const iconSx = {
+    minWidth: 'unset',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+
+  const textSx = {
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+  };
   return (
-    <Drawer
-      variant="permanent"
+    <>
+      <Box
       sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', backgroundColor: '#2c3e50', color: 'white', height: '100vh' },
+        width: '100%',
+        height: '100%',
+        bgcolor: '#00101D',
+        color: '#FFF',
+        padding: '1rem',
+        borderRadius: 'inherit'
       }}
     >
-      <Toolbar className="flex justify-center items-center py-4">
-        <Typography variant="h6" noWrap className="text-white">
-          Time Tracker
-        </Typography>
-      </Toolbar>
-      <div className="overflow-auto">
-        <List>
-          {[
-            { text: 'Dashboard', icon: <DashboardIcon /> },
-            { text: 'Time Tracker', icon: <AccessTimeIcon /> },
-            { text: 'Calendar', icon: <DateRangeIcon /> },
-            { text: 'Settings', icon: <SettingsIcon /> },
-          ].map((item, index) => (
-            <ListItemButton key={index} className="hover:bg-gray-700 transition duration-300 ease-in-out">
-              <ListItemIcon sx={{color: 'white'}}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          ))}
-            <ListItemButton className="hover:bg-gray-700 transition duration-300 ease-in-out"
-                      onClick={() => dispatch(logout())}
-            >
-                <ListItemIcon sx={{color: 'white'}}><LogoutIcon/></ListItemIcon>
-                <ListItemText primary="Log out" />
-            </ListItemButton>
-        </List>
-      </div>
-    </Drawer>
-  );
-};
+      <List>
+          <ListItem>
+              <ListItemIcon>
+                <DataSaverOff sx={{ color: '#FFF', fontSize: '3rem' }} />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Timekeeper" 
+                primaryTypographyProps={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  textAlign: 'center'
+                }}
+              />
+            </ListItem>
 
-export default Sidebar;
+           <Divider sx={{ my: 3, borderColor: '#2C3E50', borderBottomWidth: 2.5}}/>
+
+            <ListItemButton 
+                  component={Link} 
+                  href="/home" 
+                  sx={buttonSx}
+                >
+            <ListItemIcon 
+              sx={iconSx}
+            >
+            <AccessTime sx={{ color: '#FFF', height: '100%' }} />
+            </ListItemIcon>
+
+            <ListItemText 
+              primary="Time Tracker" 
+              primaryTypographyProps={{ sx: { textSx }} }
+            />
+
+            {currentSessionDuration > 0 && (
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  ml: 'auto', 
+                  height: '100%', 
+                  display: 'flex', 
+                  alignItems: 'center' 
+                }}
+              >
+                {formatDuration(currentSessionDuration)}
+              </Typography>
+            )}
+          </ListItemButton>
+
+        <ListItemButton component={Link} href="/calendar" sx={buttonSx}>
+          <ListItemIcon sx={iconSx}>
+            <CalendarToday sx={{ color: '#FFF' }} />
+          </ListItemIcon>
+          <ListItemText primary="Calendar" sx={textSx} />
+        </ListItemButton>
+
+        <Divider sx={{ my: 2, borderColor: '#2C3E50', borderBottomWidth: 2.5}} />
+
+        <ListItemButton component={Link} href="/reports" sx={buttonSx}>
+          <ListItemIcon sx={iconSx}>
+            <BarChart sx={{ color: '#FFF' }} />
+          </ListItemIcon>
+          <ListItemText primary="Reports" sx={textSx} />
+        </ListItemButton>
+
+        </List>
+    </Box>
+    </>
+  );
+}
+
+export default Sidebar

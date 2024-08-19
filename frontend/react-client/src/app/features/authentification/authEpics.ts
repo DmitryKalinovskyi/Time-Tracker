@@ -9,7 +9,7 @@ import { Action, PayloadAction } from "@reduxjs/toolkit";
 import { store } from "../../store.ts"
 import {isTokenExpired} from "../../misc/tokenValidation.ts";
 import {getAvailableRefreshToken, saveRefreshToken} from "./refreshTokenManager.ts";
-export const refreshTokenEpic = (action$) => action$.pipe(
+export const refreshTokenEpic = (action$: Observable<Action>) => action$.pipe(
     filter(() => {
         const token = getAvailableRefreshToken();
 
@@ -35,7 +35,7 @@ export const refreshTokenEpic = (action$) => action$.pipe(
                 input: {
                     refreshToken: getAvailableRefreshToken()?.value,
                 }})).pipe(
-            map((ajaxResponse) => {
+            map((ajaxResponse: any) => {
                 const data: refreshTokenQueryResponse = ajaxResponse.response.data;
 
                 if(data && data.identityMutation && data.identityMutation.refreshToken && data.identityMutation.refreshToken.refreshToken){

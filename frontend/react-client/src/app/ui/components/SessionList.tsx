@@ -15,7 +15,7 @@ import { RootState } from '../../store';
 import { getSessions, deleteSession } from '../../features/timeTracking/timeTrackingSlice';
 import SessionUpdateForm from './SessionUpdationForm'; // Adjust the import based on your file structure
 
-const formatDuration = (seconds: number) => {
+export const formatDuration = (seconds: number) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
@@ -26,7 +26,7 @@ const SessionList: React.FC = () => {
   const dispatch = useDispatch();
   const { workSessions, loading, error } = useSelector((state: RootState) => state.timeTracker);
   const user = useSelector((state: RootState) => state.auth.user);
-  const [editingSession, setEditingSession] = useState<any>(null); // Adjust type based on your session type
+  const [editingSession, setEditingSession] = useState<any>(null);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const SessionList: React.FC = () => {
       month: null,
       day: null,
     }));
-  }, [dispatch]);
+  }, [ dispatch ]);
 
   const handlePrevPage = () => {
     if (!workSessions.pageInfo.hasPreviousPage) return;

@@ -141,6 +141,9 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
             state.error = null;
             state.workSessions = action.payload;
+            state.currentSessionDuration = 
+                                state.workSessions.edges[0].node.endTime == null ?
+                                Date.now() - new Date(state.workSessions.edges[0].node.startTime).getTime() : 0;
         },
         
         startSuccessful(state, action: PayloadAction<number>) {
