@@ -6,22 +6,23 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import { RootState } from "../../../store";
-import { useSelector } from "react-redux";
-import { formatDuration } from "../../../misc/TimeFormatter";
+import { formatDurationToHMS } from "../../../misc/TimeFormatter";
 import ListItemButton from "@mui/material/ListItemButton";
 import { Link } from "react-router-dom";
 
+import { useTimerContext } from "../../../features/timeTracking/TimerProvider";
+
 
 const Sidebar: React.FC = () => {
-  const currentSessionDuration = useSelector((state : RootState) => state.timeTracker.currentSessionDuration);
+  const { duration } = useTimerContext();
+
   const buttonSx = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 2, // Space between children
-    padding: '10px', // Add padding to the button
-    height: '50px', // Set a consistent height for the button
+    gap: 2,
+    padding: '10px',
+    height: '50px',
   };
 
   const iconSx = {
@@ -81,7 +82,7 @@ const Sidebar: React.FC = () => {
               primaryTypographyProps={{ sx: { textSx }} }
             />
 
-            {currentSessionDuration > 0 && (
+            {duration > 0 && (
               <Typography 
                 variant="body2" 
                 sx={{ 
@@ -91,7 +92,7 @@ const Sidebar: React.FC = () => {
                   alignItems: 'center' 
                 }}
               >
-                {formatDuration(currentSessionDuration)}
+                {formatDurationToHMS(duration)}
               </Typography>
             )}
           </ListItemButton>
@@ -118,4 +119,4 @@ const Sidebar: React.FC = () => {
   );
 }
 
-export default Sidebar
+export default Sidebar;

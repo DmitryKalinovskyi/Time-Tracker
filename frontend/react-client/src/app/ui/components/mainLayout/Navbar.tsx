@@ -37,11 +37,11 @@ const Navbar: React.FC = () => {
     }
   }
   return (
-      <Toolbar className="flex justify-end space-x-4 m-0" >
-        <Typography variant="h6" className="text-black">
+      <Toolbar className="flex justify-end space-x-4 m-0" sx={{boxShadow: '0 7px 7px -5px rgba(0, 0, 0, 0.4)'}} >
+        <Typography variant="h5" sx={{color: "#00101D" }}>
           {user?.fullName}
         </Typography>
-        <IconButton edge="end" color="default">
+        <IconButton edge="end">
           <OnlineStyledBadge
               overlap="circular"
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

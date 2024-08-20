@@ -13,6 +13,7 @@ import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
 import UserPage from "./ui/pages/UserPage.tsx";
 import UsersPage from "./ui/pages/UsersPage.tsx";
+import { TimerProvider } from './features/timeTracking/TimerProvider.tsx';
 
 const router = createBrowserRouter([
   {
@@ -43,7 +44,9 @@ export default function App() {
     <Provider store={store}>
           <AuthProvider>
               <SnackbarProvider>
+                <TimerProvider>
                   <RouterProvider router={router} />
+                </TimerProvider>
               </SnackbarProvider>
       </AuthProvider>
     </Provider>

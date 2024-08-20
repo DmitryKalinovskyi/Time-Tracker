@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
 import { PaginatedWorkSessions } from "../../types/PaginatedWorkSessions";
+import moment from "moment";
 
 export interface TimeTrackerType {
     workSessions: PaginatedWorkSessions;
@@ -101,14 +102,10 @@ const timeTrackerSlice = createSlice({
         addSessionSuccessful(state, action: PayloadAction<WorkSession>) {
             state.loading = false;
             state.error = null;
-        
-            // Add the new session, wrapped in { node: sessionData }
             state.workSessions.edges = [
                 ...state.workSessions.edges,
                 { node: action.payload }
             ];
-        
-            // Sort based on the startTime within the node object
             state.workSessions.edges.sort((a, b) => {
                 return a.node.startTime.valueOf() - b.node.startTime.valueOf();
             });
@@ -117,8 +114,7 @@ const timeTrackerSlice = createSlice({
         deleteSessionSuccessful(state, action: PayloadAction<number>) {
             state.loading = false;
             state.error = null;
-        
-            // Filter out the session by its id within the node object
+    
             state.workSessions.edges = state.workSessions.edges.filter(session => 
                 session.node.id !== action.payload
             );
@@ -141,14 +137,24 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
             state.error = null;
             state.workSessions = action.payload;
-            state.currentSessionDuration = 
-                                state.workSessions.edges[0].node.endTime == null ?
-                                Date.now() - new Date(state.workSessions.edges[0].node.startTime).getTime() : 0;
+            const lastSession = state.workSessions.edges[0].node;
+            if (lastSession && !lastSession.endTime) {
+                state.isTracking = true;
+                const localStartTime = moment.utc(lastSession.startTime).local().toDate().valueOf();
+                const currentTime = Date.now();
+                state.currentSessionDuration = Math.floor((currentTime - localStartTime) / 1000);
+                state.currentSessionId = lastSession.id;
+              } else {
+                state.isTracking = false;
+                state.currentSessionDuration = 0;
+                state.currentSessionId = null;
+              }
         },
         
         startSuccessful(state, action: PayloadAction<number>) {
             state.currentSessionId= action.payload
             state.isTracking = true;
+            state.currentSessionDuration = 0;
             state.loading = false;
         },
 
@@ -156,6 +162,8 @@ const timeTrackerSlice = createSlice({
             state.workSessions.edges.unshift({ node: action.payload });
             state.loading = false;
             state.isTracking = false;
+            state.currentSessionDuration = 0; 
+            state.currentSessionId = null;
         },
 
         setLoading(state, action: PayloadAction<boolean>)
@@ -167,6 +175,16 @@ const timeTrackerSlice = createSlice({
         {
             state.loading = false;
             state.error = action.payload;
+        },
+
+        toggleTracking(state)
+        {
+            state.isTracking = !state.isTracking;
+        },
+
+        setCurrentSessionDuration(state, action: PayloadAction<number>)
+        {
+            state.currentSessionDuration = action.payload;
         }
     },
 })
@@ -185,7 +203,9 @@ export const {
     deleteSessionSuccessful,
     addSessionSuccessful,
     setError,
-    setLoading
+    setLoading,
+    toggleTracking,
+    setCurrentSessionDuration
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

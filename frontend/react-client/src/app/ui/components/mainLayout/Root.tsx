@@ -35,12 +35,11 @@ export default function Root(){
                               flexDirection: 'column', 
                               borderRadius: '1.5rem'
                             }}>
-
-                    <Grid container spacing={3} sx={{flex: 1}} m={0}>
-                      <Grid lg={12} xs={12} p={0}>
+                    <Grid container sx={{flex: 1}} m={0}>
+                      <Grid lg={12} xs={12} p={0} m={0} height={'8%'}>
                         <Navbar />
                       </Grid>
-                      <Grid lg={12} xs={12} sx={{flex: 1}} m={0}>
+                      <Grid lg={12} xs={12} m={0} p={0} height={'92%'}>
                         <Outlet />
                       </Grid>
                     </Grid>
