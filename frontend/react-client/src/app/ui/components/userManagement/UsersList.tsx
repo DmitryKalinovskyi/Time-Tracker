@@ -3,13 +3,13 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { Box, Button, Card, CardContent, Container, Grid, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers } from "../../features/users/usersEpics";
-import { RootState } from "../../store";
+import { fetchUsers } from "../../../features/users/usersEpics";
+import { RootState } from "../../../store";
 import { useNavigate } from 'react-router-dom';
 
 export default function UsersList() {
     const navigate = useNavigate();
-    const [itemsPerPage, setItemsPerPage] = useState<number>(5);
+    const [itemsPerPage, _setItemsPerPage] = useState<number>(5);
 
     const usersPage = useSelector((state: RootState) => state.users.usersPage);
     const dispatch = useDispatch();

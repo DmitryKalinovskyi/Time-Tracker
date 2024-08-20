@@ -6,11 +6,12 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import { RootState } from "../../store";
+import { RootState } from "../../../store";
 import { useSelector } from "react-redux";
-import { formatDuration } from "./SessionList";
+import { formatDuration } from "../../../misc/TimeFormatter";
 import ListItemButton from "@mui/material/ListItemButton";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
+
 
 const Sidebar: React.FC = () => {
   const currentSessionDuration = useSelector((state : RootState) => state.timeTracker.currentSessionDuration);
@@ -66,7 +67,7 @@ const Sidebar: React.FC = () => {
 
             <ListItemButton 
                   component={Link} 
-                  href="/home" 
+                  to="/home" 
                   sx={buttonSx}
                 >
             <ListItemIcon 
@@ -95,7 +96,7 @@ const Sidebar: React.FC = () => {
             )}
           </ListItemButton>
 
-        <ListItemButton component={Link} href="/calendar" sx={buttonSx}>
+        <ListItemButton component={Link} to="/calendar" sx={buttonSx}>
           <ListItemIcon sx={iconSx}>
             <CalendarToday sx={{ color: '#FFF' }} />
           </ListItemIcon>
@@ -104,7 +105,7 @@ const Sidebar: React.FC = () => {
 
         <Divider sx={{ my: 2, borderColor: '#2C3E50', borderBottomWidth: 2.5}} />
 
-        <ListItemButton component={Link} href="/reports" sx={buttonSx}>
+        <ListItemButton component={Link} to="/reports" sx={buttonSx}>
           <ListItemIcon sx={iconSx}>
             <BarChart sx={{ color: '#FFF' }} />
           </ListItemIcon>

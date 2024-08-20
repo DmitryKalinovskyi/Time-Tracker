@@ -1,7 +1,7 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, Card, Chip, Divider, Grid, IconButton, MenuItem, Switch, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import User from "../../types/User";
+import User from "../../../types/User";
 import { StyledMenu } from './StyledMenu';
 
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchUser, updateUser, updateUserActiveStatus, updateUserPermissions } from "../../features/user/userEpics";
 import { RootState } from "../../store";
-import UserProfile from '../components/UserProfile';
+import UserProfile from '../components/userManagement/UserProfile';
 import User from "../../types/User";
 import { fetchPermissions } from "../../features/permissions/permissionsEpics";
 

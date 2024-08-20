@@ -1,7 +1,7 @@
 import React from 'react';
-import { Toolbar, Typography, IconButton, Avatar, Badge } from '@mui/material';
+import { Toolbar, Typography, IconButton, Avatar } from '@mui/material';
 
-import { RootState } from '../../store';
+import { RootState } from '../../../store';
 import { useSelector } from 'react-redux';
 import { OnlineStyledBadge } from './OnlineStyledBadge';
 

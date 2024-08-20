@@ -1,5 +1,5 @@
-import SessionControl from "../components/SessionControl.tsx";
-import SessionList from "../components/SessionList.tsx";
+import SessionControl from "../components/timeTracking/Timer.tsx";
+import SessionList from "../components/timeTracking/SessionList.tsx";
 
 export default function HomePage() {
   return (

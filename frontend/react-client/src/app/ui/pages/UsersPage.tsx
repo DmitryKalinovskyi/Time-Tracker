@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import UsersList from "../components/UsersList";
+import UsersList from "../components/userManagement/UsersList";
 
 export default function UsersPage() {
     return (

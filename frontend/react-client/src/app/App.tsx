@@ -5,7 +5,7 @@ import AccountVerificationPage from "../app/ui/pages/AccountVerificationPage.tsx
 import LoginPage from "../app/ui/pages/LoginPage.tsx";
 import RequireAuth from "./gates/RequireAuth.tsx";
 import { store } from "./store.ts";
-import Root from "./ui/components/Root.tsx";
+import Root from "./ui/components/mainLayout/Root.tsx";
 import HomePage from "./ui/pages/HomePage.tsx";
 import NotFoundPage from "./ui/pages/NotFoundPage.tsx";
 import RegisterUserPage from "./ui/pages/RegisterUserPage.tsx";
