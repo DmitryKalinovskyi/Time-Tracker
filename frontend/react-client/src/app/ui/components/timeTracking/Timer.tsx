@@ -14,7 +14,7 @@ const Timer: React.FC = () => {
   const { duration, isTracking, startTimer, stopTimer, setInitialDuration, setInitialIsTracking } = useTimerContext();
 
   const user = useSelector((state: RootState) => state.auth.user);
-
+  
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -30,10 +30,14 @@ const Timer: React.FC = () => {
         year: null
       }
     ));
-
-    setInitialDuration(timeTracker.currentSessionDuration);
-    setInitialIsTracking(timeTracker.isTracking);
   }, [dispatch]);
+
+  useEffect(() => {
+    if (timeTracker) {
+      setInitialDuration(timeTracker.currentSessionDuration);
+      setInitialIsTracking(timeTracker.isTracking);
+    }
+  }, [timeTracker.currentSessionDuration]);
 
   const handleButtonClick = () => {
     if (isTracking) {
