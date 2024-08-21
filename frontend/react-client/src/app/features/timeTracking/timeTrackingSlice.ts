@@ -3,12 +3,16 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WorkSession} from "../../types/WorkSession";
 import { PaginatedWorkSessions } from "../../types/PaginatedWorkSessions";
 import moment from "moment";
+import { FilterType } from "../../ui/components/timeTracking/FilterSelector";
+import dayjs, { Dayjs } from "dayjs";
 
 export interface TimeTrackerType {
     workSessions: PaginatedWorkSessions;
     currentSessionId: number | null;
     isTracking: boolean;
     currentSessionDuration: number;
+    filterType: FilterType
+    filterValue: Dayjs
     loading: boolean;
     error: string | null;
 }
@@ -55,6 +59,8 @@ const initialState: TimeTrackerType = {
     currentSessionDuration: 0,
     loading: false,
     error: null,
+    filterType: 'day',
+    filterValue: dayjs()
 }
 
 const timeTrackerSlice = createSlice({
@@ -137,7 +143,7 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
             state.error = null;
             state.workSessions = action.payload;
-            const lastSession = state.workSessions.edges[0].node;
+            const lastSession = state.workSessions.edges.length != 0 ? state.workSessions.edges[0].node : null;
             if (lastSession && !lastSession.endTime) {
                 state.isTracking = true;
                 const localStartTime = moment.utc(lastSession.startTime).local().toDate().valueOf();
@@ -176,15 +182,15 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-
-        toggleTracking(state)
+        
+        setFilter(state, action: PayloadAction<FilterType>)
         {
-            state.isTracking = !state.isTracking;
+            state.filterType = action.payload;
         },
 
-        setCurrentSessionDuration(state, action: PayloadAction<number>)
+        setFilterValue(state, action: PayloadAction<Dayjs>)
         {
-            state.currentSessionDuration = action.payload;
+            state.filterValue = action.payload;
         }
     },
 })
@@ -204,8 +210,8 @@ export const {
     addSessionSuccessful,
     setError,
     setLoading,
-    toggleTracking,
-    setCurrentSessionDuration
+    setFilter,
+    setFilterValue
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

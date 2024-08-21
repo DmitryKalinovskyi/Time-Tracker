@@ -9,7 +9,7 @@ export default function Root(){
     return (
         <>
           <Box 
-              sx={{ minHeight: '100vh', display: 'flex', minWidth: '99vw' }}
+              sx={{ minHeight: '100vh', display: 'flex', width: '100vw' }}
               p={'1rem'}
               bgcolor={"#DEDEDE"}
               >

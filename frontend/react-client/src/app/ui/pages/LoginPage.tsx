@@ -27,11 +27,11 @@ const LoginPage: React.FC = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (auth.success) {
+        if (!auth.error) {
             setEmail('');
             setPassword(''); 
         }
-    }, [auth.success]);
+    }, [auth.error]);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
