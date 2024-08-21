@@ -59,7 +59,7 @@ const Timer: React.FC = () => {
       justifyContent: 'center',
       flexDirection: 'column',
       p: '2rem',
-      height: '35%'}}>
+      height: '30%'}}>
         <Box sx={{
           display: 'flex',
         }}>
