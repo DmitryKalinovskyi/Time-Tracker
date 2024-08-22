@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store'; // Adjust the path according to your store setup
-import { getSessions } from '../../../features/timeTracking/timeTrackingSlice'; // Adjust according to your actions setup
+import { getSessions, setPageNumber } from '../../../features/timeTracking/timeTrackingSlice'; // Adjust according to your actions setup
 import {
   Box,
   CircularProgress,
@@ -22,39 +22,46 @@ import CustomPagination from './CustomPagination';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
-  const { workSessions, loading, error, filterType, filterValue } = useSelector((state: RootState) => state.timeTracker);
+  const { isTracking, workSessions, loading, error, filterType, filterValue } = useSelector((state: RootState) => state.timeTracker);
   const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
-    dispatch(getSessions({
+    const initialPaginationArgs = {
       after: null,
       before: null,
       first: 4,
       last: null,
       userId: user ? user.id : null,
       year: filterValue.year(),
-      month: filterType == 'month' || filterType == 'day' ? filterValue.month() + 1 : null,
-      day: filterType == 'day' ? filterValue.date() : null,
-    }));
-  }, [dispatch, filterValue]);
+      month: filterType === 'month' || filterType === 'day' ? filterValue.month() + 1 : null,
+      day: filterType === 'day' ? filterValue.date() : null,
+    };
+
+    dispatch(getSessions(initialPaginationArgs));
+    dispatch(setPageNumber(1));
+  }, [isTracking, filterValue, user]);
 
   if (loading) return <Container 
                       sx={{
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center', 
-                        height: '58%'}}>
+                        height: '100%'}}>
                             <CircularProgress sx={{color: '#00101D'}} />
                         </Container>;
   if (error) return <div>Error: {error}</div>;
 
   return (
+    <>    {workSessions.edges.length == 0 ? 
+      <Typography  variant='h5' color={'#00101D'} height={'100%'} textAlign={'center'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+        It looks like there are no work sessions matching your current filters.
+      </Typography> :
     <>
     <Box display={'flex'} justifyContent={'flex-start'} alignItems={'center'} px={2} mb={1}>
     <Typography variant='h5' color={"#00101D"} sx={{opacity: 0.6}} mr={1}>Total time: </Typography>
     <Typography variant='h4' color={"#00101D"} sx={{opacity: 1}} > {formatDuration(12331)}</Typography>
     </Box>
-    <Box display={'flex'}  flexDirection={'column'} justifyContent={'center'} alignItems={'center'} px={2}>
+    <Box display={'flex'} height={'90%'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} px={2}>
       <TableContainer component={Paper} sx={{borderRadius: '1.5rem', mb: 2}}>
         <Table>
           <TableHead sx={{backgroundColor:"#00101D", opacity: 0.95}}>
@@ -77,10 +84,17 @@ const SessionList: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <CustomPagination itemsPerPage={4} totalCount={workSessions.totalCount} />
+
+      <Box sx={{justifySelf: 'flex-end'}}> 
+          <CustomPagination />
+      </Box>
+      
     </Box>
     
     </>
+    }
+    </>
+
   );
 };
 

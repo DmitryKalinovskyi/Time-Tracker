@@ -13,6 +13,7 @@ export interface TimeTrackerType {
     currentSessionDuration: number;
     filterType: FilterType
     filterValue: Dayjs
+    pageNumber: number
     loading: boolean;
     error: string | null;
 }
@@ -60,7 +61,8 @@ const initialState: TimeTrackerType = {
     loading: false,
     error: null,
     filterType: 'day',
-    filterValue: dayjs()
+    filterValue: dayjs(),
+    pageNumber: 1
 }
 
 const timeTrackerSlice = createSlice({
@@ -148,7 +150,7 @@ const timeTrackerSlice = createSlice({
                 state.isTracking = true;
                 const localStartTime = moment.utc(lastSession.startTime).local().toDate().valueOf();
                 const currentTime = Date.now();
-                state.currentSessionDuration = Math.floor((currentTime - localStartTime) / 1000);
+                state.currentSessionDuration = Math.floor((currentTime - localStartTime) / 1000) + 1;
                 state.currentSessionId = lastSession.id;
               } else {
                 state.isTracking = false;
@@ -164,8 +166,7 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
         },
 
-        stopSuccessful(state, action: PayloadAction<WorkSession>) {
-            state.workSessions.edges.unshift({ node: action.payload });
+        stopSuccessful(state, _action: PayloadAction<WorkSession>) {
             state.loading = false;
             state.isTracking = false;
             state.currentSessionDuration = 0; 
@@ -191,6 +192,10 @@ const timeTrackerSlice = createSlice({
         setFilterValue(state, action: PayloadAction<Dayjs>)
         {
             state.filterValue = action.payload;
+        },
+        setPageNumber(state, action: PayloadAction<number>)
+        {
+            state.pageNumber = action.payload;
         }
     },
 })
@@ -211,7 +216,8 @@ export const {
     setError,
     setLoading,
     setFilter,
-    setFilterValue
+    setFilterValue,
+    setPageNumber
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

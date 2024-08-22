@@ -1,4 +1,4 @@
-import { catchError, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
+import { catchError, delay, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
 import { ofType, StateObservable } from "redux-observable";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
 import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getSessions, getSessionsSuccessful, PaginationPayload, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, } from "./timeTrackingSlice";
@@ -108,6 +108,7 @@ export const getSessionsEpic = (action$: Observable<Action>) => action$.pipe(
                     throw new Error('[Getting Work Sessions] Unexpected response format or missing login data');
                 }
             }),
+            delay(100),
             catchError((error: any) => {
                 let errorMessage = 'An unexpected error occurred';
 

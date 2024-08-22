@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import { formatDurationToHMS } from "../../../misc/TimeFormatter";
 import ListItemButton from "@mui/material/ListItemButton";
 import { Link } from "react-router-dom";
+import GroupIcon from '@mui/icons-material/Group';
 
 import { useTimerContext } from "../../../features/timeTracking/TimerProvider";
 
@@ -111,6 +112,13 @@ const Sidebar: React.FC = () => {
             <BarChart sx={{ color: '#FFF' }} />
           </ListItemIcon>
           <ListItemText primary="Reports" sx={textSx} />
+        </ListItemButton>
+
+        <ListItemButton component={Link} to="/users" sx={buttonSx}>
+          <ListItemIcon sx={iconSx}>
+            <GroupIcon sx={{ color: '#FFF' }} />
+          </ListItemIcon>
+          <ListItemText primary="Users" sx={textSx} />
         </ListItemButton>
 
         </List>

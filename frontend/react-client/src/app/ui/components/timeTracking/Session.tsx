@@ -9,7 +9,7 @@ import TimerIcon from '@mui/icons-material/Timer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { useDispatch } from 'react-redux';
-import { deleteSession, getSessions } from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession } from '../../../features/timeTracking/timeTrackingSlice';
 
 interface SessionProps {
   session: WorkSession;
@@ -33,7 +33,7 @@ const Session: React.FC<SessionProps> = ({ session }) => {
         <Avatar
             {...stringAvatar(session.user?.fullName ?? "")}
             sx={{
-              ...stringAvatar(session.user?.fullName ?? "").sx, // Merge existing sx
+              ...stringAvatar(session.user?.fullName ?? "").sx,
               width: "30px",
               height: "30px",
               fontSize: '1.1rem'
@@ -49,7 +49,7 @@ const Session: React.FC<SessionProps> = ({ session }) => {
         <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2}}>
           <AccessTimeIcon sx={{width:"30px", height:"30px", color: "#00101D"}} />
           <Box >
-            {`${moment.utc(session.startTime).local().format("HH:mm")} - ${moment.utc(session.endTime).local().format("HH:mm")}`}
+            {`${moment.utc(session.startTime).local().format("HH:mm")} - ${session.endTime ? moment.utc(session.endTime).local().format("HH:mm") : "Now"}`}
           </Box>
         </Box>
       </TableCell>

@@ -13,7 +13,10 @@ export default function HomePage() {
           <FilterSelector />
           <DateSelector  />
         </Box>
-        <SessionList />
+        <Box height={'60%'}>
+          <SessionList />
+        </Box>
+        
     </>
   );
 };
