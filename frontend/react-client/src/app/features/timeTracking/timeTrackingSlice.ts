@@ -128,14 +128,9 @@ const timeTrackerSlice = createSlice({
             );
         },
 
-        updateSessionSuccessful(state, action: PayloadAction<WorkSession>)
+        updateSessionSuccessful(state, _action: PayloadAction<WorkSession>)
         {
             state.loading = false;
-            state.workSessions.edges = state.workSessions.edges.map(session => 
-                session.node.id === action.payload.id 
-                    ? { node: action.payload } 
-                    : session
-            );
             state.error = null;
         },
 

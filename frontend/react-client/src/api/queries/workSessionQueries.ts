@@ -152,6 +152,7 @@ export const addSessionQuery = (payload: AddSessionPayload) => {
 }
 
 export const updateSessionQuery = (payload: UpdateSessionPayload) => {
+    console.log(payload);
     const query = 
     `
     mutation{
@@ -160,8 +161,8 @@ export const updateSessionQuery = (payload: UpdateSessionPayload) => {
                             input: 
                             { 
                                 id: ${payload.id},
-                                startTime: "${payload.startTime.toISOString()}", 
-                                endTime: "${payload.endTime.toISOString()}"
+                                startTime: "${new Date(payload.startTime).toISOString()}", 
+                                endTime: "${new Date(payload.endTime).toISOString()}"
                             }
                         ) 
             {

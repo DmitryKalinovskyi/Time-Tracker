@@ -8,29 +8,22 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TimerIcon from '@mui/icons-material/Timer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { useDispatch } from 'react-redux';
-import { deleteSession } from '../../../features/timeTracking/timeTrackingSlice';
-
 interface SessionProps {
   session: WorkSession;
+  onEdit: () => void;
+  onDelete: (sessionId: number) => void;
 }
 
+const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
 
-const Session: React.FC<SessionProps> = ({ session }) => {
-
-  const dispatch = useDispatch();
-
-  const handleDeleteSession = (sessionId: number) => {
-    dispatch(deleteSession(sessionId));
-    console.log(`Session with id = ${sessionId} has been deleted. `)
-  }
-  
   return (
     <TableRow>
-      <TableCell sx={{ width: '10%',  fontSize: '1.1rem', textAlign: 'center' }}>{moment.utc(session.createdAt).local().format("MMM DD, YYYY \n HH:mm")}</TableCell>
+      <TableCell sx={{ width: '10%', fontSize: '1.1rem', textAlign: 'center' }}>
+        {moment.utc(session.startTime).local().format("MMM DD, YYYY")}
+      </TableCell>
       <TableCell sx={{ width: '12.5%', textAlign: 'center' }}>
         <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
-        <Avatar
+          <Avatar
             {...stringAvatar(session.user?.fullName ?? "")}
             sx={{
               ...stringAvatar(session.user?.fullName ?? "").sx,
@@ -39,67 +32,70 @@ const Session: React.FC<SessionProps> = ({ session }) => {
               fontSize: '1.1rem'
             }}
           />
-        <Typography  sx={{color: "#00101D", fontSize: '1.1rem'}}>
-          {session.user?.fullName}
-        </Typography>
+          <Typography sx={{ color: "#00101D", fontSize: '1.1rem' }}>
+            {session.user?.fullName}
+          </Typography>
         </Box>
       </TableCell>
-
-      <TableCell sx={{ width: '15%', textAlign: 'center', fontSize: '1.1rem'}}>
-        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2}}>
-          <AccessTimeIcon sx={{width:"30px", height:"30px", color: "#00101D"}} />
-          <Box >
+      <TableCell sx={{ width: '15%', textAlign: 'center', fontSize: '1.1rem' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+          <AccessTimeIcon sx={{ width: "30px", height: "30px", color: "#00101D" }} />
+          <Box>
             {`${moment.utc(session.startTime).local().format("HH:mm")} - ${session.endTime ? moment.utc(session.endTime).local().format("HH:mm") : "Now"}`}
           </Box>
         </Box>
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>{session.endTime ? "Finished" : "In Progress"}</TableCell>
-      <TableCell sx={{ width: '12.5%', textAlign: 'center', fontSize: '1.1rem' }}>
-        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2}}>
-            <TimerIcon sx={{width:"30px", height:"30px", color: "#00101D" }}/>
-            <Box>
-              {session.duration ? formatDuration(session.duration) : ""}
-            </Box>
-        </Box>
-        </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>{session.sessionOrigin.originName}</TableCell>
-      <TableCell sx={{ width: '12.5%', textAlign: 'center', fontSize: '1.1rem' }}>
-        {session.editedBy ?       
-        <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
-        <Avatar
-            {...stringAvatar(session.editedBy?.fullName ?? "")}
-            sx={{
-              ...stringAvatar(session.editedBy?.fullName ?? "").sx,
-              width: "30px",
-              height: "30px",
-              fontSize: '1.1rem'
-            }}
-          />
-        <Typography  sx={{color: "#00101D", fontSize: '1.1rem'}}>
-          {session.editedBy?.fullName}
-        </Typography>
-        </Box> : " " }
-      </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>{moment.utc(session.lastUpdatedAt).local().format("MMM DD, YYYY HH:mm")}</TableCell>
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
-        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <Button 
-          sx={{color: "#00101D"}} 
-          onClick={() => console.log(session.id)} 
-        >
-          <EditIcon />
-        </Button>
-        <Button 
-          sx={{color: "#00101D"}} 
-          onClick={() => handleDeleteSession(session.id)}
-        >
-          <DeleteForeverIcon />
-        </Button>
+        {session.endTime ? "Finished" : "In Progress"}
+      </TableCell>
+      <TableCell sx={{ width: '12.5%', textAlign: 'center', fontSize: '1.1rem' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+          <TimerIcon sx={{ width: "30px", height: "30px", color: "#00101D" }} />
+          <Box>
+            {session.duration ? formatDuration(session.duration) : ""}
+          </Box>
         </Box>
-        
-      </TableCell>      
-
-
+      </TableCell>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+        {session.sessionOrigin.originName}
+      </TableCell>
+      <TableCell sx={{ width: '12.5%', textAlign: 'center', fontSize: '1.1rem' }}>
+        {session.editedBy ?
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
+            <Avatar
+              {...stringAvatar(session.editedBy?.fullName ?? "")}
+              sx={{
+                ...stringAvatar(session.editedBy?.fullName ?? "").sx,
+                width: "30px",
+                height: "30px",
+                fontSize: '1.1rem'
+              }}
+            />
+            <Typography sx={{ color: "#00101D", fontSize: '1.1rem' }}>
+              {session.editedBy?.fullName}
+            </Typography>
+          </Box>
+          : " "}
+      </TableCell>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+        {moment.utc(session.lastUpdatedAt).local().format("MMM DD, YYYY HH:mm")}
+      </TableCell>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          { session.endTime && <Button
+            sx={{ color: "#00101D" }}
+            onClick={onEdit}
+          >
+            <EditIcon />
+          </Button>}
+          <Button
+            sx={{ color: "#00101D" }}
+            onClick={() => onDelete(session.id)}
+          >
+            <DeleteForeverIcon />
+          </Button>
+        </Box>
+      </TableCell>
     </TableRow>
   );
 };

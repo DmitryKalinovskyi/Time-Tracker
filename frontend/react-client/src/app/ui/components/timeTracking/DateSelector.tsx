@@ -113,7 +113,7 @@ export default function PickerWithButtonField() {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
       <ButtonDatePicker
         label={filterValue.format(getDateFormatFromFilter(filterType))}
         value={filterValue}
