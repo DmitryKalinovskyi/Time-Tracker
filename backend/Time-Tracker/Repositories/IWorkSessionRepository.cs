@@ -1,4 +1,5 @@
-﻿using Time_Tracker.Models;
+﻿using Time_Tracker.Helpers;
+using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
 {
@@ -13,9 +14,7 @@ namespace Time_Tracker.Repositories
 
         Task<WorkSession?> GetWorkSessionByIdAsync(int id);
 
-        Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage, int? totalNumber)> GetWorkSessionsWithPagination(int? first, int? last, int? beforeId, int? afterId, int? userId, int? year,
-            int? month,
-            int? day);
+        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest request);
 
 
     }

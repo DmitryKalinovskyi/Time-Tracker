@@ -1,5 +1,7 @@
-﻿using Dapper;
+﻿using Azure.Core;
+using Dapper;
 using Microsoft.Data.SqlClient;
+using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
@@ -68,89 +70,33 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<(IEnumerable<User>, bool HasNextPage, bool HasPrevPage, int? totalNumber)> GetUsersAsync(int? first, int? afterId, int? last, int? beforeId)
+        public async Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest request)
         {
 
-            var sql = @"WITH SortedResults AS (
-                                SELECT 
-                                    *,
-                                    ROW_NUMBER() OVER (ORDER BY Id ASC) AS RowNum,
-                                    COUNT(*) OVER () AS TotalRows
-                                FROM 
-                                    Users
-                                WHERE 
-                                    (@afterId IS NULL OR Id > @afterId) AND 
-                                    (@beforeId IS NULL OR Id < @beforeId)
-                            ),
-                            PagedResults AS (
-                                SELECT 
-                                    *
-                                FROM 
-                                    SortedResults
-                                WHERE 
-                                    (@first IS NOT NULL AND RowNum <= @first) OR
-                                    (@last IS NOT NULL AND RowNum > (TotalRows - @last))
-                            ),
-                            CheckNextPage AS (
-                                SELECT 1 AS HasNextPage 
-                                FROM Users
-                                WHERE 
-                                    Id > (SELECT MAX(Id) FROM PagedResults)
-                            ),
-                            CheckPrevPage AS (
-                                SELECT 1 AS HasPrevPage 
-                                FROM Users
-                                WHERE 
-                                    Id < (SELECT MIN(Id) FROM PagedResults)
-                            )
-                            SELECT 
-                                Id,
-                                Email,
-                                FullName,
-                                HashedPassword,
-                                Salt,
-                                IsActive,
-                                Permissions,
-                                RefreshToken,
-                                RefreshTokenDateExpires,
-                                ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
-                                ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage,
-                                (select count(*) from Users) as TotalNumber 
-                            FROM 
-                                PagedResults;
+            var (query, parameters) = PaginationHelper.BuildPaginatedQuery("Users", request);
 
-                                        ";
+            var countQuery = PaginationHelper.BuildCountQuery("Users", request);
+
+            IEnumerable<DBUser> paginatedData = [];
+
+            var totalRecords = 0;
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var parameters = new
-                {
-                    first,
-                    last,
-                    beforeId,
-                    afterId,
-                };
-
-                var result = await connection.QueryAsync<dynamic>(sql, parameters);
-
-                var items = result.Select(r => new DBUser
-                {
-                    Id = (int)r.Id,
-                    FullName = (string)r.FullName,
-                    Email = (string)r.Email,
-                    HashedPassword = (string)r.HashedPassword,
-                    Salt = (string)r.Salt,
-                    IsActive = r.IsActive,
-                    Permissions = r.Permissions,
-                    RefreshToken = (string?)r.RefreshToken,
-                    RefreshTokenDateExpires = (DateTime?)r.RefreshTokenDateExpires
-                }).Select(DBUser.Deserialize).ToList();
-
-                bool hasNextPage = result.Any() ? result.First().HasNextPage == 1 : false;
-                bool hasPrevPage = result.Any() ? result.First().HasPrevPage == 1 : false;
-                int? totalNumber = result.Any() ? result.First().TotalNumber : null;
-                return (items, hasNextPage, hasPrevPage, totalNumber);
+                paginatedData = await connection.QueryAsync<DBUser>(query, parameters);
+                totalRecords = await connection.ExecuteScalarAsync<int>(countQuery, parameters);
             }
+
+            var totalPages = (int)Math.Ceiling((double)totalRecords / request.PageSize);
+
+            return new PaginationResult<User>
+            {
+                Results = paginatedData.Select(DBUser.Deserialize),
+                TotalRecords = totalRecords,
+                TotalPages = totalPages,
+                CurrentPage = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
 
         public async Task<User?> FindAsync(int userId)

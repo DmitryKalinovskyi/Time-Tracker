@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Data.SqlClient;
 using System.Text;
+using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
@@ -64,111 +65,32 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task<(IEnumerable<WorkSession>, bool HasNextPage, bool HasPrevPage, int? totalNumber)> GetWorkSessionsWithPagination(int? first, 
-            int? last, 
-            int? beforeId, 
-            int? afterId,
-            int? userId,
-            int? year,
-            int? month,
-            int? day)
+        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest request)
         {
-            var sql = @"WITH FilteredCTE AS (
-                            SELECT 
-                                *,
-                                Count(*) over () as TotalNumber
-                            FROM 
-                                WorkSessions
-                            WHERE 
-                                (@userId IS NULL OR UserId = @userId) AND
-                                (@year IS NULL OR YEAR(StartTime) = @year) AND
-                                (@month IS NULL OR MONTH(StartTime) = @month) AND
-                                (@day IS NULL OR DAY(StartTime) = @day)
-                        ),
-                        SortedResults AS (
-                            SELECT 
-                                *,
-                                ROW_NUMBER() OVER (ORDER BY StartTime DESC) AS RowNum,
-                                COUNT(*) OVER () AS TotalRows
-                            FROM 
-                                FilteredCTE
-                            WHERE 
-                                (@afterId IS NULL OR StartTime < (select StartTime from WorkSessions where id = @afterId) ) AND 
-                                (@beforeId IS NULL OR StartTime > (select StartTime from WorkSessions where id = @beforeId))
-                        ),
-						PagedResults as (
-						Select 
-							*
-						From
-							SortedResults
-						Where
-							(@first is null or RowNum <= @first) AND
-							(@last is null or RowNum > (TotalRows - @last))
-						),
-                        CheckNextPage AS (
-                            SELECT 1 AS HasNextPage 
-                            FROM FilteredCTE
-                            WHERE 
-                                StartTime < (SELECT MIN(StartTime) FROM PagedResults)
-                        ),
-                        CheckPrevPage AS (
-                            SELECT 1 AS HasPrevPage 
-                            FROM FilteredCTE
-                            WHERE 
-                                StartTime > (SELECT MAX(StartTime) FROM PagedResults)
-                        )
-                        SELECT 
-                            Id,
-                            UserId,
-                            StartTime,
-                            EndTime,
-                            SessionOriginId,
-                            Duration,
-                            EditedBy,
-                            CreatedAt,
-                            LastUpdatedAt,
-                            ISNULL((SELECT TOP 1 HasNextPage FROM CheckNextPage), 0) AS HasNextPage,
-                            ISNULL((SELECT TOP 1 HasPrevPage FROM CheckPrevPage), 0) AS HasPrevPage,
-                            TotalNumber
-                        FROM 
-                            PagedResults";
+            var (query, parameters) = PaginationHelper.BuildPaginatedQuery("WorkSessions", request);
+
+            var countQuery = PaginationHelper.BuildCountQuery("WorkSessions", request);
+
+            IEnumerable<WorkSession> paginatedData = [];
+
+            var totalRecords = 0;
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var parameters = new
-                {
-                    first,
-                    last,
-                    beforeId,
-                    afterId,
-                    userId,
-                    year,
-                    month,
-                    day
-                };
-
-                var result = await connection.QueryAsync<dynamic>(sql, parameters);
-
-                var items = result.Select(r => new WorkSession
-                {
-                    Id = (int)r.Id,
-                    UserId = (int)r.UserId,
-                    StartTime = (DateTime?)r.StartTime,
-                    EndTime = (DateTime?)r.EndTime,
-                    SessionOriginId = (int)r.SessionOriginId,
-                    Duration = (long?)r.Duration,
-                    EditedBy = (int?)r.EditedBy,
-                    CreatedAt = (DateTime)r.CreatedAt,
-                    LastUpdatedAt = (DateTime)r.LastUpdatedAt
-                }).ToList();
-
-                bool hasNextPage = result.Any() ? result.First().HasNextPage == 1 : false;
-                bool hasPrevPage = result.Any() ? result.First().HasPrevPage == 1 : false;
-                int? totalNumber = result.Any() ? result.First().TotalNumber : null;
-
-                return (items, hasNextPage, hasPrevPage, totalNumber);
+                paginatedData = await connection.QueryAsync<WorkSession>(query, parameters);
+                totalRecords = await connection.ExecuteScalarAsync<int>(countQuery, parameters);
             }
 
+            var totalPages = (int)Math.Ceiling((double)totalRecords / request.PageSize);
+
+            return new PaginationResult<WorkSession>
+            {
+                Results = paginatedData,
+                TotalRecords = totalRecords,
+                TotalPages = totalPages,
+                CurrentPage = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
 
         public async Task<WorkSession> UpdateWorkSessionAsync(WorkSession workSession)
