@@ -12,6 +12,7 @@ export interface authUserQueryResponse{
 }
 
 export interface refreshTokenQueryResponse{
+    errors?: []
     identityMutation:{
         refreshToken:{
             user: User,
