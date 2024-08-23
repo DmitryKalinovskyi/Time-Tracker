@@ -36,7 +36,7 @@ namespace Time_Tracker.Repositories
                     HashedPassword = dbUser.HashedPassword,
                     Salt = dbUser.Salt,
                     IsActive = dbUser.IsActive,
-                    Permissions = dbUser.Permissions?.Split(" ").ToList() ?? [],
+                    Permissions = dbUser.Permissions?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList() ?? [],
                     RefreshToken = dbUser.RefreshToken,
                     RefreshTokenDateExpires = dbUser.RefreshTokenDateExpires,
                 };
@@ -52,7 +52,7 @@ namespace Time_Tracker.Repositories
                     HashedPassword = user.HashedPassword,
                     Salt = user.Salt,
                     IsActive = user.IsActive,
-                    Permissions = string.Join(" ", user.Permissions),
+                    Permissions = user.Permissions.Count > 0? string.Join(" ", user.Permissions): null,
                     RefreshToken = user.RefreshToken,
                     RefreshTokenDateExpires = user.RefreshTokenDateExpires,
                 };
