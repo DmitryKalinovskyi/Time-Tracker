@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -19,17 +20,7 @@ public class TokenService
 
     public TokenDto GenerateAccessToken(int userId)
     {
-        return GenerateTokenWithKey(userId, _configuration["Jwt:Key"]);
-    }
-
-    public TokenDto GenerateRefreshToken(int userId)
-    {
-        return GenerateTokenWithKey(userId, _configuration["Jwt:RefreshKey"]);
-    }
-
-    private TokenDto GenerateTokenWithKey(int userId, string KEY)
-    {
-        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(KEY);
+        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["Jwt:Key"]);
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -37,9 +28,35 @@ public class TokenService
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
         };
 
-
         DateTime DateIssued = DateTime.UtcNow;
         DateTime DateExpires = DateIssued.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenLifeTimeInMinutes"]));
+
+        var token = new JwtSecurityToken(
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            claims,
+            notBefore: DateIssued,
+            expires: DateExpires,
+            signingCredentials: credentials
+        );
+
+        string value = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return new TokenDto(value, DateIssued, DateExpires);
+    }
+
+    public TokenDto GenerateRefreshToken(int userId)
+    {
+        var key = SymmetricSecurityKeyHelper.GetSymmetricSecurityKey(_configuration["Jwt:RefreshKey"]);
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+        };
+
+        DateTime DateIssued = DateTime.UtcNow;
+        DateTime DateExpires = DateIssued.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenLifeTimeInMinutes"]));
 
         var token = new JwtSecurityToken(
             _configuration["Jwt:Issuer"],
@@ -72,6 +89,5 @@ public class TokenService
         };
 
         return new JwtSecurityTokenHandler().ValidateToken(refreshToken, validation, out _);
-
     }
 }
