@@ -14,6 +14,7 @@ import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
 import UserPage from "./ui/pages/UserPage.tsx";
 import UsersPage from "./ui/pages/UsersPage.tsx";
 import { TimerProvider } from './features/timeTracking/TimerProvider.tsx';
+import {CalendarPage} from "./ui/pages/CalendarPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
             { path: "/users", element: <UsersPage /> },
             { path: "/user/:UserId", element: <UserPage /> },
             { path: "/register", element: <RegisterUserPage /> },
+            { path: "/calendar", element: <CalendarPage/> },
           ]
         }
       ]

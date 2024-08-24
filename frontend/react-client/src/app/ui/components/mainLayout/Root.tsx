@@ -4,6 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Sidebar from './Sidebar';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
+import {Stack} from "@mui/material";
 
 export default function Root(){
     return (
@@ -32,17 +33,23 @@ export default function Root(){
                         sx={{ 
                               flex: 1, 
                               display: 'flex', 
-                              flexDirection: 'column', 
+                              flexDirection: 'column',
+                            overflow: 'hidden',
                               borderRadius: '1.5rem'
                             }}>
-                    <Grid container sx={{flex: 1}} m={0}>
-                      <Grid lg={12} xs={12} p={0} m={0} height={'8%'}>
-                        <Navbar />
-                      </Grid>
-                      <Grid lg={12} xs={12} m={0} p={0} height={'92%'}>
-                        <Outlet />
-                      </Grid>
-                    </Grid>
+                      <Stack sx={{flex: 1}}>
+                          <Navbar />
+                          <Outlet/>
+                      </Stack>
+                      {/*<div className="flex flex-col flex-grow">*/}
+                      {/*    <Navbar/>*/}
+                      {/*    <div className="flex flex-grow">*/}
+                      {/*        <Outlet className="flex-grow"/>*/}
+                      {/*    </div>*/}
+                      {/*</div>*/}
+                    {/*<Stack sx={{flex: 1}} m={0}>*/}
+                        {/*<Outlet sx={{flexGrow: 1, overflow: 'auto' }}/>*/}
+                    {/*</Stack>*/}
                   </Paper>
               </Grid>
             </Grid>
