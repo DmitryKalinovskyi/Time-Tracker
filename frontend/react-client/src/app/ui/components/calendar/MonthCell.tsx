@@ -1,42 +1,34 @@
 import Typography from "@mui/material/Typography";
 import {Chip} from "@mui/material";
+import {isSameDay} from "../../../misc/DateHelper.ts";
+import useCalendarEventsInThatDay from "../../../hooks/useCalendarEventsInThatDay.ts";
 
 
 interface MonthCellProps{
     day: Date,
-}
-
-function isSameDay(day1: Date, day2: Date){
-    return day1.getFullYear() === day2.getFullYear()
-        && day1.getMonth() === day2.getMonth()
-        && day1.getDate() === day2.getDate();
+    month: number,
+    onClick: (day: Date) => void
 }
 
 export function MonthCell(props: MonthCellProps) {
-    const today = new Date();
-
-    // if(today.getDate() === props.day.getDate()){
-    //     return <div className="px-2 h-full border border-blue-500 hover:bg-blue-50 cursor-pointer">
-    //         <Typography>
-    //             {props.day.getDate()}
-    //         </Typography>
-    //     </div>
-    // }
+    const today = new Date()
+    const calendarEvents = useCalendarEventsInThatDay(props.day);
 
     return <div
-        className={`p-2 h-full border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>
-        <Typography variant={isSameDay(props.day, today) ? "h6" : "body1"}
-                    color={isSameDay(props.day, today) ? "primary" : "textPrimary"}>
-            {props.day.getDate()}
-        </Typography>
+        onClick={() => props.onClick(props.day)}
+        className={`p-2 h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>
+
+        {props.month != props.day.getMonth() ?
+            <Typography variant="body1" className="text-gray-300">
+                {props.day.getDate()}
+            </Typography>
+        :
+            <Typography variant="body1"
+                        color={isSameDay(props.day, today) ? "primary" : "textPrimary"}>
+                {props.day.getDate()}
+            </Typography>
+        }
         {isSameDay(props.day, today) && <Chip label="Today" color="secondary" size="small" sx={{marginTop: 1}}/>}
+        {calendarEvents.map((e,index) => <div key={index}>{e.name}</div>)}
     </div>
-    // return <div className="p-2 h-full border hover:bg-blue-50 cursor-pointer">
-    //     {isSameDay(props.day, today) ?
-    //         <Typography>
-    //             {props.day.getDate()}
-    //         </Typography>
-    //     }
-    //
-    // </div>
 }

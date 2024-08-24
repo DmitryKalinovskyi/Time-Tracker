@@ -1,19 +1,41 @@
 import Grid from "@mui/material/Grid";
 import {MonthCell} from "./MonthCell.tsx";
-import {IconButton, Popover, Stack} from "@mui/material";
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Stack
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {useEffect, useState} from "react";
+import TextField from "@mui/material/TextField";
+import {DatePicker} from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import {CalendarEvent} from "../../../types/CalendarEvent.ts";
+import {useDispatch} from "react-redux";
+import {addCalendarEvent} from "../../../features/calendar/calendarSlice.ts";
+
 export function CalendarViewByMonth(){
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
+    const dispatch = useDispatch();
     const [calendarDate, setCalendarDate] = useState({
         year: new Date().getFullYear(),
         month: new Date().getMonth()
     })
+
+    const [calendarEvent, setCalendarEvent] = useState<CalendarEvent|null>({
+       name: "",
+        day: new Date()
+    });
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [days, setDays] = useState<Date[]>([]);
 
     useEffect(() => {
@@ -30,7 +52,6 @@ export function CalendarViewByMonth(){
             calendarDays.push(day);
         }
 
-        console.log(calendarDate.month)
         setDays(calendarDays);
     }, [calendarDate]);
 
@@ -59,12 +80,23 @@ export function CalendarViewByMonth(){
         })
     }
 
-    return <Stack sx={{height: "100%"}}>
-        <Stack direction="row" m={2} spacing={2}>
-            <Button color="secondary" onClick={() => setToday()}>Today</Button>
+    function onMonthClick(day: Date){
+        setCalendarEvent({name: "", day});
+        setIsModalOpen(true);
+    }
+
+    function createCalendarEvent(){
+        setIsModalOpen(false);
+        if(calendarEvent)
+        dispatch(addCalendarEvent(calendarEvent));
+    }
+
+    return <><Stack sx={{height: "100%"}}>
+        <Stack direction="row" m={2} spacing={2} alignItems="center">
+            <Button color="secondary" variant="contained" onClick={() => setToday()}>Today</Button>
             <IconButton onClick={() => movePrevious()}><ArrowBackIcon/></IconButton>
             <IconButton onClick={() => moveNext()}><ArrowForwardIcon/></IconButton>
-            <Typography variant="h4">
+            <Typography variant="h5" className="">
                 {`${getMonth()} ${calendarDate.year}`}
             </Typography>
             {/*<Popover open>*/}
@@ -75,19 +107,48 @@ export function CalendarViewByMonth(){
             {dayNames.map((day, index) =>
                 <Grid item xs={1} key={index}>
                     <div className="h-12 flex border border-t-2 justify-center items-center">
-                        <Typography>
+                        <Typography variant="h6">
                             {day}
                         </Typography>
                     </div>
                 </Grid>
             )}
         </Grid>
-        <Grid sx={{height: "100%"}} container  columns={7} alignItems="stretch">
+        <Grid sx={{height: "100%"}} container  columns={7}>
             {days.map((day,index) =>
-                <Grid item xs={1} key={index}>
-                    <MonthCell day={day}/>
+                <Grid item xs={1} key={index} sx={{height: "20%"}}>
+                    <MonthCell day={day} month={calendarDate.month} onClick={onMonthClick}/>
                 </Grid>
             )}
         </Grid>
     </Stack>
+        <Dialog
+            open={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+        >
+            <DialogTitle>
+                Create new event
+            </DialogTitle>
+            <DialogContent>
+                <Stack spacing={2}>
+                <TextField fullWidth placeholder="Going to a party."
+                           onChange={(e) => setCalendarEvent({...calendarEvent, name: e.target.value})}/>
+                <DatePicker label="Event day" name="startDate"  sx={{width: "100%"}}
+                            value={dayjs(calendarEvent?.day)}
+                            onChange={(newDate) => {
+                                if (newDate) {
+                                    setCalendarEvent({ ...calendarEvent, day: newDate.toDate() });
+                                }
+                            }}
+                />
+                </Stack>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setIsModalOpen(false)} color="error">Cancel</Button>
+                <Button onClick={() => createCalendarEvent()} variant="contained">
+                    Save
+                </Button>
+            </DialogActions>
+        </Dialog>
+    </>
 }
