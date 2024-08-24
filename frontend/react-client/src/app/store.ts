@@ -9,6 +9,7 @@ import userReducer from "./features/user/userSlice.ts";
 import permissionsReducer from "./features/permissions/permissionsSlice.ts";
 import resetReducer  from "./features/resetPassword/resetSlice.ts";
 import timeTrackerReducer from './features/timeTracking/timeTrackingSlice.ts';
+import calendarReducer from "./features/calendar/calendarSlice.ts";
 
 import {authUserEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,7 +55,8 @@ export const store = configureStore({
         user: userReducer,
         permissions: permissionsReducer,
         reset: resetReducer,
-        timeTracker: timeTrackerReducer
+        timeTracker: timeTrackerReducer,
+        calendar: calendarReducer,
     },
     middleware: () => new Tuple(epicMiddleware)
 })

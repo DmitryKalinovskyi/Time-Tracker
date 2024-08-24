@@ -36,7 +36,7 @@ export const refreshTokenEpic = (action$: Observable<Action>, state$: StateObser
                 input: {
                     refreshToken: getAvailableRefreshToken()?.value,
                 }})).pipe(
-            map((ajaxResponse: any) => {
+            map((ajaxResponse) => {
                 const data: refreshTokenQueryResponse = ajaxResponse.response.data;
                 if(data.errors){
                     console.log(data.errors);
