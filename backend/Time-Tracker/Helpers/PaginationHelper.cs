@@ -1,16 +1,19 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Http.Extensions;
 using System.Text;
 
 namespace Time_Tracker.Helpers
 {
-    public class PaginationRequest<TSortFields>
+    public class PaginationRequest<TSortFields, TFilterFields, TOperators>
         where TSortFields : Enum
+        where TFilterFields : Enum
+        where TOperators : Enum
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 5;
         public  required List<SortCriteria<TSortFields>> SortCriterias { get; set; }
         public bool SortDescending { get; set; } = false;
-        public List<KeyValuePair<string, string>> Filters { get; set; } = new List<KeyValuePair<string, string>>();
+        public required List<FilterCriteria<TFilterFields, TOperators>> FilterCriterias { get; set; }
     }
 
     public class PaginationResult<T>
@@ -26,23 +29,22 @@ namespace Time_Tracker.Helpers
     public class PaginationHelper
     {
 
-        public static (string Query, DynamicParameters Parameters) BuildPaginatedQuery<TSortFields>(
+        public static (string Query, DynamicParameters Parameters) BuildPaginatedQuery<TSortFields, TFilterFields, TOperators>(
             string tableName,
-            PaginationRequest<TSortFields> request)
+            PaginationRequest<TSortFields, TFilterFields, TOperators> request)
             where TSortFields : Enum
+            where TFilterFields : Enum
+            where TOperators : Enum
         {
-            var queryBuilder = new StringBuilder($"SELECT * FROM {tableName} WHERE 1 = 1");
+            var queryBuilder = new StringBuilder($"SELECT * FROM {tableName}");
             var parameters = new DynamicParameters();
 
             //Apply filters
-            if(request.Filters.Any())
-            {
-                foreach( var filter in request.Filters)
-                {
-                    queryBuilder.Append($" AND {filter.Key} = @{filter.Key}");
-                    parameters.Add($"@{filter.Key}", filter.Value);
-                }
-            }
+            var (whereClause, filterParameters) = FilterHelper.BuildWhereClause(request.FilterCriterias);
+            
+            queryBuilder.Append(whereClause);
+            
+            parameters.AddDynamicParams(filterParameters);
 
             //Apply sorting
             var orderByClause = SortHelper.BuildOrderByClause(request.SortCriterias);
@@ -57,19 +59,17 @@ namespace Time_Tracker.Helpers
             return (queryBuilder.ToString(), parameters);
         }
 
-        public static string BuildCountQuery<TSortFields>(string tableName, PaginationRequest<TSortFields> request)
+        public static string BuildCountQuery<TSortFields, TFilterFields, TOperators>(string tableName, PaginationRequest<TSortFields, TFilterFields, TOperators> request)
             where TSortFields : Enum
+            where TFilterFields : Enum
+            where TOperators : Enum
         {
-            var countQueryBuilder = new StringBuilder($"SELECT COUNT(1) FROM {tableName} WHERE 1=1");
+            var countQueryBuilder = new StringBuilder($"SELECT COUNT(1) FROM {tableName}");
 
             //Apply filters
-            if(request.Filters.Any())
-            {
-                foreach(var filter in request.Filters)
-                {
-                    countQueryBuilder.Append($" AND {filter.Key} = @{filter.Key}");
-                }
-            }
+            var whereClauseWithParams = FilterHelper.BuildWhereClause(request.FilterCriterias);
+
+            countQueryBuilder.Append(whereClauseWithParams.WhereClause);
 
             return countQueryBuilder.ToString();
         }

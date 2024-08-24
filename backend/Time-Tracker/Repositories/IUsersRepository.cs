@@ -7,7 +7,7 @@ namespace Time_Tracker.Repositories
 {
     public interface IUsersRepository
     {
-        Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest<UserSortableFields> request);
+        Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest<UserSortableFields, UserFilterableFields, FilterOperators> request);
 
         public Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds);
         public Task<User?> FindAsync(int id);    

@@ -3,7 +3,7 @@
     public class SortCriteria<TSortFields> where TSortFields : Enum
     {
         public required TSortFields SortBy { get; set; }
-        public bool isAscending { get; set; } = true;
+        public required bool isAscending { get; set; }
     }
 
     public class SortHelper
