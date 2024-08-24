@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import {CalendarEvent} from "../../../types/CalendarEvent.ts";
 import {useDispatch} from "react-redux";
 import {addCalendarEvent} from "../../../features/calendar/calendarSlice.ts";
+import {getDaysInMonth} from "../../../misc/DateHelper.ts";
 
 export function CalendarViewByMonth(){
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -37,6 +38,7 @@ export function CalendarViewByMonth(){
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [days, setDays] = useState<Date[]>([]);
+    const [weeks, setWeeks] = useState<number>(5);
 
     useEffect(() => {
         const firstDay = new Date();
@@ -44,7 +46,15 @@ export function CalendarViewByMonth(){
         firstDay.setMonth(calendarDate.month);
         firstDay.setDate(1);
         const calendarDays: Date[] = [];
-        for(let i = 0; i < 35; i++){
+
+        // how many weeks we need to display our month?
+        const daysInMonth = getDaysInMonth(calendarDate.year, calendarDate.month);
+        const daysNeedToDisplay = firstDay.getDay() + daysInMonth;
+        console.log("Days in month: " + daysInMonth);
+        console.log("Days need to display: " + daysNeedToDisplay);
+        const w = Math.ceil(daysNeedToDisplay/7);
+        console.log("weeks: " + w);
+        for(let i = 0; i < w*7; i++){
             const day = new Date(firstDay);
 
             day.setDate(firstDay.getDate() + i - firstDay.getDay());
@@ -52,6 +62,7 @@ export function CalendarViewByMonth(){
             calendarDays.push(day);
         }
 
+        setWeeks(w);
         setDays(calendarDays);
     }, [calendarDate]);
 
@@ -116,7 +127,7 @@ export function CalendarViewByMonth(){
         </Grid>
         <Grid sx={{height: "100%"}} container  columns={7}>
             {days.map((day,index) =>
-                <Grid item xs={1} key={index} sx={{height: "20%"}}>
+                <Grid item xs={1} key={index} sx={{height: `${100/weeks}%`}}>
                     <MonthCell day={day} month={calendarDate.month} onClick={onMonthClick}/>
                 </Grid>
             )}
