@@ -1,4 +1,5 @@
 ﻿using Microsoft.Identity.Client;
+using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 
@@ -6,7 +7,7 @@ namespace Time_Tracker.Repositories
 {
     public interface IUsersRepository
     {
-        Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest request);
+        Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest<UserSortableFields> request);
 
         public Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds);
         public Task<User?> FindAsync(int id);    

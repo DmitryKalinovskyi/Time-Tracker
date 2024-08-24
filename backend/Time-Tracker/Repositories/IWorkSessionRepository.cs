@@ -1,4 +1,5 @@
-﻿using Time_Tracker.Helpers;
+﻿using Time_Tracker.Enums;
+using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 
 namespace Time_Tracker.Repositories
@@ -14,7 +15,7 @@ namespace Time_Tracker.Repositories
 
         Task<WorkSession?> GetWorkSessionByIdAsync(int id);
 
-        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest request);
+        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields> request);
 
 
     }

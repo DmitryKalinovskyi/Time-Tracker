@@ -1,6 +1,6 @@
-﻿using Azure.Core;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 
@@ -70,7 +70,7 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest request)
+        public async Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest<UserSortableFields> request)
         {
 
             var (query, parameters) = PaginationHelper.BuildPaginatedQuery("Users", request);

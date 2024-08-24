@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Time_Tracker.Enums;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.GraphQL.Pagination;
 using Time_Tracker.Helpers;
@@ -18,10 +19,10 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
 
             Field<PaginatedResultResponseGraphType<User, UserGraphType>>
                 ("users")
-                .Argument<NonNullGraphType<PaginationRequestInputGraphType>>("input")
+                .Argument<NonNullGraphType<PaginationRequestInputGraphType<UserSortableFields>>>("input")
                 .ResolveAsync(async context =>
                 {
-                    var paginationRequest = context.GetArgument<PaginationRequest>("input");
+                    var paginationRequest = context.GetArgument<PaginationRequest<UserSortableFields>>("input");
 
                     return await usersRepository.GetUsersWithPaginationAsync(paginationRequest);
                 });

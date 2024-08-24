@@ -1,7 +1,4 @@
-﻿using GraphQL;
-using GraphQL.Types;
-using GraphQL.Validation;
-
+﻿using GraphQL.Types;
 namespace Time_Tracker.GraphQL
 {
     public class RootSchema : Schema

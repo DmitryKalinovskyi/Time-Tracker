@@ -1,7 +1,6 @@
 ﻿using Dapper;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Data.SqlClient;
-using System.Text;
+using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 
@@ -65,7 +64,7 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest request)
+        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields> request)
         {
             var (query, parameters) = PaginationHelper.BuildPaginatedQuery("WorkSessions", request);
 

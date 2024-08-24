@@ -1,8 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using GraphQL.Types.Relay.DataObjects;
-using Microsoft.IdentityModel.Protocols;
-using System.Collections.Generic;
+using Time_Tracker.Enums;
 using Time_Tracker.GraphQL.Pagination;
 using Time_Tracker.GraphQL.TimeTracking.Types;
 using Time_Tracker.Helpers;
@@ -28,10 +26,10 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
 
             Field<PaginatedResultResponseGraphType<WorkSession, WorkSessionGraphType>>
                 ("workSessions")
-                .Argument<NonNullGraphType<PaginationRequestInputGraphType>>("input")
+                .Argument<NonNullGraphType<PaginationRequestInputGraphType<WorkSessionSortableFields>>>("input")
                 .ResolveAsync(async context =>
                 {
-                    var paginationRequest = context.GetArgument<PaginationRequest>("input");
+                    var paginationRequest = context.GetArgument<PaginationRequest<WorkSessionSortableFields>>("input");
 
                     return await workSessionRepository.GetWorkSessionsWithPaginationAsync(paginationRequest);
                 });

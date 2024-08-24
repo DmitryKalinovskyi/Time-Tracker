@@ -3,12 +3,12 @@ using System.Text;
 
 namespace Time_Tracker.Helpers
 {
-    public class PaginationRequest
+    public class PaginationRequest<TSortFields>
+        where TSortFields : Enum
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 5;
-
-        public string SortBy { get; set; } = "Id";
+        public  required List<SortCriteria<TSortFields>> SortCriterias { get; set; }
         public bool SortDescending { get; set; } = false;
         public List<KeyValuePair<string, string>> Filters { get; set; } = new List<KeyValuePair<string, string>>();
     }
@@ -26,9 +26,10 @@ namespace Time_Tracker.Helpers
     public class PaginationHelper
     {
 
-        public static (string Query, DynamicParameters Parameters) BuildPaginatedQuery(
+        public static (string Query, DynamicParameters Parameters) BuildPaginatedQuery<TSortFields>(
             string tableName,
-            PaginationRequest request)
+            PaginationRequest<TSortFields> request)
+            where TSortFields : Enum
         {
             var queryBuilder = new StringBuilder($"SELECT * FROM {tableName} WHERE 1 = 1");
             var parameters = new DynamicParameters();
@@ -44,7 +45,9 @@ namespace Time_Tracker.Helpers
             }
 
             //Apply sorting
-            queryBuilder.Append($" ORDER BY {request.SortBy} {(request.SortDescending ? "DESC" : "ASC")}");
+            var orderByClause = SortHelper.BuildOrderByClause(request.SortCriterias);
+
+            queryBuilder.Append(orderByClause);
 
 
             //Apply pagination
@@ -54,7 +57,8 @@ namespace Time_Tracker.Helpers
             return (queryBuilder.ToString(), parameters);
         }
 
-        public static string BuildCountQuery(string tableName, PaginationRequest request)
+        public static string BuildCountQuery<TSortFields>(string tableName, PaginationRequest<TSortFields> request)
+            where TSortFields : Enum
         {
             var countQueryBuilder = new StringBuilder($"SELECT COUNT(1) FROM {tableName} WHERE 1=1");
 
