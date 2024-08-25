@@ -15,7 +15,7 @@ namespace Time_Tracker.Repositories
 
         Task<WorkSession?> GetWorkSessionByIdAsync(int id);
 
-        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, UserFilterableFields, FilterOperators> request);
+        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators> request);
 
 
     }

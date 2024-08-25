@@ -6,6 +6,8 @@
         NotEqual,
         Like,
         Contains,
+        GreaterThan,
+        LessThen
     }
 
     public static class FilterOperatorsExtensions
@@ -18,6 +20,8 @@
                 FilterOperators.NotEqual => $"{fieldName} != {parameterName}",
                 FilterOperators.Like => $"{fieldName} LIKE {parameterName}",
                 FilterOperators.Contains => $"CONTAINS({fieldName}, {parameterName})",
+                FilterOperators.GreaterThan => $"{fieldName} > {parameterName}",
+                FilterOperators.LessThen => $"{fieldName} < {parameterName}",
                 _ => throw new NotSupportedException($"The operator {operatorType} is not supported."),
             };
         }

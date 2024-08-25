@@ -26,10 +26,10 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
 
             Field<PaginatedResultResponseGraphType<WorkSession, WorkSessionGraphType>>
                 ("workSessions")
-                .Argument<NonNullGraphType<PaginationRequestInputGraphType<WorkSessionSortableFields, UserFilterableFields, FilterOperators>>>("input")
+                .Argument<NonNullGraphType<PaginationRequestInputGraphType<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators>>>("input")
                 .ResolveAsync(async context =>
                 {
-                    var paginationRequest = context.GetArgument<PaginationRequest<WorkSessionSortableFields, UserFilterableFields, FilterOperators>>("input");
+                    var paginationRequest = context.GetArgument<PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators>>("input");
 
                     return await workSessionRepository.GetWorkSessionsWithPaginationAsync(paginationRequest);
                 });

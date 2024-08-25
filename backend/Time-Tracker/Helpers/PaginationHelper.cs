@@ -12,7 +12,6 @@ namespace Time_Tracker.Helpers
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 5;
         public  required List<SortCriteria<TSortFields>> SortCriterias { get; set; }
-        public bool SortDescending { get; set; } = false;
         public required List<FilterCriteria<TFilterFields, TOperators>> FilterCriterias { get; set; }
     }
 
