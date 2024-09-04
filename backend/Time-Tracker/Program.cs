@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Time_Tracker.Authorization;
+using Time_Tracker.Factories;
 using Time_Tracker.GraphQL;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
@@ -39,10 +40,13 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<TokenService>();
 
+builder.Services.AddSingleton<ISQLConnectionFactory>(new SQLConnectionFactory(builder.Configuration.GetConnectionString("MSSQL")));
+
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 builder.Services.AddSingleton<IWorkSessionRepository, WorkSessionRepository>();
 builder.Services.AddSingleton<ISessionOriginRepository, SessionOriginRepository>();
 builder.Services.AddSingleton<IActivationCodeRepository, ActivationCodeRepository>();
+builder.Services.AddSingleton<ICalendarEventsRepository, CalendarEventsRepository>();
 
 builder.Services.AddSingleton<IPermissionsService, PermissionsService>();
 
