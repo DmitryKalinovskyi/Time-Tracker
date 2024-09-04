@@ -13,12 +13,15 @@ const calendarSlice = createSlice({
     name: "calendar",
     initialState,
     reducers: {
-        addCalendarEvent : (state, action: PayloadAction<CalendarEvent>) => {
-            state.events.push(action.payload);
+        addEvent : (state, action: PayloadAction<CalendarEvent>) => {
+            state.daysOff.push(action.payload);
         },
+        removeEvent: (state, action: PayloadAction<number>) => {
+            state.daysOff = state.filter(e => e.id != action.payload);
+        }
     }
 })
 
-export const {addCalendarEvent} = calendarSlice.actions;
+export const {addEvent, removeEvent} = calendarSlice.actions;
 
 export default calendarSlice.reducer;

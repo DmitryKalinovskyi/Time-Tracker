@@ -2,12 +2,12 @@ import React from 'react';
 import { TableRow, TableCell, Box, Avatar, Typography, Button } from '@mui/material';
 import moment from 'moment';
 import { WorkSession } from '../../../types/WorkSession';
-import { stringAvatar } from '../mainLayout/Navbar';
 import { formatDuration } from '../../../misc/TimeFormatter';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TimerIcon from '@mui/icons-material/Timer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import {stringAvatar} from "../../../misc/StringHelper.ts";
 interface SessionProps {
   session: WorkSession;
   onEdit: () => void;

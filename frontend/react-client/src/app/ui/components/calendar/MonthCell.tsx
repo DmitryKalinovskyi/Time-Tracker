@@ -1,7 +1,9 @@
 import Typography from "@mui/material/Typography";
 import {Chip} from "@mui/material";
-import {isSameDay} from "../../../misc/DateHelper.ts";
+import {isEventInThatDay, isSameDay} from "../../../misc/DateHelper.ts";
 import useCalendarEventsInThatDay from "../../../hooks/useCalendarEventsInThatDay.ts";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../store.ts";
 
 
 interface MonthCellProps{
@@ -12,7 +14,10 @@ interface MonthCellProps{
 
 export function MonthCell(props: MonthCellProps) {
     const today = new Date()
-    const calendarEvents = useCalendarEventsInThatDay(props.day);
+    let events = useSelector((state: RootState) => state.calendar.events)
+        .filter(e => isEventInThatDay(e, today));
+
+    // {events.map((d,index) => <Chip key={index} color="success" size="small" sx={{marginTop: 1, ml: 1}} label={"day off"}/>)}
 
     return <div
         onClick={() => props.onClick(props.day)}
@@ -29,6 +34,5 @@ export function MonthCell(props: MonthCellProps) {
             </Typography>
         }
         {isSameDay(props.day, today) && <Chip label="Today" color="secondary" size="small" sx={{marginTop: 1}}/>}
-        {calendarEvents.map((e,index) => <div key={index}>{e.name}</div>)}
     </div>
 }

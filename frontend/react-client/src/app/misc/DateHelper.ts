@@ -1,7 +1,13 @@
+import {CalendarEvent} from "../types/CalendarEvent.ts";
+
 export function isSameDay(day1: Date, day2: Date){
     return day1.getFullYear() === day2.getFullYear()
         && day1.getMonth() === day2.getMonth()
         && day1.getDate() === day2.getDate();
+}
+
+export function isEventInThatDay(calendarEvent: CalendarEvent, day: Date){
+    return true;
 }
 
 export function getDaysInMonth(year, month) {
