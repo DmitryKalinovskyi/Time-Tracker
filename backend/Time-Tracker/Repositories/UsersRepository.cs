@@ -167,5 +167,16 @@ namespace Time_Tracker.Repositories
 
             return users.Select(DBUser.Deserialize).ToDictionary(u => u.Id);
         }
+
+        public async Task<List<User>> SearchByEmailOrFullname(string emailOrFullName, int limit)
+        {
+            var sql = "SELECT TOP(@limit) * FROM Users WHERE Email LIKE @emailOrFullName OR FullName LIKE @emailOrFullName";
+
+            using var connection = new SqlConnection(_connectionString);
+
+            var dbUsers = await connection.QueryAsync<DBUser>(sql, new { emailOrFullName = $"%{emailOrFullName}%", limit});
+
+            return dbUsers.Select(DBUser.Deserialize).ToList();
+        }
     }
 }
