@@ -51,7 +51,7 @@ export function UserAutoComplete(props: UserAutoCompleteProps){
             active = false;
             subscription.unsubscribe();
         };
-    }, [loading]);
+    }, [emailOrFullName, loading]);
 
     useEffect(() => {
         if(!open){
