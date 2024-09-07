@@ -1,9 +1,24 @@
-export const stringAvatar = (name: string) => {
+export const stringAvatar = (fullName: string) => {
+    const tokens = fullName.split(' ')
+        .map(token => token.trim())
+        .filter(token => token.length > 0);
+
+    let avatarName = "";
+    if(tokens.length == 0){
+        avatarName = "?";
+    }
+    else if(tokens.length == 1){
+        avatarName = tokens[0][0];
+    }
+    else{
+        avatarName = `${tokens[0][0]}${tokens[1][0]}`
+    }
+
     return {
         sx : {
-            bgcolor: stringToColor(name),
+            bgcolor: stringToColor(fullName),
         },
-        children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+        children: avatarName
     }
 }
 

@@ -1,12 +1,13 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {CalendarEvent} from "../../types/CalendarEvent.ts";
+import User from "../../types/User.ts";
 
 interface CalendarStateType{
-    events: CalendarEvent[]
+    selectedUser: User | null
 }
 
 const initialState: CalendarStateType = {
-    events: []
+    selectedUser: null
 }
 
 const calendarSlice = createSlice({
@@ -14,14 +15,21 @@ const calendarSlice = createSlice({
     initialState,
     reducers: {
         addEvent : (state, action: PayloadAction<CalendarEvent>) => {
-            state.daysOff.push(action.payload);
+            state.selectedUser.calendarEvents.push(action.payload);
         },
         removeEvent: (state, action: PayloadAction<number>) => {
-            state.daysOff = state.filter(e => e.id != action.payload);
+            state.selectedUser.calendarEvents = state.filter(e => e.id != action.payload);
+        },
+        changeSelectedUser : (state, action: PayloadAction<User>) => {
+            state.selectedUser = action.payload;
         }
     }
 })
 
-export const {addEvent, removeEvent} = calendarSlice.actions;
+export const {
+    addEvent,
+    removeEvent,
+    changeSelectedUser
+} = calendarSlice.actions;
 
 export default calendarSlice.reducer;

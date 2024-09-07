@@ -1,7 +1,6 @@
 import Grid from "@mui/material/Grid";
 import {MonthCell} from "./MonthCell.tsx";
 import {
-    Dialog,
     IconButton,
     Stack
 } from "@mui/material";
@@ -11,9 +10,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import React, {useEffect, useState} from "react";
 import {getDaysInMonth} from "../../../misc/DateHelper.ts";
-import {UserAutocomplete} from "./UserAutocomplete.tsx";
+import {UserAutoComplete} from "./UserAutoComplete/UserAutoComplete.tsx";
 import {CreateEventDialog} from "./CreateEventDialog.tsx";
 import {DayModal} from "./DayModal.tsx";
+import useAuth from "../../../hooks/useAuth.ts";
+import {useDispatch, useSelector} from "react-redux";
+import {changeSelectedUser} from "../../../features/calendar/calendarSlice.ts";
+import {RootState} from "../../../store.ts";
 
 export function CalendarViewByMonth(){
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -24,12 +27,19 @@ export function CalendarViewByMonth(){
     })
 
     const [day, setDay] = useState<Date>(new Date());
-
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isDayModalOpen, setIsDayModalOpen] = useState(false);
-
     const [days, setDays] = useState<Date[]>([]);
     const [weeks, setWeeks] = useState<number>(5);
+    const selectedUser = useSelector((state: RootState) => state.calendar.selectedUser);
+
+    const dispatch = useDispatch();
+    const me = useAuth().user;
+    useEffect(() => {
+        if(me)
+            dispatch(changeSelectedUser(me));
+    }, []);
+
 
     useEffect(() => {
         const firstDay = new Date();
@@ -101,15 +111,24 @@ export function CalendarViewByMonth(){
     return <>
         <Stack sx={{height: "100%"}}>
             {/*toolbar*/}
-            <Stack direction="row" m={2} spacing={2} alignItems="center">
-                <Button color="secondary" variant="contained" onClick={() => setToday()}>Today</Button>
-                <IconButton onClick={() => movePrevious()}><ArrowBackIcon/></IconButton>
-                <IconButton onClick={() => moveNext()}><ArrowForwardIcon/></IconButton>
-                <Typography variant="h5" className="">
-                    {`${getMonth()} ${calendarDate.year}`}
-                </Typography>
-                <UserAutocomplete/>
+            <Stack direction="row" justifyContent="space-between">
+                <Stack direction="row" m={2} spacing={2} alignItems="center">
+                    <Button color="secondary" variant="contained" onClick={() => setToday()}>Today</Button>
+                    <IconButton onClick={() => movePrevious()}><ArrowBackIcon/></IconButton>
+                    <IconButton onClick={() => moveNext()}><ArrowForwardIcon/></IconButton>
+                    <Typography variant="h5">
+                        {`${getMonth()} ${calendarDate.year}`}
+                    </Typography>
+                </Stack>
+
+                <Stack direction="row"  m={2} spacing={2} alignItems="center">
+                    <UserAutoComplete selectedUser={selectedUser} onChange={(user) => {
+                        if (user) dispatch(changeSelectedUser(user))
+                    }}/>
+                    <Button color="secondary" onClick={() => dispatch(changeSelectedUser(me))} variant="contained">View my</Button>
+                </Stack>
             </Stack>
+
 
             {/*calendar week days*/}
             <Grid container columns={7} alignItems="stretch">
@@ -128,7 +147,7 @@ export function CalendarViewByMonth(){
             <Grid sx={{height: "100%"}} container columns={7}>
                 {days.map((day,index) =>
                     <Grid item xs={1} key={index} sx={{height: `${100/weeks}%`}}>
-                        <MonthCell day={day} month={calendarDate.month} onClick={onMonthClick}/>
+                        <MonthCell day={day} month={calendarDate.month} events={selectedUser.calendarEvents} onClick={onMonthClick}/>
                     </Grid>
                 )}
             </Grid>
