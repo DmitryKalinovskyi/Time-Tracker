@@ -137,6 +137,24 @@ namespace Time_Tracker.Repositories
             };
         }
 
+        public async Task<bool> IsWorkSessionTimeAvailable(WorkSession workSession)
+        {
+            var queryBuilder = new StringBuilder("SELECT COUNT(*) " +
+                                                 "FROM WORKSESSIONS " +
+                                                 "WHERE StartTime <= @EndTime AND " +
+                                                 "(EndTime >= @StartTime OR EndTime IS NULL) AND " +
+                                                 "Id != @Id AND " +
+                                                 "UserId = @UserId");
+            var totalCount = 0;
+
+            using(var connection = new SqlConnection(_connectionString))
+            {
+                totalCount = await connection.ExecuteScalarAsync<int>(queryBuilder.ToString(), workSession);
+            }
+
+            return totalCount == 0;
+        }
+
         public async Task<WorkSession> UpdateWorkSessionAsync(WorkSession workSession)
         {
             var sql = @"

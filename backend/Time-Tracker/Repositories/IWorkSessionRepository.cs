@@ -20,5 +20,7 @@ namespace Time_Tracker.Repositories
         Task<int> GetTotalDurationByFiltersAsync(List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>> filterCriterias);
 
         Task<WorkSession?> GetCurrentWorkSessionByUserIdAsync(int userId);
+
+        Task<bool> IsWorkSessionTimeAvailable(WorkSession workSession);
     }
 }
