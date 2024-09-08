@@ -2,7 +2,7 @@ import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { Observable, catchError, map, mergeMap, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
-import { getPermissionsQuery } from "../../../api/queries/permissionQueries";
+import { getPermissionsQuery } from "./api/permissionQueries";
 import { createRequest } from "../../misc/RequestCreator";
 import { fetchPermissionsFailure, fetchPermissionsSuccess } from "./permissionsSlice";
 

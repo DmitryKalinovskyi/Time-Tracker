@@ -1,6 +1,6 @@
-import { WorkSession } from "../../app/types/WorkSession";
-import { AddSessionPayload, PaginationPayload, UpdateSessionPayload } from "../../app/features/timeTracking/timeTrackingSlice";
-import { PaginatedWorkSessions } from "../../app/types/PaginatedWorkSessions";
+import { WorkSession } from "../../../types/WorkSession";
+import { AddSessionPayload, PaginationPayload, UpdateSessionPayload } from "../timeTrackingSlice";
+import { PaginatedWorkSessions } from "../../../types/PaginatedWorkSessions";
 
 export interface StartSessionResponse{
     timeTrackerMutation:{
