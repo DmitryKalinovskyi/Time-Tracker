@@ -1,20 +1,21 @@
 ﻿using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
+using Time_Tracker.Mappers;
 
 namespace Time_Tracker.Factories
 {
     public static class FilterableFieldMapperFactory
     {
-        public static IFilterableFieldMapper<TFilterableFields> GetMapper<TFilterableFields>()
+        public static IFilterableFieldsMapper<TFilterableFields> GetMapper<TFilterableFields>()
             where TFilterableFields : Enum
         {
             if(typeof(TFilterableFields) == typeof(UserFilterableFields))
             {
-                return (IFilterableFieldMapper<TFilterableFields>)new UserFilterableFieldMapper();
+                return (IFilterableFieldsMapper<TFilterableFields>)new UserFilterableFieldsMapper();
             }
             else if(typeof(TFilterableFields) == typeof(WorkSessionFilterableFields))
             {
-                return (IFilterableFieldMapper<TFilterableFields>)new WorkSessionFilterableFieldMapper();
+                return (IFilterableFieldsMapper<TFilterableFields>)new WorkSessionFilterableFieldsMapper();
             }
             else
             {

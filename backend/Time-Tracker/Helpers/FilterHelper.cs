@@ -1,10 +1,11 @@
 ﻿using Dapper;
 using Time_Tracker.Enums;
+using Time_Tracker.Extensions;
 using Time_Tracker.Factories;
 
 namespace Time_Tracker.Helpers
 {
-    public interface IFilterableFieldMapper<TFilterableFields>
+    public interface IFilterableFieldsMapper<TFilterableFields>
         where TFilterableFields : Enum
     {
         string toSqlFieldName(TFilterableFields filterableField);
