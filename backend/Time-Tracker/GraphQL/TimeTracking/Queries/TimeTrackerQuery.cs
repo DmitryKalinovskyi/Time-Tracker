@@ -44,7 +44,16 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
 
                     return totalDuration;
                 });
+            Field<WorkSessionGraphType>("currentWorkSession")
+                .Argument<IntGraphType>("userId")
+                .ResolveAsync(async context =>
+                {
+                    var userId = context.GetArgument<int>("userId");
 
+                    WorkSession? currentWorkSession = await workSessionRepository.GetCurrentWorkSessionByUserIdAsync(userId);
+
+                    return currentWorkSession;
+                });
 
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Diagnostics;
 using System.Text;
 using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
@@ -52,6 +53,26 @@ namespace Time_Tracker.Repositories
 
             await connection.ExecuteAsync(sql, new {Id = id});
 
+        }
+
+        public async Task<WorkSession?> GetCurrentWorkSessionByUserIdAsync(int userId)
+        {
+            var queryBuilder = new StringBuilder("Select TOP (1) * " +
+                                                 "FROM WORKSESSIONS " +
+                                                 "WHERE UserId = @UserId AND " +
+                                                 "EndTime is NULL " +
+                                                 "ORDER BY StartTime DESC");
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+
+            WorkSession? currentWorkSession = null;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                currentWorkSession = await connection.QueryFirstOrDefaultAsync<WorkSession>(queryBuilder.ToString(), parameters);
+            }
+            return currentWorkSession;
         }
 
         public async Task<int> GetTotalDurationByFiltersAsync(List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>> filterCriterias)
