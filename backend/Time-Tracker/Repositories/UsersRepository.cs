@@ -70,7 +70,7 @@ namespace Time_Tracker.Repositories
                 ?? throw new Exception("MSSQL connection string not seted.");
         }
 
-        public async Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest<UserSortableFields, UserFilterableFields, FilterOperators> request)
+        public async Task<PaginationResult<User>> GetUsersWithPaginationAsync(PaginationRequest<UserSortableFields, UserFilterableFields, SQLOperators> request)
         {
 
             var (query, parameters) = PaginationHelper.BuildPaginatedQuery("Users", request);

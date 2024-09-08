@@ -38,10 +38,10 @@ namespace Time_Tracker.Helpers
             {
                 var fieldName = filterableFieldMapper.toSqlFieldName(filterCriteria.FilterBy);
                 var parameterName = $"@{filterCriteria.FilterBy}_{parameterIndex++}";
-                var clause = ((FilterOperators)(object)filterCriteria.Operator)
+                var clause = ((SQLOperators)(object)filterCriteria.Operator)
                     .ToSqlClause(fieldName, parameterName);
                 clauses.Add(clause);
-                var parameterValue = (FilterOperators)(object)filterCriteria.Operator == FilterOperators.Contains ? $"\"{filterCriteria.Value}\"" : filterCriteria.Value;
+                var parameterValue = (SQLOperators)(object)filterCriteria.Operator == SQLOperators.Contains ? $"\"{filterCriteria.Value}\"" : filterCriteria.Value;
                 parameters.Add(parameterName, parameterValue);
             }
 

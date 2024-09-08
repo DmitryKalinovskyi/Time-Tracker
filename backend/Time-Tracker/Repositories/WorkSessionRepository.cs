@@ -64,7 +64,7 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators> request)
+        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, SQLOperators> request)
         {
             var (query, parameters) = PaginationHelper.BuildPaginatedQuery("WorkSessions", request);
 
