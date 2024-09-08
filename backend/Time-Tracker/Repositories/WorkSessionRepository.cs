@@ -1,5 +1,7 @@
-﻿using Dapper;
+﻿using Azure.Core;
+using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Text;
 using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
 using Time_Tracker.Models;
@@ -50,6 +52,28 @@ namespace Time_Tracker.Repositories
 
             await connection.ExecuteAsync(sql, new {Id = id});
 
+        }
+
+        public async Task<int> GetTotalDurationByFiltersAsync(List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>> filterCriterias)
+        {
+            var queryBuilder = new StringBuilder($"SELECT SUM(Duration) FROM WorkSessions");
+            var parameters = new DynamicParameters();
+
+            //Apply filters
+            var (whereClause, filterParameters) = FilterHelper.BuildWhereClause(filterCriterias);
+
+            queryBuilder.Append(whereClause);
+
+            parameters.AddDynamicParams(filterParameters);
+
+            var totalDuration = 0;
+
+            using( var connection = new SqlConnection(_connectionString))
+            {
+                totalDuration = await connection.ExecuteScalarAsync<int>(queryBuilder.ToString(), parameters);
+            }
+
+            return totalDuration;
         }
 
         public async Task<WorkSession?> GetWorkSessionByIdAsync(int id)
@@ -119,5 +143,7 @@ namespace Time_Tracker.Repositories
 
             return await connection.QuerySingleAsync<WorkSession>(sql, workSession);
         }
+
+
     }
 }

@@ -3,7 +3,8 @@ using Time_Tracker.Helpers;
 
 namespace Time_Tracker.Mappers
 {
-    public class WorkSessionFilterableFieldsMapper : IFilterableFieldsMapper<WorkSessionFilterableFields>
+    public class WorkSessionFilterableFieldsMapper : IFilterableFieldsMapper<WorkSessionFilterableFields>,
+                                                     IFilterableFieldsMapper<TotalDurationOfWorkSessionsFilters>
     {
         public string toSqlFieldName(WorkSessionFilterableFields filterableField)
         {
@@ -19,6 +20,11 @@ namespace Time_Tracker.Mappers
                 WorkSessionFilterableFields.Duration => "Duration",
                 _ => throw new NotSupportedException($"[WORKSESSION_FILTERABLE_FIELD_MAPPER] The field {filterableField} is not supported."),
             };
+        }
+
+        public string toSqlFieldName(TotalDurationOfWorkSessionsFilters filterableField)
+        {
+            return toSqlFieldName((WorkSessionFilterableFields)filterableField);
         }
     }
 }

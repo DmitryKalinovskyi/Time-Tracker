@@ -5,12 +5,6 @@ using Time_Tracker.Factories;
 
 namespace Time_Tracker.Helpers
 {
-    public interface IFilterableFieldsMapper<TFilterableFields>
-        where TFilterableFields : Enum
-    {
-        string toSqlFieldName(TFilterableFields filterableField);
-    }
-
     public class FilterCriteria<TFilterFields, TOperators> 
         where TFilterFields: Enum
         where TOperators : Enum

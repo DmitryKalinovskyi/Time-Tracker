@@ -34,6 +34,18 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                     return await workSessionRepository.GetWorkSessionsWithPaginationAsync(paginationRequest);
                 });
 
+            Field<IntGraphType>("totalDuration")
+                .Argument<ListGraphType<FilterCriteriaInputGraphType<TotalDurationOfWorkSessionsFilters, SQLOperators>>>("input")
+                .ResolveAsync(async context =>
+                {
+                    var filterCriterias = context.GetArgument<List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>>>("input");
+
+                    var totalDuration = await workSessionRepository.GetTotalDurationByFiltersAsync(filterCriterias);
+
+                    return totalDuration;
+                });
+
+
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Time_Tracker.Factories
             {
                 return (IFilterableFieldsMapper<TFilterableFields>)new UserFilterableFieldsMapper();
             }
-            else if(typeof(TFilterableFields) == typeof(WorkSessionFilterableFields))
+            else if(typeof(TFilterableFields) == typeof(WorkSessionFilterableFields)
+                || typeof(TFilterableFields) == typeof(TotalDurationOfWorkSessionsFilters))
             {
                 return (IFilterableFieldsMapper<TFilterableFields>)new WorkSessionFilterableFieldsMapper();
             }
