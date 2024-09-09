@@ -20,7 +20,7 @@ namespace Time_Tracker.Helpers
         where TFilterFields: Enum
         where TOperators : Enum
         {
-            if(!filterCriterias.Any()) return (string.Empty, new DynamicParameters());
+            if(filterCriterias is null || !filterCriterias.Any()) return (string.Empty, new DynamicParameters());
 
             var clauses = new List<string>();
             var parameters = new DynamicParameters();

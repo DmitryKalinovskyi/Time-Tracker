@@ -11,7 +11,7 @@
         public static string BuildOrderByClause<TSortFields>(List<SortCriteria<TSortFields>> sortCriterias)
             where TSortFields : Enum
         {
-            if(!sortCriterias.Any()) return string.Empty;
+            if(sortCriterias is null || !sortCriterias.Any()) return $" ORDER BY Id DESC";
 
             var orderByParts = sortCriterias.Select(criteria =>
             {
