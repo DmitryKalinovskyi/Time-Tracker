@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, setPageNumber, updateSession} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, setPageNumber, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -20,6 +20,10 @@ import Session from './Session';
 import CustomPagination from './CustomPagination';
 import UpdateWorkSessionModal from '../timeTracking/UpdateWorkSessionModel'; // Adjust the path as needed
 import { WorkSession } from '../../../types/WorkSession';
+import { getWorkSessionsWithPagination } from '../../../features/timeTracking/api/workSessionQueries';
+import { WorkSessionSorts } from '../../../enums/WorkSessionSorts';
+import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
+import { SQLOperators } from '../../../enums/SQLOperators';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
@@ -29,21 +33,23 @@ const SessionList: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<WorkSession | null>(null);
   
-  const initialPaginationArgs = {
-    after: null,
-    before: null,
-    first: 4,
-    last: null,
-    userId: user ? user.id : null,
-    year: filterValue.year(),
-    month: filterType === 'month' || filterType === 'day' ? filterValue.month() + 1 : null,
-    day: filterType === 'day' ? filterValue.date() : null,
+  const initialPaginationArgs: WorkSessionPaginationRequest = {
+    pageNumber: 1,
+    pageSize: 10,
+    sortCriterias: 
+    [
+      {sortBy: WorkSessionSorts.Id, isAscending: false },
+      {sortBy: WorkSessionSorts.UserId, isAscending: true },
+    ],
+    filterCriterias: 
+    [
+      {filterBy: WorkSessionFilters.UserId, operator: SQLOperators.Equal, value: "123"}
+    ]
   };
 
   useEffect(() => {
-    dispatch(getSessions(initialPaginationArgs));
-    dispatch(setPageNumber(1));
-  }, [isTracking, filterValue, user]);
+    console.log(getWorkSessionsWithPagination(initialPaginationArgs));
+  }, [ ]);
 
   const handleOpenModal = (session: WorkSession) => {
     setSelectedSession(session);

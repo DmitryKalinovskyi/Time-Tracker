@@ -1,6 +1,7 @@
 import { WorkSession } from "../../../types/WorkSession";
-import { AddSessionPayload, PaginationPayload, UpdateSessionPayload } from "../timeTrackingSlice";
+import { AddSessionPayload, UpdateSessionPayload, WorkSessionPaginationRequest } from "../timeTrackingSlice";
 import { PaginatedWorkSessions } from "../../../types/PaginatedWorkSessions";
+
 
 export interface StartSessionResponse{
     timeTrackerMutation:{
@@ -250,61 +251,62 @@ export const getWorkSessionByIdQuery = (workSessionId: number) => {
     return query;
 }
 
-export const getWorkSessionsWithPagination = (payload: PaginationPayload) => {
+export const getWorkSessionsWithPagination = (payload: WorkSessionPaginationRequest) => {
     const query = 
     `
         query{
         timeTrackerQuery{
-            workSessions(
-                            after: ${payload.after ? `"${payload.after}"` : null}, 
-                            before: ${payload.before ? `"${payload.before}"` : null}, 
-                            first: ${payload.first}, 
-                            last: ${payload.last}, 
-                            userId: ${payload.userId}, 
-                            year: ${payload.year}, 
-                            month: ${payload.month}, 
-                            day: ${payload.day}
-                        ) 
+            workSessions(input:
             {
-            totalCount
-            pageInfo {
-                hasNextPage
-                hasPreviousPage
-                startCursor
-                endCursor
+                pageNumber: ${payload.pageNumber}
+                ${payload.pageSize ? "pageSize: " + payload.pageSize : ""}
+                ${payload.sortCriterias ? "sortCriterias: [ " + 
+                                            payload.sortCriterias.map(sortCriteria => {
+                                                return `{ sortBy: ${sortCriteria.sortBy} isAscending: ${sortCriteria.isAscending} }`
+                                            }) +
+                                            " ]" : ""}
+                ${payload.filterCriterias ? "filterCriterias: [ " + 
+                            payload.filterCriterias.map(filterCriteria => {
+                                return `{ filterBy: ${filterCriteria.filterBy} operator: ${filterCriteria.operator} value: "${filterCriteria.value}"}`
+                            }) +
+                            " ]" : ""}
             }
-            edges {
-            node {
-                id
-                startTime
-                endTime
-                duration
-                createdAt
-                lastUpdatedAt
-                user {
-                    id
-                    fullName
-                    email
-                    permissions
-                    isActive
-                }
-                editedBy {
-                    id
-                    fullName
-                    email
-                    permissions
-                    isActive
-                }
-                sessionOrigin {
-                    id
-                    originName
-                    description
-                }
-            }
+            ) 
+            {
+                results {
+                            id
+                            startTime
+                            endTime
+                            duration
+                            createdAt
+                            lastUpdatedAt
+                            user {
+                                id
+                                fullName
+                                email
+                                permissions
+                                isActive
+                            }
+                            editedBy {
+                                id
+                                fullName
+                                email
+                                permissions
+                                isActive
+                            }
+                            sessionOrigin {
+                                id
+                                originName
+                                description
+                            }
+                        }
+                        totalRecords
+                        totalPages
+                        currentPage
+                        pageSize
             }
         }
         }
-    }
     `;
 
     return query;

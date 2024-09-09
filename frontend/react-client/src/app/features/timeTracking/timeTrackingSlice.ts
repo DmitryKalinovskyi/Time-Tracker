@@ -5,6 +5,10 @@ import { PaginatedWorkSessions } from "../../types/PaginatedWorkSessions";
 import moment from "moment";
 import { FilterType } from "../../ui/components/timeTracking/FilterSelector";
 import dayjs, { Dayjs } from "dayjs";
+import PaginatedRequest from "../../types/PaginatedRequest";
+import { WorkSessionSorts } from "../../enums/WorkSessionSorts";
+import { WorkSessionFilters } from "../../enums/WorkSessionFilters";
+import { SQLOperators } from "../../enums/SQLOperators";
 
 export interface TimeTrackerType {
     workSessions: PaginatedWorkSessions;
@@ -33,16 +37,7 @@ export interface UpdateSessionPayload{
     endTime: Date;
 }
 
-export interface PaginationPayload{
-    after: string | null;
-    first: number | null;
-    before: string | null;
-    last: number | null;
-    userId: number | null;
-    year: number | null;
-    month: number | null;
-    day: number | null;
-}
+export type WorkSessionPaginationRequest = PaginatedRequest<WorkSessionSorts, WorkSessionFilters, SQLOperators>;
 
 const initialState: TimeTrackerType = {
     workSessions: {
@@ -72,7 +67,6 @@ const timeTrackerSlice = createSlice({
         startSession(state, _action: PayloadAction<number>)
         {
             state.loading = true; 
-            state.currentSessionId = null;
             state.error = null;
         },
 
@@ -82,9 +76,8 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        getSessions(state, _action: PayloadAction<PaginationPayload>)
+        getSessions(state, _action: PayloadAction<WorkSessionPaginationRequest>)
         {
-            state.workSessions = initialState.workSessions;
             state.loading = true;
             state.error = null;
         },
