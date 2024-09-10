@@ -17,8 +17,7 @@ namespace Time_Tracker.Repositories
         public async Task<List<CalendarEvent>> FindAllByUserIdAsync(int userId)
         {
             using SqlConnection connection = sqlConnectionFactory.GetSqlConnection();
-
-            return [..await connection.QueryAsync<CalendarEvent>("SELECT * FROM CalendarEvents WHERE UserId = @userId", new { userId })];
+            return [.. await connection.QueryAsync<CalendarEvent>("SELECT * FROM CalendarEvents WHERE UserId = @userId", new { userId })];
         }
 
         public async Task<CalendarEvent?> FindAsync(int id)

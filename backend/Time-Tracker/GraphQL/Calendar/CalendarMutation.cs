@@ -14,7 +14,7 @@ namespace Time_Tracker.GraphQL.Calendar
         {
             Field<NonNullGraphType<CalendarEventGraphType>>("createCalendarEvent")
                 .Authorize()
-                .Argument<NonNullGraphType<CreateCalendarEventGraphType>>("calendarEvent")
+                .Argument<NonNullGraphType<CreateCalendarEventInputGraphType>>("calendarEvent")
                 .ResolveAsync(async (context) =>
                 {
                     var createCalendarEventRequest = context.GetArgument<CreateCalendarEventRequest>("calendarEvent");
@@ -33,7 +33,7 @@ namespace Time_Tracker.GraphQL.Calendar
 
             Field<CalendarEventGraphType>("updateCalendarEvent")
                 .Authorize()
-                .Argument<NonNullGraphType<UpdateCalendarEventInputType>>("calendarEvent")
+                .Argument<NonNullGraphType<UpdateCalendarEventInputGraphType>>("calendarEvent")
                 .ResolveAsync(async (context) =>
                 {
                     // check is belong to the user or not.
