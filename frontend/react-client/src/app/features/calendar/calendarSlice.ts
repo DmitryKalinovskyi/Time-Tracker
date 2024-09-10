@@ -14,11 +14,17 @@ const calendarSlice = createSlice({
     name: "calendar",
     initialState,
     reducers: {
-        addEvent : (state, action: PayloadAction<CalendarEvent>) => {
+        addCalendarEvent : (state, action: PayloadAction<CalendarEvent>) => {
             state.selectedUser.calendarEvents.push(action.payload);
         },
-        removeEvent: (state, action: PayloadAction<number>) => {
-            state.selectedUser.calendarEvents = state.filter(e => e.id != action.payload);
+        removeCalendarEvent: (state, action: PayloadAction<number>) => {
+            state.selectedUser.calendarEvents = state.selectedUser.calendarEvents
+                .filter(e => e.id != action.payload);
+        },
+        updateCalendarEvent: (state, action: PayloadAction<CalendarEvent>) => {
+            state.selectedUser.calendarEvents = state.selectedUser.calendarEvents
+                .filter(e => e.id != action.payload);
+            state.selectedUser.calendarEvents.push(action.payload);
         },
         changeSelectedUser : (state, action: PayloadAction<User>) => {
             state.selectedUser = action.payload;
@@ -27,8 +33,9 @@ const calendarSlice = createSlice({
 })
 
 export const {
-    addEvent,
-    removeEvent,
+    addCalendarEvent,
+    updateCalendarEvent,
+    removeCalendarEvent,
     changeSelectedUser
 } = calendarSlice.actions;
 

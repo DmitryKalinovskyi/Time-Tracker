@@ -69,6 +69,11 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                 .pipe(
                     map((ajaxResponse: any) => {
                         const data: authUserQueryResponse = ajaxResponse.response.data;
+                        const errors = ajaxResponse.response.errors;
+
+                        if(errors && errors.length > 0){
+                            console.log(errors)
+                        }
 
                         if (data && data.identityMutation && data.identityMutation.login) {
                             saveRefreshToken(data.identityMutation.login.refreshToken);

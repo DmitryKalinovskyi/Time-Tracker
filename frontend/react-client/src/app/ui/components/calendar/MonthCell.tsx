@@ -19,6 +19,8 @@ export function MonthCell(props: MonthCellProps) {
     const events = useSelector((state: RootState) => state.calendar.selectedUser.calendarEvents)
         .filter(value => isSameDay(props.day, new Date(value.startTime)));
 
+
+    console.log(events);
     return <div
         onClick={() => props.onClick(props.day)}
         className={`p-2 h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>
@@ -33,11 +35,14 @@ export function MonthCell(props: MonthCellProps) {
                 {props.day.getDate()}
             </Typography>
         }
+        {isSameDay(props.day, today) && <Chip label="Today" color="secondary" size="small" sx={{marginTop: 1}}/>}
         {events.map((d,index) => <Chip key={index}
                                        color="primary"
                                        size="small"
-                                       sx={{width: "90%", marginTop: 1, mx: 1}}
-                                       label={`${dayjs(d.startTime).format("hh:mm a")}-${dayjs(d.endTime).format("hh:mm a")}`}/>)}
-        {isSameDay(props.day, today) && <Chip label="Today" color="secondary" size="small" sx={{marginTop: 1}}/>}
+                                       sx={{width: "90%", marginTop: 1}}
+                                       label={`${dayjs(new Date(d.startTime))
+                                           .format("hh:mm a")} -
+                                           ${dayjs(new Date(d.endTime))
+                                           .format("hh:mm a")}`}/>)}
     </div>
 }

@@ -8,10 +8,12 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store.ts";
 import {isSameDay} from "../../../misc/DateHelper.ts";
 import {useIsMe} from "../../../hooks/useIsMe.ts";
+import {apiDeleteCalendarEvent} from "../../../features/calendar/calendarEpic.ts";
+import {CalendarEvent} from "../../../types/CalendarEvent.ts";
 interface DayModalProps{
     isOpen: boolean
     day: Date,
@@ -20,6 +22,8 @@ interface DayModalProps{
 }
 
 export function DayModal(props: DayModalProps){
+    const dispatch = useDispatch();
+
     const selectedUser = useSelector((state: RootState) => state.calendar.selectedUser);
     const events = selectedUser
         ?.calendarEvents
@@ -38,7 +42,7 @@ export function DayModal(props: DayModalProps){
                     borderRadius: '8px',
 
                 }}>
-                    {events && events.length > 0 ? events.map((event, index) =>
+                    {events && events.length > 0 ? events.map((event: CalendarEvent, index: number) =>
                         <ListItem
                             key={index}
                             sx={{
@@ -51,17 +55,20 @@ export function DayModal(props: DayModalProps){
                             }}
                         >
                             <ListItemText
-                                primary={`${dayjs(event.start).format("hh:mm A")} - ${dayjs(event.end).format("hh:mm A")}`}
+                                primary={`${dayjs(event.startTime)
+                                    .format("hh:mm A")} -
+                                    ${dayjs(event.endTime)
+                                    .format("hh:mm A")}`}
                             />
                             {isYourEvents &&
                             <div className="ml-4">
-                                <IconButton color="primary"
-                                    // onClick={() => onEdit(event)}
-                                >
-                                    <EditIcon />
-                                </IconButton>
+                                {/*<IconButton color="primary"*/}
+                                {/*    // onClick={() => onEdit(event)}*/}
+                                {/*>*/}
+                                {/*    <EditIcon />*/}
+                                {/*</IconButton>*/}
                                 <IconButton color="error"
-                                    // onClick={() => onDelete(event)}
+                                    onClick={() => dispatch(apiDeleteCalendarEvent(event.id))}
                                 >
                                     <DeleteForeverIcon />
                                 </IconButton>
