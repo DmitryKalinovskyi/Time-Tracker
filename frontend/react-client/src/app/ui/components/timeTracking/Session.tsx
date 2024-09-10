@@ -18,10 +18,10 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
 
   return (
     <TableRow>
-      <TableCell sx={{ width: '10%', fontSize: '1.1rem', textAlign: 'center' }}>
+      <TableCell sx={{ width: '10%', fontSize: '0.8rem', textAlign: 'center' }}>
         {moment.utc(session.startTime).local().format("MMM DD, YYYY")}
       </TableCell>
-      <TableCell sx={{ width: '12.5%', textAlign: 'center' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center' }}>
         <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
           <Avatar
             {...stringAvatar(session.user?.fullName ?? "")}
@@ -29,15 +29,15 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
               ...stringAvatar(session.user?.fullName ?? "").sx,
               width: "30px",
               height: "30px",
-              fontSize: '1.1rem'
+              fontSize: '0.8rem'
             }}
           />
-          <Typography sx={{ color: "#00101D", fontSize: '1.1rem' }}>
+          <Typography sx={{ color: "#00101D", fontSize: '0.8rem' }}>
             {session.user?.fullName}
           </Typography>
         </Box>
       </TableCell>
-      <TableCell sx={{ width: '15%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
           <AccessTimeIcon sx={{ width: "30px", height: "30px", color: "#00101D" }} />
           <Box>
@@ -45,10 +45,10 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
           </Box>
         </Box>
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         {session.endTime ? "Finished" : "In Progress"}
       </TableCell>
-      <TableCell sx={{ width: '12.5%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
           <TimerIcon sx={{ width: "30px", height: "30px", color: "#00101D" }} />
           <Box>
@@ -56,10 +56,10 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
           </Box>
         </Box>
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         {session.sessionOrigin.originName}
       </TableCell>
-      <TableCell sx={{ width: '12.5%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         {session.editedBy ?
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
             <Avatar
@@ -71,16 +71,16 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
                 fontSize: '1.1rem'
               }}
             />
-            <Typography sx={{ color: "#00101D", fontSize: '1.1rem' }}>
+            <Typography sx={{ color: "#00101D", fontSize: '0.8rem' }}>
               {session.editedBy?.fullName}
             </Typography>
           </Box>
           : " "}
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         {moment.utc(session.lastUpdatedAt).local().format("MMM DD, YYYY HH:mm")}
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1.1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '0.8rem' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           { session.endTime && <Button
             sx={{ color: "#00101D" }}

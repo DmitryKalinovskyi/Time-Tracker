@@ -1,23 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
-import { PaginatedWorkSessions } from "../../types/PaginatedWorkSessions";
-import moment from "moment";
-import { FilterType } from "../../ui/components/timeTracking/FilterSelector";
-import dayjs, { Dayjs } from "dayjs";
 import PaginatedRequest from "../../types/PaginatedRequest";
 import { WorkSessionSorts } from "../../enums/WorkSessionSorts";
 import { WorkSessionFilters } from "../../enums/WorkSessionFilters";
 import { SQLOperators } from "../../enums/SQLOperators";
+import PaginatedResult from "../../types/PaginatedResult";
+import FilterCriteria from "../../types/FilterCriteria";
+import { SortCriteria } from "../../types/SortCriteria";
 
 export interface TimeTrackerType {
-    workSessions: PaginatedWorkSessions;
-    currentSessionId: number | null;
+    workSessions: Array<WorkSession>;
+    paginationInfo?: {
+        totalRecords?: number
+        totalPages?: number
+        currentPage: number
+        pageSize?: number
+    }
+    currentSession: WorkSession | null;
     isTracking: boolean;
-    currentSessionDuration: number;
-    filterType: FilterType
-    filterValue: Dayjs
-    pageNumber: number
+    filters?: FilterCriteria<WorkSessionFilters, SQLOperators>[];
+    sorts?: SortCriteria<WorkSessionSorts>[];
     loading: boolean;
     error: string | null;
 }
@@ -39,25 +42,18 @@ export interface UpdateSessionPayload{
 
 export type WorkSessionPaginationRequest = PaginatedRequest<WorkSessionSorts, WorkSessionFilters, SQLOperators>;
 
+export type WorkSessionPaginationResult = PaginatedResult<WorkSession>;
+
 const initialState: TimeTrackerType = {
-    workSessions: {
-        totalCount: 0,
-        pageInfo:{
-            hasNextPage: false,
-            hasPreviousPage: false,
-            startCursor: null,
-            endCursor: null
-        },
-        edges: []
-    },
-    currentSessionId: null,
+    workSessions: [],
+    currentSession: null,
     isTracking: false,
-    currentSessionDuration: 0,
     loading: false,
     error: null,
-    filterType: 'day',
-    filterValue: dayjs(),
-    pageNumber: 1
+    paginationInfo: {
+        currentPage: 1,
+        pageSize: 3
+    }
 }
 
 const timeTrackerSlice = createSlice({
@@ -100,15 +96,33 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
+        setPage(state, action: PayloadAction<number>)
+        {
+            state.paginationInfo!.currentPage = action.payload;
+        },
+        
+        setFilters(state, action: PayloadAction<FilterCriteria<WorkSessionFilters, SQLOperators>[]>)
+        {
+            state.filters = action.payload;
+            state.paginationInfo!.currentPage = 1;
+        },
+
+        
+        setSorts(state, action: PayloadAction<SortCriteria<WorkSessionSorts>[]>)
+        {
+            state.sorts = action.payload;
+            state.paginationInfo!.currentPage = 1;
+        },
+
         addSessionSuccessful(state, action: PayloadAction<WorkSession>) {
             state.loading = false;
             state.error = null;
-            state.workSessions.edges = [
-                ...state.workSessions.edges,
-                { node: action.payload }
+            state.workSessions = [
+                ...state.workSessions,
+                action.payload
             ];
-            state.workSessions.edges.sort((a, b) => {
-                return a.node.startTime.valueOf() - b.node.startTime.valueOf();
+            state.workSessions.sort((a, b) => {
+                return a.startTime.valueOf() - b.startTime.valueOf();
             });
         },
         
@@ -116,8 +130,8 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
             state.error = null;
     
-            state.workSessions.edges = state.workSessions.edges.filter(session => 
-                session.node.id !== action.payload
+            state.workSessions = state.workSessions.filter(session => 
+                session.id !== action.payload
             );
         },
 
@@ -127,38 +141,30 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        getSessionsSuccessful(state, action: PayloadAction<PaginatedWorkSessions>)
+        getSessionsSuccessful(state, action: PayloadAction<WorkSessionPaginationResult>)
         {
             console.log(action.payload);
             state.loading = false;
             state.error = null;
-            state.workSessions = action.payload;
-            const lastSession = state.workSessions.edges.length != 0 ? state.workSessions.edges[0].node : null;
-            if (lastSession && !lastSession.endTime) {
-                state.isTracking = true;
-                const localStartTime = moment.utc(lastSession.startTime).local().toDate().valueOf();
-                const currentTime = Date.now();
-                state.currentSessionDuration = Math.floor((currentTime - localStartTime) / 1000) + 1;
-                state.currentSessionId = lastSession.id;
-              } else {
-                state.isTracking = false;
-                state.currentSessionDuration = 0;
-                state.currentSessionId = null;
-              }
+            state.workSessions = action.payload.results;
+            state.paginationInfo = {
+                currentPage: action.payload.currentPage,
+                pageSize: action.payload.pageSize,
+                totalPages: action.payload.totalPages,
+                totalRecords: action.payload.totalRecords
+            }
         },
         
-        startSuccessful(state, action: PayloadAction<number>) {
-            state.currentSessionId= action.payload
+        startSuccessful(state, action: PayloadAction<WorkSession>) {
+            state.currentSession = action.payload
             state.isTracking = true;
-            state.currentSessionDuration = 0;
             state.loading = false;
         },
 
         stopSuccessful(state, _action: PayloadAction<WorkSession>) {
             state.loading = false;
             state.isTracking = false;
-            state.currentSessionDuration = 0; 
-            state.currentSessionId = null;
+            state.currentSession = null;
         },
 
         setLoading(state, action: PayloadAction<boolean>)
@@ -171,20 +177,6 @@ const timeTrackerSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        
-        setFilter(state, action: PayloadAction<FilterType>)
-        {
-            state.filterType = action.payload;
-        },
-
-        setFilterValue(state, action: PayloadAction<Dayjs>)
-        {
-            state.filterValue = action.payload;
-        },
-        setPageNumber(state, action: PayloadAction<number>)
-        {
-            state.pageNumber = action.payload;
-        }
     },
 })
 
@@ -203,9 +195,9 @@ export const {
     addSessionSuccessful,
     setError,
     setLoading,
-    setFilter,
-    setFilterValue,
-    setPageNumber
+    setFilters,
+    setPage,
+    setSorts
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

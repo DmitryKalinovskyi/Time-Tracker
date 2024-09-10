@@ -1,14 +1,8 @@
 import { WorkSession } from "../../../types/WorkSession";
-import { AddSessionPayload, UpdateSessionPayload, WorkSessionPaginationRequest } from "../timeTrackingSlice";
-import { PaginatedWorkSessions } from "../../../types/PaginatedWorkSessions";
-
-
+import { AddSessionPayload, UpdateSessionPayload, WorkSessionPaginationRequest, WorkSessionPaginationResult } from "../timeTrackingSlice";
 export interface StartSessionResponse{
     timeTrackerMutation:{
-        startSession: {
-            id: number,
-            startTime: Date
-        }
+        startSession: WorkSession
     }      
 }
 
@@ -38,7 +32,7 @@ export interface WorkSessionByIdResponse{
 
 export interface WorkSessionsWithPaginationResponse{
     timeTrackerQuery:{
-        workSessions: PaginatedWorkSessions
+        workSessions: WorkSessionPaginationResult
     }
 }
 

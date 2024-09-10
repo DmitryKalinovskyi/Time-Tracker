@@ -15,8 +15,6 @@ import UserPage from "./ui/pages/UserPage.tsx";
 import UsersPage from "./ui/pages/UsersPage.tsx";
 import { TimerProvider } from './features/timeTracking/TimerProvider.tsx';
 import {CalendarPage} from "./ui/pages/CalendarPage.tsx";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 
 const router = createBrowserRouter([
   {
@@ -49,9 +47,7 @@ export default function App() {
           <AuthProvider>
               <SnackbarProvider>
                 <TimerProvider>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <RouterProvider router={router} />
-                  </LocalizationProvider>
                 </TimerProvider>
               </SnackbarProvider>
       </AuthProvider>

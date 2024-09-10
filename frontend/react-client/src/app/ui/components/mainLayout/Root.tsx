@@ -10,46 +10,44 @@ export default function Root(){
     return (
         <>
           <Box 
-              sx={{ minHeight: '100vh', display: 'flex', width: '100vw' }}
-              p={'1rem'}
+              sx={{ minHeight: '100vh', 
+                display: 'flex', 
+                minwidth: '100vw', 
+                scrollbarWidth: 'none', 
+                '&::-webkit-scrollbar': {
+                    display: 'none',
+                },
+                overflowY: 'scroll'
+              }}
+              p={2}
               bgcolor={"#DEDEDE"}
               >
             <Grid container 
                   spacing={3} 
-                  width={'100%'} 
                   bgcolor={'#FAFAFA'}
                   borderRadius={'1.7rem'}
                   m={0}
+                  width={'100%'}
                   flexGrow={1}
                   >
-              <Grid lg={2} m={0}>
+              <Grid lg={2.5} md={6} sm={12} m={0}>
                 <Paper elevation={3} sx={{height: '100%', borderRadius: '1.5rem'}} >
                     <Sidebar />
                 </Paper>
               </Grid>
-              <Grid lg={10} sx={{ display: 'flex', justifyContent: 'stretch'}}>
+              <Grid lg={9.5} md={6} sm={12} sx={{ display: 'flex', justifyContent: 'stretch'}}>
                   <Paper 
                         elevation={3} 
                         sx={{ 
                               flex: 1, 
                               display: 'flex', 
                               flexDirection: 'column',
-                            overflow: 'hidden',
                               borderRadius: '1.5rem'
                             }}>
                       <Stack sx={{flex: 1}}>
                           <Navbar />
                           <Outlet/>
                       </Stack>
-                      {/*<div className="flex flex-col flex-grow">*/}
-                      {/*    <Navbar/>*/}
-                      {/*    <div className="flex flex-grow">*/}
-                      {/*        <Outlet className="flex-grow"/>*/}
-                      {/*    </div>*/}
-                      {/*</div>*/}
-                    {/*<Stack sx={{flex: 1}} m={0}>*/}
-                        {/*<Outlet sx={{flexGrow: 1, overflow: 'auto' }}/>*/}
-                    {/*</Stack>*/}
                   </Paper>
               </Grid>
             </Grid>
