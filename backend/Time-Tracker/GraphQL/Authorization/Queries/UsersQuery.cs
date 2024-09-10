@@ -20,10 +20,10 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
 
             Field<PaginatedResultResponseGraphType<User, UserGraphType>>
                 ("users")
-                .Argument<NonNullGraphType<PaginationRequestInputGraphType<UserSortableFields, UserFilterableFields, FilterOperators>>>("input")
+                .Argument<NonNullGraphType<PaginationRequestInputGraphType<UserSortableFields, UserFilterableFields, SQLOperators>>>("input")
                 .ResolveAsync(async context =>
                 {
-                    var paginationRequest = context.GetArgument<PaginationRequest<UserSortableFields, UserFilterableFields, FilterOperators>>("input");
+                    var paginationRequest = context.GetArgument<PaginationRequest<UserSortableFields, UserFilterableFields, SQLOperators>>("input");
 
                     return await usersRepository.GetUsersWithPaginationAsync(paginationRequest);
                 });

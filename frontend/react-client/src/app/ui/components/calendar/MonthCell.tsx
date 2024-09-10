@@ -19,8 +19,6 @@ export function MonthCell(props: MonthCellProps) {
     const events = useSelector((state: RootState) => state.calendar.selectedUser.calendarEvents)
         .filter(value => isSameDay(props.day, new Date(value.startTime)));
 
-
-    console.log(events);
     return <div
         onClick={() => props.onClick(props.day)}
         className={`p-2 h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>

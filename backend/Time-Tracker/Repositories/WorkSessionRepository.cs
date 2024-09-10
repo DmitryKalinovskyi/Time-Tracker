@@ -1,5 +1,8 @@
-﻿using Dapper;
+﻿using Azure.Core;
+using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Diagnostics;
+using System.Text;
 using Time_Tracker.Enums;
 using Time_Tracker.Helpers;
 using Time_Tracker.Models;
@@ -52,6 +55,48 @@ namespace Time_Tracker.Repositories
 
         }
 
+        public async Task<WorkSession?> GetCurrentWorkSessionByUserIdAsync(int userId)
+        {
+            var queryBuilder = new StringBuilder("Select TOP (1) * " +
+                                                 "FROM WORKSESSIONS " +
+                                                 "WHERE UserId = @UserId AND " +
+                                                 "EndTime is NULL " +
+                                                 "ORDER BY StartTime DESC");
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+
+            WorkSession? currentWorkSession = null;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                currentWorkSession = await connection.QueryFirstOrDefaultAsync<WorkSession>(queryBuilder.ToString(), parameters);
+            }
+            return currentWorkSession;
+        }
+
+        public async Task<int> GetTotalDurationByFiltersAsync(List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>> filterCriterias)
+        {
+            var queryBuilder = new StringBuilder($"SELECT SUM(Duration) FROM WorkSessions");
+            var parameters = new DynamicParameters();
+
+            //Apply filters
+            var (whereClause, filterParameters) = FilterHelper.BuildWhereClause(filterCriterias);
+
+            queryBuilder.Append(whereClause);
+
+            parameters.AddDynamicParams(filterParameters);
+
+            var totalDuration = 0;
+
+            using( var connection = new SqlConnection(_connectionString))
+            {
+                totalDuration = await connection.ExecuteScalarAsync<int>(queryBuilder.ToString(), parameters);
+            }
+
+            return totalDuration;
+        }
+
         public async Task<WorkSession?> GetWorkSessionByIdAsync(int id)
         {
             var sql = $@"SELECT *
@@ -64,7 +109,7 @@ namespace Time_Tracker.Repositories
 
         }
 
-        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators> request)
+        public async Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, SQLOperators> request)
         {
             var (query, parameters) = PaginationHelper.BuildPaginatedQuery("WorkSessions", request);
 
@@ -90,6 +135,24 @@ namespace Time_Tracker.Repositories
                 CurrentPage = request.PageNumber,
                 PageSize = request.PageSize
             };
+        }
+
+        public async Task<bool> IsWorkSessionTimeAvailable(WorkSession workSession)
+        {
+            var queryBuilder = new StringBuilder("SELECT COUNT(*) " +
+                                                 "FROM WORKSESSIONS " +
+                                                 "WHERE StartTime <= @EndTime AND " +
+                                                 "(EndTime >= @StartTime OR EndTime IS NULL) AND " +
+                                                 "Id != @Id AND " +
+                                                 "UserId = @UserId");
+            var totalCount = 0;
+
+            using(var connection = new SqlConnection(_connectionString))
+            {
+                totalCount = await connection.ExecuteScalarAsync<int>(queryBuilder.ToString(), workSession);
+            }
+
+            return totalCount == 0;
         }
 
         public async Task<WorkSession> UpdateWorkSessionAsync(WorkSession workSession)
@@ -119,5 +182,7 @@ namespace Time_Tracker.Repositories
 
             return await connection.QuerySingleAsync<WorkSession>(sql, workSession);
         }
+
+
     }
 }

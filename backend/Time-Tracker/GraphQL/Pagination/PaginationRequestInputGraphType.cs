@@ -14,7 +14,7 @@ namespace Time_Tracker.GraphQL.Pagination
             Name = $"PaginationRequestInputGraphType_{typeof(TSortFields).Name}";
             Field<NonNullGraphType<IntGraphType>>("pageNumber");
             Field<IntGraphType>("pageSize");
-            Field<NonNullGraphType<ListGraphType<SortCriteriaInputGraphType<TSortFields>>>>("sortCriterias");
+            Field<ListGraphType<SortCriteriaInputGraphType<TSortFields>>>("sortCriterias");
             Field<ListGraphType<FilterCriteriaInputGraphType<TFilterFields, TOperators>>>("filterCriterias");
         }
     }

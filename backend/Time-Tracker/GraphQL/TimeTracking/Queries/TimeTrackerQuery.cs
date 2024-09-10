@@ -26,12 +26,33 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
 
             Field<PaginatedResultResponseGraphType<WorkSession, WorkSessionGraphType>>
                 ("workSessions")
-                .Argument<NonNullGraphType<PaginationRequestInputGraphType<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators>>>("input")
+                .Argument<NonNullGraphType<PaginationRequestInputGraphType<WorkSessionSortableFields, WorkSessionFilterableFields, SQLOperators>>>("input")
                 .ResolveAsync(async context =>
                 {
-                    var paginationRequest = context.GetArgument<PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators>>("input");
+                    var paginationRequest = context.GetArgument<PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, SQLOperators>>("input");
 
                     return await workSessionRepository.GetWorkSessionsWithPaginationAsync(paginationRequest);
+                });
+
+            Field<IntGraphType>("totalDuration")
+                .Argument<ListGraphType<FilterCriteriaInputGraphType<TotalDurationOfWorkSessionsFilters, SQLOperators>>>("input")
+                .ResolveAsync(async context =>
+                {
+                    var filterCriterias = context.GetArgument<List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>>>("input");
+
+                    var totalDuration = await workSessionRepository.GetTotalDurationByFiltersAsync(filterCriterias);
+
+                    return totalDuration;
+                });
+            Field<WorkSessionGraphType>("currentWorkSession")
+                .Argument<IntGraphType>("userId")
+                .ResolveAsync(async context =>
+                {
+                    var userId = context.GetArgument<int>("userId");
+
+                    WorkSession? currentWorkSession = await workSessionRepository.GetCurrentWorkSessionByUserIdAsync(userId);
+
+                    return currentWorkSession;
                 });
 
         }

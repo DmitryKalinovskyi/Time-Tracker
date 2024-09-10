@@ -75,6 +75,11 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                         context.Errors.Add(new ExecutionError($"User with id = {inputSession.UserId} does not exist."));
                         return null;
                     }
+                    else if(!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
+                    {
+                        context.Errors.Add(new ExecutionError("Work session time overlaps with an existing one"));
+                        return null;
+                    }
 
                     if(inputSession.StartTime.Value.Kind != DateTimeKind.Utc ||
                        inputSession.EndTime.Value.Kind != DateTimeKind.Utc)
@@ -102,7 +107,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
 
             Field<WorkSessionGraphType>("updateSession")
                 .Argument<NonNullGraphType<IntGraphType>>("editorId")
-                .Argument<UpdateSessionInputGraphType>("input")
+                .Argument<NonNullGraphType<UpdateSessionInputGraphType>>("input")
                 .ResolveAsync(async context =>
                 {
                     var inputSession = context.GetArgument<WorkSession>("input");
@@ -114,11 +119,9 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                         context.Errors.Add(new ExecutionError($"Work session with id = {inputSession.Id} does not exist."));
                         return null;
                     }
-
-                    if (inputSession.StartTime.Value.Kind != DateTimeKind.Utc ||
-                      inputSession.EndTime.Value.Kind != DateTimeKind.Utc)
+                    else if (!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
                     {
-                        context.Errors.Add(new ExecutionError("StartTime and EndTime have to be in UTC time format."));
+                        context.Errors.Add(new ExecutionError("Work session time overlaps with an existing one"));
                         return null;
                     }
 

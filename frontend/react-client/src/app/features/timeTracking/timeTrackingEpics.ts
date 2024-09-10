@@ -1,10 +1,10 @@
-import { catchError, delay, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
+import { catchError, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
 import { ofType, StateObservable } from "redux-observable";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
-import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getSessions, getSessionsSuccessful, PaginationPayload, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, } from "./timeTrackingSlice";
+import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getSessions, getSessionsSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, WorkSessionPaginationRequest, } from "./timeTrackingSlice";
 import { ajax } from "rxjs/ajax";
 import { createRequest } from "../../misc/RequestCreator";
-import { addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse } from "../../../api/queries/workSessionQueries";
+import { addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse } from "./api/workSessionQueries.ts";
 import { RootState } from "../../store.ts";
 
 
@@ -24,7 +24,7 @@ export const startSessionEpic = (action$: Observable<Action>) => action$.pipe(
                         }
         
                         if (data && data.timeTrackerMutation && data.timeTrackerMutation.startSession) {
-                            return startSuccessful(data.timeTrackerMutation.startSession.id);
+                            return startSuccessful(data.timeTrackerMutation.startSession);
                         } else {
                             throw new Error('[Session starting] Unexpected response format or missing login data');
                         }
@@ -50,7 +50,7 @@ export const stopSessionEpic = (action$: Observable<Action>, state$: StateObserv
     ofType(stopSession.type),
     withLatestFrom(state$),
     switchMap(([_action, state]) => {
-        const currentSessionId = state.timeTracker.currentSessionId;
+        const currentSessionId = state.timeTracker.currentSession!.id;
         if (currentSessionId === null) 
             return of(setError('No current session ID available.'));
 
@@ -89,12 +89,11 @@ export const stopSessionEpic = (action$: Observable<Action>, state$: StateObserv
 
 export const getSessionsEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(getSessions.type),
-    switchMap((action: PayloadAction<PaginationPayload>) => {
+    switchMap((action: PayloadAction<WorkSessionPaginationRequest>) => {
         const request$ = ajax(createRequest(getWorkSessionsWithPagination(action.payload)));
 
         return from(request$).pipe(
             map((ajaxResponse: any) => {
-                console.log(ajaxResponse.data);
                 const errors = ajaxResponse.response.errors;
                 const data: WorkSessionsWithPaginationResponse = ajaxResponse.response.data;
 
@@ -108,7 +107,6 @@ export const getSessionsEpic = (action$: Observable<Action>) => action$.pipe(
                     throw new Error('[Getting Work Sessions] Unexpected response format or missing login data');
                 }
             }),
-            delay(100),
             catchError((error: any) => {
                 let errorMessage = 'An unexpected error occurred';
 

@@ -15,8 +15,12 @@ namespace Time_Tracker.Repositories
 
         Task<WorkSession?> GetWorkSessionByIdAsync(int id);
 
-        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, FilterOperators> request);
+        Task<PaginationResult<WorkSession>> GetWorkSessionsWithPaginationAsync(PaginationRequest<WorkSessionSortableFields, WorkSessionFilterableFields, SQLOperators> request);
 
+        Task<int> GetTotalDurationByFiltersAsync(List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>> filterCriterias);
 
+        Task<WorkSession?> GetCurrentWorkSessionByUserIdAsync(int userId);
+
+        Task<bool> IsWorkSessionTimeAvailable(WorkSession workSession);
     }
 }

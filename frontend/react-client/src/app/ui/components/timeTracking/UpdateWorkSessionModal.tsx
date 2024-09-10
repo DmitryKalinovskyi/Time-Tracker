@@ -10,7 +10,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { WorkSession } from '../../../types/WorkSession';
-import moment from 'moment';
+import { toIsoString } from '../../../misc/DateHelper';
 
 interface UpdateWorkSessionModalProps {
   open: boolean;
@@ -22,8 +22,8 @@ interface UpdateWorkSessionModalProps {
 const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, onSave, initialData }) => {
   const [session, setSession] = useState<WorkSession>({
     ...initialData,
-    startTime: moment.utc(initialData.startTime).local().format('YYYY-MM-DDTHH:mm'),
-    endTime: moment.utc(initialData.endTime).local().format('YYYY-MM-DDTHH:mm'),
+    startTime: new Date(toIsoString(new Date(initialData.startTime))),
+    endTime: new Date(toIsoString(new Date(initialData.endTime!))),
   });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<{ startTime?: string; endTime?: string }>({});
@@ -31,8 +31,8 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
   useEffect(() => {
     setSession({
       ...initialData,
-      startTime: moment.utc(initialData.startTime).local().format('YYYY-MM-DDTHH:mm'),
-      endTime: moment.utc(initialData.endTime).local().format('YYYY-MM-DDTHH:mm'),
+      startTime: new Date(toIsoString(new Date(initialData.startTime))),
+      endTime: new Date(toIsoString(new Date(initialData.endTime!))), 
     });
     setErrors({});
   }, [initialData]);
@@ -40,23 +40,25 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
   const validate = () => {
     let tempErrors: { startTime?: string; endTime?: string } = {};
 
-    const currentTime = moment();
-    const startTime = moment(session.startTime);
-    const endTime = moment(session.endTime);
+    const currentTime = new Date();
+    const startTime = new Date(session.startTime);
+    const endTime = new Date(session.endTime!);
 
     if (!session.startTime) {
       tempErrors.startTime = "Start time is required";
-    } else if (startTime.isAfter(currentTime)) {
+    } else if (startTime > currentTime) {
       tempErrors.startTime = "Start time cannot be in the future";
     }
 
     if (!session.endTime) {
       tempErrors.endTime = "End time is required";
-    } else if (endTime.isBefore(startTime)) {
+    } else if (endTime < startTime) {
       tempErrors.endTime = "End time cannot be earlier than start time";
-    } else if (endTime.isAfter(currentTime)) {
-      tempErrors.endTime = "End time cannot be in the future";
-    } else if (endTime.diff(startTime, 'hours') > 8) {
+    } else if (endTime > currentTime) {
+      const durationInHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+      if (durationInHours > 8) {
+        tempErrors.endTime = "Session duration cannot be longer than 8 hours";
+      }
       tempErrors.endTime = "Session duration cannot be longer than 8 hours";
     }
 
@@ -70,8 +72,8 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
 
       const updatedSession: WorkSession = {
         ...session,
-        startTime: new Date(moment(session.startTime).utc().format()),
-        endTime: new Date(moment(session.endTime).utc().format()),
+        startTime: new Date(toIsoString(new Date(session.startTime))),
+        endTime: new Date(toIsoString(new Date(session.endTime!))),
       };
 
       onSave(updatedSession);

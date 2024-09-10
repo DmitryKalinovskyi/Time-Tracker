@@ -19,10 +19,10 @@ const Timer: React.FC = () => {
 
   useEffect(() => {
     if (timeTracker) {
-      setInitialDuration(timeTracker.currentSessionDuration);
+      setInitialDuration(timeTracker.currentSession?.duration ?? 0);
       setInitialIsTracking(timeTracker.isTracking);
     }
-  }, [timeTracker.currentSessionDuration]);
+  }, [timeTracker.currentSession?.duration]);
 
   const handleButtonClick = () => {
     if (isTracking) {

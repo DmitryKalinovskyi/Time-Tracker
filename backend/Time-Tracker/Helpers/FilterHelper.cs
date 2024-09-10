@@ -1,15 +1,10 @@
 ﻿using Dapper;
 using Time_Tracker.Enums;
+using Time_Tracker.Extensions;
 using Time_Tracker.Factories;
 
 namespace Time_Tracker.Helpers
 {
-    public interface IFilterableFieldMapper<TFilterableFields>
-        where TFilterableFields : Enum
-    {
-        string toSqlFieldName(TFilterableFields filterableField);
-    }
-
     public class FilterCriteria<TFilterFields, TOperators> 
         where TFilterFields: Enum
         where TOperators : Enum
@@ -25,7 +20,7 @@ namespace Time_Tracker.Helpers
         where TFilterFields: Enum
         where TOperators : Enum
         {
-            if(!filterCriterias.Any()) return (string.Empty, new DynamicParameters());
+            if(filterCriterias is null || !filterCriterias.Any()) return (string.Empty, new DynamicParameters());
 
             var clauses = new List<string>();
             var parameters = new DynamicParameters();
@@ -38,10 +33,10 @@ namespace Time_Tracker.Helpers
             {
                 var fieldName = filterableFieldMapper.toSqlFieldName(filterCriteria.FilterBy);
                 var parameterName = $"@{filterCriteria.FilterBy}_{parameterIndex++}";
-                var clause = ((FilterOperators)(object)filterCriteria.Operator)
+                var clause = ((SQLOperators)(object)filterCriteria.Operator)
                     .ToSqlClause(fieldName, parameterName);
                 clauses.Add(clause);
-                var parameterValue = (FilterOperators)(object)filterCriteria.Operator == FilterOperators.Contains ? $"\"{filterCriteria.Value}\"" : filterCriteria.Value;
+                var parameterValue = (SQLOperators)(object)filterCriteria.Operator == SQLOperators.Contains ? $"\"{filterCriteria.Value}\"" : filterCriteria.Value;
                 parameters.Add(parameterName, parameterValue);
             }
 
