@@ -45,7 +45,12 @@ export const authUserQuery = (
                         id,
                         fullName,
                         email,
-                        permissions
+                        permissions,
+                        calendarEvents{
+                            id,
+                            startTime,
+                            endTime
+                        }
                       }
                     }
                 }
@@ -64,7 +69,12 @@ export const refreshTokenQuery = () =>
         id,
         fullName,
         email,
-        permissions
+        permissions,
+        calendarEvents{
+            id,
+            startTime,
+            endTime
+        }
       },
       accessToken{
         value,

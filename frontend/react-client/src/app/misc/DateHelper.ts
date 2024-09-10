@@ -11,7 +11,7 @@ export function getDaysInMonth(year: number, month: number) {
 
 export function toIsoString(date: Date) {
     console.log(date);
-    var tzo = -date.getTimezoneOffset(),
+    const tzo = -date.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
         pad = function(num: number) {
             return (num < 10 ? '0' : '') + num;

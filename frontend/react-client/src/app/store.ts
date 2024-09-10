@@ -20,6 +20,11 @@ import { addSessionEpic, deleteSessionEpic, getSessionsEpic, startSessionEpic, s
 import { getUsersEpic } from "./features/users/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
 import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
+import {
+    addCalendarEventEpic,
+    deleteCalendarEventEpic,
+    updateCalendarEventEpic
+} from "./features/calendar/calendarEpic.ts";
 
 
 
@@ -40,7 +45,11 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     updateSessionEpic,
     deleteSessionEpic,
     addSessionEpic,
-    refreshTokenEpic
+    refreshTokenEpic,
+
+    addCalendarEventEpic,
+    updateCalendarEventEpic,
+    deleteCalendarEventEpic
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, any, any>();

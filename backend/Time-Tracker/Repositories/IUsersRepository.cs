@@ -14,6 +14,8 @@ namespace Time_Tracker.Repositories
 
         public Task<User?> FindByEmailAsync(string email);
 
+        public Task<List<User>> SearchByEmailOrFullname(string emailOrFullName, int limit);
+
         Task<int> AddAsync(User user);
         Task UpdateAsync(User user);
     }

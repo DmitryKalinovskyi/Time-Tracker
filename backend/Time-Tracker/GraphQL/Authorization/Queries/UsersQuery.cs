@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Time_Tracker.Dtos;
 using Time_Tracker.Enums;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.GraphQL.Pagination;
@@ -26,6 +27,16 @@ namespace Time_Tracker.GraphQL.Authorization.Queries
 
                     return await usersRepository.GetUsersWithPaginationAsync(paginationRequest);
                 });
+
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<UserGraphType>>>>
+               ("usersByEmailOrFullName")
+               .Argument<NonNullGraphType<UsersByEmailOrFullNameRequestGraphType>>("input")
+               .ResolveAsync(async context =>
+               {
+                   var request = context.GetArgument<UsersByEmailOrFullNameRequest>("input");
+
+                   return await usersRepository.SearchByEmailOrFullname(request.EmailOrFullName, request.UsersLimit);
+               });
         }
     }
 
