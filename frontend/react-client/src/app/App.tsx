@@ -17,6 +17,8 @@ import { TimerProvider } from './features/timeTracking/TimerProvider.tsx';
 import {CalendarPage} from "./ui/pages/CalendarPage.tsx";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers";
+import RequirePermission from "./gates/RequirePermission.tsx";
+import {ManageUsersPermission} from "./features/permissions/permissions.ts";
 
 const router = createBrowserRouter([
   {
@@ -30,7 +32,9 @@ const router = createBrowserRouter([
             { path: "/home", element: <HomePage /> },
             { path: "/users", element: <UsersPage /> },
             { path: "/user/:UserId", element: <UserPage /> },
-            { path: "/register", element: <RegisterUserPage /> },
+            { element: <RequirePermission permission={ManageUsersPermission}/>, children: [
+              { path: "/register", element: <RegisterUserPage /> },
+              ]},
             { path: "/calendar", element: <CalendarPage/> }
           ]
         }

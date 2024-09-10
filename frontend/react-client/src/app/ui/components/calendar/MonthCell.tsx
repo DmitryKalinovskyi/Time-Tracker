@@ -22,7 +22,6 @@ export function MonthCell(props: MonthCellProps) {
     return <div
         onClick={() => props.onClick(props.day)}
         className={`p-2 h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>
-
         {props.month != props.day.getMonth() ?
             <Typography variant="body1" className="text-gray-300">
                 {props.day.getDate()}
