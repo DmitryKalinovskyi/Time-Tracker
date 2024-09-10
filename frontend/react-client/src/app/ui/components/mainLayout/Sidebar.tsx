@@ -10,12 +10,17 @@ import { formatDurationToHMS } from "../../../misc/TimeFormatter";
 import ListItemButton from "@mui/material/ListItemButton";
 import { Link } from "react-router-dom";
 import GroupIcon from '@mui/icons-material/Group';
+import BadgeIcon from '@mui/icons-material/Badge';
 
 import { useTimerContext } from "../../../features/timeTracking/TimerProvider";
+import useIsHavePermission from "../../../hooks/useIsHavePermission.ts";
+import {ManageUsersPermission} from "../../../features/permissions/permissions.ts";
 
 
 const Sidebar: React.FC = () => {
   const { duration } = useTimerContext();
+
+  const isCanManageUsers = useIsHavePermission(ManageUsersPermission);
 
   const buttonSx = {
     display: 'flex',
@@ -120,7 +125,13 @@ const Sidebar: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary="Users" sx={textSx} />
         </ListItemButton>
-
+          {isCanManageUsers &&
+          <ListItemButton component={Link} to="/register" sx={buttonSx}>
+              <ListItemIcon sx={iconSx}>
+                  <BadgeIcon sx={{ color: '#FFF' }} />
+              </ListItemIcon>
+              <ListItemText primary="Register" sx={textSx} />
+          </ListItemButton>}
         </List>
     </Box>
     </>
