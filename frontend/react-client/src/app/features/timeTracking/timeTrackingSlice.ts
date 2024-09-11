@@ -8,7 +8,6 @@ import { SQLOperators } from "../../enums/SQLOperators";
 import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
-import { toIsoString } from "../../misc/DateHelper";
 
 export interface TimeTrackerType {
     workSessions: Array<WorkSession>;

@@ -2,7 +2,7 @@ import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import React, { useEffect } from 'react';
 import { formatDuration, formatDurationToHMS } from '../../../misc/TimeFormatter';
-import { Dialpad, PlayArrow, Stop } from '@mui/icons-material';
+import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { getCurrentWorkSession, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
