@@ -35,7 +35,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                 });
 
             Field<IntGraphType>("totalDuration")
-                .Argument<ListGraphType<FilterCriteriaInputGraphType<TotalDurationOfWorkSessionsFilters, SQLOperators>>>("input")
+                .Argument<NonNullGraphType<ListGraphType<FilterCriteriaInputGraphType<TotalDurationOfWorkSessionsFilters, SQLOperators>>>>("input")
                 .ResolveAsync(async context =>
                 {
                     var filterCriterias = context.GetArgument<List<FilterCriteria<TotalDurationOfWorkSessionsFilters, SQLOperators>>>("input");

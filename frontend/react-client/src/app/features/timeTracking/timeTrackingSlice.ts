@@ -21,6 +21,8 @@ export interface TimeTrackerType {
     isTracking: boolean;
     filters?: FilterCriteria<WorkSessionFilters, SQLOperators>[];
     sorts?: SortCriteria<WorkSessionSorts>[];
+    todayTotalDuration: number;
+    workSessionsListingTotalDuration: number;
     loading: boolean;
     error: string | null;
 }
@@ -53,7 +55,9 @@ const initialState: TimeTrackerType = {
     paginationInfo: {
         currentPage: 1,
         pageSize: 3
-    }
+    },
+    todayTotalDuration: 0,
+    workSessionsListingTotalDuration: 0
 }
 
 const timeTrackerSlice = createSlice({
@@ -100,6 +104,24 @@ const timeTrackerSlice = createSlice({
         {
             state.loading = true;
             state.error = null;
+        },
+
+        getTotalDurationByFilters(state, _action: PayloadAction<Array<FilterCriteria<WorkSessionFilters, SQLOperators>>>)
+        {
+            state.loading = true;
+            state.error = null;
+        },
+
+        getTodayTotalDurationSuccessful(state, action: PayloadAction<number>)
+        {
+            state.loading = false;
+            state.todayTotalDuration = action.payload;
+        },
+
+        getWorkSessionsListingTotalDurationSuccessful(state, action: PayloadAction<number>)
+        {
+            state.loading = false;
+            state.workSessionsListingTotalDuration = action.payload;
         },
 
         setPage(state, action: PayloadAction<number>)
@@ -230,7 +252,10 @@ export const {
     setPage,
     setSorts,
     getCurrentWorkSession,
-    getCurrentWorkSessionSuccessful
+    getCurrentWorkSessionSuccessful,
+    getTotalDurationByFilters,
+    getTodayTotalDurationSuccessful,
+    getWorkSessionsListingTotalDurationSuccessful
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

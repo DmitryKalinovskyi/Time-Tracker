@@ -1,3 +1,6 @@
+import { SQLOperators } from "../../../enums/SQLOperators";
+import { WorkSessionFilters } from "../../../enums/WorkSessionFilters";
+import FilterCriteria from "../../../types/FilterCriteria";
 import { WorkSession } from "../../../types/WorkSession";
 import { AddSessionPayload, UpdateSessionPayload, WorkSessionPaginationRequest, WorkSessionPaginationResult } from "../timeTrackingSlice";
 export interface StartSessionResponse{
@@ -39,6 +42,12 @@ export interface WorkSessionsWithPaginationResponse{
 export interface CurrentWorkSessionResponse{
     timeTrackerQuery: {
         currentWorkSession: WorkSession | null
+    }
+}
+
+export interface TotalDurationRespone{
+    timeTrackerQuery: {
+        totalDuration: number | null
     }
 }
 
@@ -345,6 +354,25 @@ export const getCurrentWorkSessionQuery = (payload: number) => {
             }
         }
     }
+    }
+    `;
+
+    return query;
+}
+
+export const getTotalDurationByFiltersQuery = (payload: Array<FilterCriteria<WorkSessionFilters, SQLOperators>>) => {
+    const query = 
+    `
+    query{
+        timeTrackerQuery{
+            totalDuration(
+                    input: [
+                        ${  payload.map(filterCriteria => {
+                               return `{ filterBy: ${filterCriteria.filterBy} operator: ${filterCriteria.operator} value: "${filterCriteria.value}"}`
+                            })}
+                        ]
+                    )
+        }
     }
     `;
 

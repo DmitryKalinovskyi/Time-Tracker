@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, getTotalDurationByFilters, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -26,7 +26,7 @@ import { SQLOperators } from '../../../enums/SQLOperators';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
-  const { isTracking, workSessions, filters, paginationInfo, sorts, loading, error } = useSelector((state: RootState) => state.timeTracker);
+  const { isTracking, workSessions, filters, paginationInfo, sorts, loading, error, workSessionsListingTotalDuration } = useSelector((state: RootState) => state.timeTracker);
   const user = useSelector((state: RootState) => state.auth.user);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -35,16 +35,18 @@ const SessionList: React.FC = () => {
 
 
   useEffect(() => {
+    const finalFilters = filters ? 
+    [...filters, {filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] 
+    : [{filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] ;
     const PaginationArgs: WorkSessionPaginationRequest = {
       pageNumber: paginationInfo!.currentPage,
       pageSize: paginationInfo!.pageSize,
       sortCriterias: sorts,
-      filterCriterias: filters 
-      ? [...filters, {filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] 
-      : [{filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}]
+      filterCriterias: finalFilters
     };
 
     dispatch(getSessions(PaginationArgs));
+    dispatch(getTotalDurationByFilters(finalFilters));
   }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
 
   const handleOpenModal = (session: WorkSession) => {
@@ -99,7 +101,7 @@ const SessionList: React.FC = () => {
       <>
         <Box display={'flex'} justifyContent={'flex-start'} alignItems={'center'} px={2}>
           <Typography variant='h5' color={"#00101D"} sx={{ opacity: 0.6 }} mr={1}>Total time: </Typography>
-          <Typography variant='h4' color={"#00101D"} sx={{ opacity: 1 }}> {formatDuration(12331)}</Typography>
+          <Typography variant='h4' color={"#00101D"} sx={{ opacity: 1 }}> {formatDuration(workSessionsListingTotalDuration)}</Typography>
         </Box>
         <Box display={'flex'} height={'85%'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} px={2}>
           <TableContainer component={Paper} sx={{ borderRadius: '1.5rem', mb: 2 }}>

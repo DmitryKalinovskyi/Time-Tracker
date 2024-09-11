@@ -5,8 +5,10 @@ import { formatDuration, formatDurationToHMS } from '../../../misc/TimeFormatter
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { getCurrentWorkSession, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { getCurrentWorkSession, getTotalDurationByFilters, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { useTimerContext } from '../../../features/timeTracking/TimerProvider';
+import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
+import { SQLOperators } from '../../../enums/SQLOperators';
 
 const Timer: React.FC = () => {
   const timeTracker = useSelector((state: RootState) => state.timeTracker);
@@ -19,6 +21,13 @@ const Timer: React.FC = () => {
 
   useEffect(() => {
     dispatch(getCurrentWorkSession(user!.id)); 
+    dispatch(getTotalDurationByFilters(
+      [
+        {filterBy: WorkSessionFilters.Year, operator: SQLOperators.Equal, value: new Date().getUTCFullYear().toString()},
+        {filterBy: WorkSessionFilters.Month, operator: SQLOperators.Equal, value: (new Date().getUTCMonth() + 1).toString()},
+        {filterBy: WorkSessionFilters.Day, operator: SQLOperators.Equal, value: new Date().getUTCDate().toString()}
+      ]
+    ));
   }, [])
 
   useEffect(() => {
@@ -26,6 +35,13 @@ const Timer: React.FC = () => {
       setInitialDuration(timeTracker.currentSession?.duration ?? 0);
       setInitialIsTracking(timeTracker.isTracking);
     }
+    dispatch(getTotalDurationByFilters(
+      [
+        {filterBy: WorkSessionFilters.Year, operator: SQLOperators.Equal, value: new Date().getUTCFullYear().toString()},
+        {filterBy: WorkSessionFilters.Month, operator: SQLOperators.Equal, value: (new Date().getUTCMonth() + 1).toString()},
+        {filterBy: WorkSessionFilters.Day, operator: SQLOperators.Equal, value: new Date().getUTCDate().toString()}
+      ]
+    ));
   }, [timeTracker.currentSession]);
 
   const handleButtonClick = () => {
@@ -74,7 +90,7 @@ const Timer: React.FC = () => {
             typography: 'body1',
             color: '#00101D',
             opacity: 0.85,
-          }}>Total time tracked today: {formatDurationToHMS(1234)} </Typography>
+          }}>Total time tracked today: {formatDurationToHMS(timeTracker.todayTotalDuration)} </Typography>
           <Box>
             <IconButton
               onClick={handleButtonClick}
