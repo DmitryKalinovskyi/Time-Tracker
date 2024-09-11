@@ -1,10 +1,10 @@
 import { catchError, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
 import { ofType, StateObservable } from "redux-observable";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
-import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getSessions, getSessionsSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, WorkSessionPaginationRequest, } from "./timeTrackingSlice";
+import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getCurrentWorkSession, getCurrentWorkSessionSuccessful, getSessions, getSessionsSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, WorkSessionPaginationRequest, } from "./timeTrackingSlice";
 import { ajax } from "rxjs/ajax";
 import { createRequest } from "../../misc/RequestCreator";
-import { addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse } from "./api/workSessionQueries.ts";
+import { getCurrentWorkSessionQuery, addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse, CurrentWorkSessionResponse } from "./api/workSessionQueries.ts";
 import { RootState } from "../../store.ts";
 
 
@@ -105,6 +105,41 @@ export const getSessionsEpic = (action$: Observable<Action>) => action$.pipe(
                     return getSessionsSuccessful(data.timeTrackerQuery.workSessions);
                 } else {
                     throw new Error('[Getting Work Sessions] Unexpected response format or missing login data');
+                }
+            }),
+            catchError((error: any) => {
+                let errorMessage = 'An unexpected error occurred';
+
+                if (error.status === 0) {
+                    errorMessage = 'Connection time out';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
+                return of(setError(errorMessage));
+            })
+        );
+    })
+);
+
+export const getCurrentSessionEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(getCurrentWorkSession.type),
+    switchMap((action: PayloadAction<number>) => {
+        const request$ = ajax(createRequest(getCurrentWorkSessionQuery(action.payload)));
+
+        return from(request$).pipe(
+            map((ajaxResponse: any) => {
+                const errors = ajaxResponse.response.errors;
+                const data: CurrentWorkSessionResponse = ajaxResponse.response.data;
+
+                if (errors && errors.length > 0) {
+                    return setError(errors[0].message);
+                }
+
+                if (data && data.timeTrackerQuery && data.timeTrackerQuery.currentWorkSession) {
+                    return getCurrentWorkSessionSuccessful(data.timeTrackerQuery.currentWorkSession);
+                } else {
+                    throw new Error('[Getting Current Work Session] Unexpected response format or missing login data');
                 }
             }),
             catchError((error: any) => {

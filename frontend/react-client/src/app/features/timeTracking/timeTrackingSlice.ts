@@ -8,6 +8,7 @@ import { SQLOperators } from "../../enums/SQLOperators";
 import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
+import { toIsoString } from "../../misc/DateHelper";
 
 export interface TimeTrackerType {
     workSessions: Array<WorkSession>;
@@ -96,6 +97,12 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
+        getCurrentWorkSession(state, _action: PayloadAction<number>)
+        {
+            state.loading = true;
+            state.error = null;
+        },
+
         setPage(state, action: PayloadAction<number>)
         {
             state.paginationInfo!.currentPage = action.payload;
@@ -167,6 +174,31 @@ const timeTrackerSlice = createSlice({
             state.currentSession = null;
         },
 
+        getCurrentWorkSessionSuccessful(state, action: PayloadAction<WorkSession | null>)
+        {
+            console.log(action.payload);
+            state.loading = false;
+            if(action.payload)
+            {
+                state.isTracking = true;
+                state.currentSession = action.payload;
+                
+                const startTimeUTC = new Date(action.payload.startTime + 'Z');
+
+                console.log('NOW: ', Date.now());
+                console.log("NOW SERVER (UTC assumed): ", startTimeUTC);
+
+                state.currentSession.duration = Math.floor((Date.now() - startTimeUTC.getTime()) / 1000);
+
+                console.log("Current duration: ", state.currentSession.duration);
+            }
+            else
+            {
+                state.isTracking = false;
+                state.currentSession = null;
+            }
+        },
+
         setLoading(state, action: PayloadAction<boolean>)
         {
             state.loading = action.payload;
@@ -197,7 +229,9 @@ export const {
     setLoading,
     setFilters,
     setPage,
-    setSorts
+    setSorts,
+    getCurrentWorkSession,
+    getCurrentWorkSessionSuccessful
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

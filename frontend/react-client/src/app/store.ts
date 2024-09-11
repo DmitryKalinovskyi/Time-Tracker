@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { regUserEpic } from "./features/registration/regEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
 import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
-import { addSessionEpic, deleteSessionEpic, getSessionsEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
+import { addSessionEpic, deleteSessionEpic, getCurrentSessionEpic, getSessionsEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
 import { getUsersEpic } from "./features/users/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
 import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
@@ -42,6 +42,7 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     startSessionEpic,
     stopSessionEpic,
     getSessionsEpic,
+    getCurrentSessionEpic,
     updateSessionEpic,
     deleteSessionEpic,
     addSessionEpic,

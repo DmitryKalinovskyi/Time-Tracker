@@ -12,11 +12,14 @@ import {
 import { SQLOperators } from '../../../enums/SQLOperators'; // Keep the SQL operators enum common for all
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import FilterCriteria from '../../../types/FilterCriteria';
+import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
+import { WorkSessionOrigin } from '../../../enums/WorkSessionOrigin';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 interface FiltersPickerModalProps<T> {
   open: boolean;
-  filtersEnum: T[];                     // This represents the available filters as an enum
+  filtersEnum: T[];
   onClose: () => void;
   onApplyFilters: (filters: FilterCriteria<T, SQLOperators>[]) => void;
 }
@@ -31,57 +34,93 @@ const FiltersPickerModal = <T extends string>({
     { filterBy: filtersEnum[0], operator: SQLOperators.Equal, value: '' },
   ]);
 
-  // Handle filter field change
   const handleFilterChange = (index: number, key: keyof FilterCriteria<T, SQLOperators>, value: string | T | SQLOperators) => {
     const updatedFilters = [...filters];
     updatedFilters[index] = { ...updatedFilters[index], [key]: value };
     setFilters(updatedFilters);
   };
 
-  // Add a new filter row
   const handleAddFilter = () => {
     setFilters([...filters, { filterBy: filtersEnum[0], operator: SQLOperators.Equal, value: '' }]);
   };
 
-  // Remove an existing filter row
   const handleRemoveFilter = (index: number) => {
     const updatedFilters = filters.filter((_, i) => i !== index);
     setFilters(updatedFilters);
   };
 
-  // Apply the filters and close the modal
   const handleApply = () => {
     onApplyFilters(filters);
     onClose();
   };
 
+  // Render different input fields based on filter type
+  const renderInputField = (filter: FilterCriteria<T, SQLOperators>, index: number) => {
+    switch (filter.filterBy) {
+      case WorkSessionFilters.Year:
+      case WorkSessionFilters.Month:
+      case WorkSessionFilters.Week:
+      case WorkSessionFilters.Day:
+        return (
+          <DatePicker
+            label={filter.filterBy}
+            views={getPickerViews(filter.filterBy as WorkSessionFilters)} 
+            value={filter.value}
+            onChange={(newValue) => handleFilterChange(index, 'value', newValue ? newValue.format('YYYY-MM-DD') : '')}
+            renderInput={(params: any) => <TextField {...params} sx={{ width: '40%' }} />}
+          />
+        );
+
+      case WorkSessionFilters.SessionOrigin:
+        return (
+          <TextField
+            select
+            label="Session Origin"
+            value={filter.value}
+            onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
+            sx={{ width: '40%' }}
+          >
+            {Object.values(WorkSessionOrigin).map((option) => (
+              <MenuItem key={option} value={option}>
+                {option === WorkSessionOrigin.Automatic ? 'Automatic' : option === WorkSessionOrigin.Manual ? 'Manual' : 'Edited'}
+              </MenuItem>
+            ))}
+          </TextField>
+        );
+
+      default:
+        return (
+          <TextField
+            label="Value"
+            value={filter.value}
+            onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
+            sx={{ width: '40%' }}
+          />
+        );
+    }
+  };
+
+  const getPickerViews = (filter: WorkSessionFilters) => {
+    switch (filter) {
+      case WorkSessionFilters.Year:
+        return ['year'];
+      case WorkSessionFilters.Month:
+        return ['year', 'month'];
+      case WorkSessionFilters.Week:
+      case WorkSessionFilters.Day:
+        return ['year', 'month', 'day'];
+      default:
+        return ['day'];
+    }
+  };
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth="sm"
-      PaperProps={{
-        sx: {
-          color: '#00101D',
-          borderColor: '#00101D',
-          borderWidth: 2,
-          borderStyle: 'solid',
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          color: '#00101D',
-          borderBottom: '1px solid #00101D',
-        }}
-      >
-        Pick Filters
-      </DialogTitle>
-      
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>Pick Filters</DialogTitle>
+
       <DialogContent>
         {filters.map((filter, index) => (
-          <div key={index} style={{  marginTop: '1rem', display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+          <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
             <TextField
               select
               label="Filter"
@@ -110,16 +149,12 @@ const FiltersPickerModal = <T extends string>({
               ))}
             </TextField>
 
-            <TextField
-              label="Value"
-              value={filter.value}
-              onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
-              sx={{ marginRight: '16px', width: '40%' }}
-            />
+            {/* Render the appropriate input field */}
+            {renderInputField(filter, index)}
 
             {filters.length > 1 && (
               <IconButton onClick={() => handleRemoveFilter(index)}>
-                <DeleteIcon sx={{ color: '#00101D', '&:hover': { color: '#003366' } }} />
+                <DeleteIcon />
               </IconButton>
             )}
           </div>
@@ -129,45 +164,18 @@ const FiltersPickerModal = <T extends string>({
           variant="outlined"
           onClick={handleAddFilter}
           startIcon={<AddIcon />}
-          sx={{
-            marginTop: '16px',
-            color: '#00101D',
-            borderColor: '#00101D',
-            '&:hover': {
-              borderColor: '#003366',
-              color: '#003366',
-            },
-          }}
+          sx={{ marginTop: '16px' }}
         >
           Add Filter
         </Button>
-
       </DialogContent>
 
       <DialogActions>
-        <Button
-          onClick={onClose}
-          sx={{
-            color: '#00101D',
-            '&:hover': { color: '#003366' },
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={handleApply}
-          variant="contained"
-          sx={{
-            backgroundColor: '#00101D',
-            '&:hover': {
-              backgroundColor: '#003366',
-            },
-          }}
-        >
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleApply} variant="contained">
           Apply
         </Button>
       </DialogActions>
-
     </Dialog>
   );
 };

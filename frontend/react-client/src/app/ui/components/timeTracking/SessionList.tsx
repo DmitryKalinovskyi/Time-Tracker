@@ -6,6 +6,7 @@ import {
   Box,
   CircularProgress,
   Container,
+  Fade,
   Paper,
   Table,
   TableBody,
@@ -20,10 +21,12 @@ import Session from './Session';
 import UpdateWorkSessionModal from './UpdateWorkSessionModal';
 import { WorkSession } from '../../../types/WorkSession';
 import CustomPagination from './CustomPagination';
+import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
+import { SQLOperators } from '../../../enums/SQLOperators';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
-  const { workSessions, filters, paginationInfo, sorts, loading, error } = useSelector((state: RootState) => state.timeTracker);
+  const { isTracking, workSessions, filters, paginationInfo, sorts, loading, error } = useSelector((state: RootState) => state.timeTracker);
   const user = useSelector((state: RootState) => state.auth.user);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,11 +39,13 @@ const SessionList: React.FC = () => {
       pageNumber: paginationInfo!.currentPage,
       pageSize: paginationInfo!.pageSize,
       sortCriterias: sorts,
-      filterCriterias: filters
+      filterCriterias: filters 
+      ? [...filters, {filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] 
+      : [{filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}]
     };
 
     dispatch(getSessions(PaginationArgs));
-  }, [paginationInfo!.currentPage, sorts, filters]);
+  }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
 
   const handleOpenModal = (session: WorkSession) => {
     setSelectedSession(session);
@@ -84,62 +89,65 @@ const SessionList: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <>
-      {workSessions.length === 0 ? 
-        <Typography variant='h5' color={'#00101D'} height={'100%'} textAlign={'center'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-          It looks like there are no work sessions matching your current filters.
-        </Typography>
-        :
-        <>
-          <Box display={'flex'} justifyContent={'flex-start'} alignItems={'center'} px={2} mt={1}>
-            <Typography variant='h5' color={"#00101D"} sx={{ opacity: 0.6 }} mr={1}>Total time: </Typography>
-            <Typography variant='h4' color={"#00101D"} sx={{ opacity: 1 }}> {formatDuration(12331)}</Typography>
-          </Box>
-          <Box display={'flex'} height={'85%'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} px={2}>
-            <TableContainer component={Paper} sx={{ borderRadius: '1.5rem', mb: 2 }}>
-              <Table>
-                <TableHead sx={{ backgroundColor: "#00101D", opacity: 0.95 }}>
-                  <TableRow>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Date</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>User</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>TimeRange</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Status</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Duration</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Origin</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>EditedBy</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>LastUpdatedAt</TableCell>
-                    <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Actions</TableCell> {/* Added Actions column */}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {workSessions.map(session => (
-                    <Session
-                      key={session.id}
-                      session={session}
-                      onEdit={() => handleOpenModal(session)}
-                      onDelete={() => handleDeleteSession(session.id)}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+    <Fade in={!loading} timeout={500}>
+  <Box sx={{height: '100%'}}>
+    {workSessions.length === 0 ? 
+      <Typography variant='h5' color={'#00101D'} height={'100%'} textAlign={'center'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+        It looks like there are no work sessions matching your current filters.
+      </Typography>
+      :
+      <>
+        <Box display={'flex'} justifyContent={'flex-start'} alignItems={'center'} px={2}>
+          <Typography variant='h5' color={"#00101D"} sx={{ opacity: 0.6 }} mr={1}>Total time: </Typography>
+          <Typography variant='h4' color={"#00101D"} sx={{ opacity: 1 }}> {formatDuration(12331)}</Typography>
+        </Box>
+        <Box display={'flex'} height={'85%'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} px={2}>
+          <TableContainer component={Paper} sx={{ borderRadius: '1.5rem', mb: 2 }}>
+            <Table>
+              <TableHead sx={{ backgroundColor: "#00101D", opacity: 0.95 }}>
+                <TableRow>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Date</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>User</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>TimeRange</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Status</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Duration</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Origin</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>EditedBy</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>LastUpdatedAt</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {workSessions.map(session => (
+                  <Session
+                    key={session.id}
+                    session={session}
+                    onEdit={() => handleOpenModal(session)}
+                    onDelete={() => handleDeleteSession(session.id)}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-            <Box sx={{ justifySelf: 'flex-end' }}>
-              <CustomPagination />
-            </Box>
-
+          <Box sx={{ justifySelf: 'flex-end' }}>
+            <CustomPagination />
           </Box>
-        </>
-      }
-      {selectedSession && (
-        <UpdateWorkSessionModal
-          open={modalOpen}
-          onClose={handleCloseModal}
-          onSave={handleUpdateSession}
-          initialData={selectedSession}
-        />
-      )}
-    </>
+        </Box>
+      </>
+    }
+    {selectedSession && (
+      <UpdateWorkSessionModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        onSave={handleUpdateSession}
+        initialData={selectedSession}
+      />
+    )}
+  </Box>
+</Fade>
+
+    
   );
 };
 

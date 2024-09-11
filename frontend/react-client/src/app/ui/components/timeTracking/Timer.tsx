@@ -2,10 +2,10 @@ import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import React, { useEffect } from 'react';
 import { formatDuration, formatDurationToHMS } from '../../../misc/TimeFormatter';
-import { PlayArrow, Stop } from '@mui/icons-material';
+import { Dialpad, PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { getCurrentWorkSession, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { useTimerContext } from '../../../features/timeTracking/TimerProvider';
 
 const Timer: React.FC = () => {
@@ -18,11 +18,15 @@ const Timer: React.FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (timeTracker) {
+    dispatch(getCurrentWorkSession(user!.id)); 
+  }, [])
+
+  useEffect(() => {
+    if (timeTracker.currentSession) {
       setInitialDuration(timeTracker.currentSession?.duration ?? 0);
       setInitialIsTracking(timeTracker.isTracking);
     }
-  }, [timeTracker.currentSession?.duration]);
+  }, [timeTracker.currentSession]);
 
   const handleButtonClick = () => {
     if (isTracking) {

@@ -12,12 +12,6 @@ export default function Root(){
           <Box 
               sx={{ minHeight: '100vh', 
                 display: 'flex', 
-                minwidth: '100vw', 
-                scrollbarWidth: 'none', 
-                '&::-webkit-scrollbar': {
-                    display: 'none',
-                },
-                overflowY: 'scroll'
               }}
               p={2}
               bgcolor={"#DEDEDE"}

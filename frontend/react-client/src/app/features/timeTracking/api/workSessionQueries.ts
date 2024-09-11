@@ -36,6 +36,12 @@ export interface WorkSessionsWithPaginationResponse{
     }
 }
 
+export interface CurrentWorkSessionResponse{
+    timeTrackerQuery: {
+        currentWorkSession: WorkSession | null
+    }
+}
+
 
 
 export const startSessionQuery = (userId: number) => {
@@ -301,6 +307,45 @@ export const getWorkSessionsWithPagination = (payload: WorkSessionPaginationRequ
             }
         }
         }
+    `;
+
+    return query;
+}
+
+export const getCurrentWorkSessionQuery = (payload: number) => {
+    const query = 
+    `
+    query{
+        timeTrackerQuery{
+            currentWorkSession(userId: ${payload}) {
+            id
+            startTime
+            endTime
+            duration
+            createdAt
+            lastUpdatedAt
+            user {
+                id
+                fullName
+                email
+                permissions
+                isActive
+            }
+            editedBy {
+                id
+                fullName
+                email
+                permissions
+                isActive
+            }
+            sessionOrigin {
+                id
+                originName
+                description
+            }
+        }
+    }
+    }
     `;
 
     return query;
