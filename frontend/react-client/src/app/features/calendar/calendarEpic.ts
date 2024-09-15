@@ -9,6 +9,7 @@ import {
     updateCalendarEventQuery, UpdateCalendarEventQueryResponseType
 } from "./api/calendarQueries.ts";
 import {addCalendarEvent, removeCalendarEvent, updateCalendarEvent} from "./calendarSlice.ts";
+import {ShowFailure, ShowSuccess} from "../../misc/SnackBarHelper.ts";
 
 export interface AddCalendarEventInputType {
     startTime: Date,
@@ -29,12 +30,12 @@ export const addCalendarEventEpic = (action$: Observable<Action>) =>
                     if (errors && errors.length > 0) {
                         throw new Error(errors[0]);
                     }
-
+                    ShowSuccess("Work time added.")
                     return addCalendarEvent(data.calendarMutation.createCalendarEvent);
                 }),
                 catchError((error: any) => {
                     console.log(error)
-                    console.log("Error while trying to add calendar event.");
+                    ShowFailure("An error occurred while trying to add the calendar event.");
                     return of();
                 })
             )
@@ -63,10 +64,11 @@ export const updateCalendarEventEpic = (action$: Observable<Action>) =>
                         throw new Error(errors[0]);
                     }
 
+                    ShowSuccess("Work time updated.")
                     return updateCalendarEvent(data.calendarMutation.updateCalendarEvent);
                 }),
                 catchError((error: any) => {
-                    console.log("Error while trying to add calendar event.");
+                    ShowFailure("Error while trying to add calendar event.");
                     return of();
                 })
             )
@@ -88,10 +90,11 @@ export const deleteCalendarEventEpic = (action$: Observable<Action>) =>
                         throw new Error(errors[0]);
                     }
 
+                    ShowSuccess("Work time removed.")
                     return removeCalendarEvent(action.payload);
                 }),
                 catchError((error: any) => {
-                    console.log("Error while trying to add calendar event.");
+                    ShowFailure("Error while trying to add calendar event.");
                     return of();
                 })
             )

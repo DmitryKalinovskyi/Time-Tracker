@@ -1,6 +1,6 @@
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import {Autocomplete, Avatar} from "@mui/material";
+import {Autocomplete, Avatar, CircularProgress} from "@mui/material";
 import {stringAvatar} from "../../../../misc/StringHelper.ts";
 import Typography from "@mui/material/Typography";
 import React, {useEffect, useState} from "react";
@@ -59,8 +59,8 @@ export function UserAutoComplete(props: UserAutoCompleteProps){
         }
     }, [open]);
 
-    return <Autocomplete renderInput={(params) => <TextField {...params} label="Enter user name or email" />}
-                         options={options ?? []}
+    return <Autocomplete options={options ?? []}
+                         renderInput={(params) => <TextField {...params} label="Selected user" />}
                          sx={{width:"500px"}}
                          open={open}
                          loading={loading}

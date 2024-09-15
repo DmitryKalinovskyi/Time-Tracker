@@ -1,4 +1,4 @@
-import {Dialog, DialogActions, DialogContent, DialogTitle, Stack} from "@mui/material";
+import {Alert, Dialog, DialogActions, DialogContent, DialogTitle, Stack} from "@mui/material";
 import dayjs from "dayjs";
 import {TimePicker} from "@mui/x-date-pickers";
 import Button from "@mui/material/Button";
@@ -21,6 +21,8 @@ export function CreateEventDialog(props: CreateEventModalProps){
     const initialEndTime = new Date(props.day);
     initialEndTime.setHours(16, 0);
 
+    const [error, setError] = useState<string | null>(null);
+
     const [eventDetails, setEventDetails] = useState<AddCalendarEventInputType>({
         startTime: initialStartTime,
         endTime: initialEndTime
@@ -28,7 +30,7 @@ export function CreateEventDialog(props: CreateEventModalProps){
 
     const lastClicked = useRef<Date>(new Date());
 
-    const onAddButtonClick = () => {
+    const handleAddButtonClick = () => {
         if (new Date().getTime() - lastClicked < 1300) return;
 
         lastClicked.current = new Date();
@@ -43,30 +45,28 @@ export function CreateEventDialog(props: CreateEventModalProps){
         details.endTime.setHours(eventDetails.endTime.getHours());
         details.endTime.setMinutes(eventDetails.endTime.getMinutes());
 
+        if (details.endTime < details.startTime) {
+            setError("The end time cannot be earlier than the start time. Please select a valid time range.");
+            return;
+        }
+
+        setError(null);
         dispatch(apiAddCalendarEvent(details));
         props.onClose();
     }
 
-    // const updateDay = (newDate: Date|null) => {
-    //     if (newDate) {
-    //         const updatedStartTime = new Date(newDate);
-    //         updatedStartTime.setHours(eventDetails.startTime.getHours(), eventDetails.startTime.getMinutes());
-    //         const updatedEndTime = new Date(newDate);
-    //         updatedEndTime.setHours(eventDetails.endTime.getHours(), eventDetails.endTime.getMinutes());
-    //
-    //         setEventDetails({
-    //             ...eventDetails,
-    //             startTime: updatedStartTime,
-    //             endTime: updatedEndTime
-    //         });
-    //     }
-    // }
+    const handleClose = () => {
+        setError(null);
+        props.onClose();
+    }
 
-    return <Dialog open={props.isOpen} onClose={props.onClose} {...props.props}>
+    return <Dialog open={props.isOpen}
+                   onClose={handleClose} {...props.props}
+    >
             <DialogTitle>
                 {`Add work time for ${dayjs(props.day).format("DD/MM/YYYY")}`}
             </DialogTitle>
-            <DialogContent>
+                <DialogContent sx={{width: "360px"}}>
                 <Stack spacing={2} sx={{pt: 2}}>
                     {/*<TextField fullWidth placeholder="Going to a party."*/}
                     {/*           onChange={(e) => setDayOff({...dayOff, name: e.target.value})}/>*/}
@@ -77,19 +77,24 @@ export function CreateEventDialog(props: CreateEventModalProps){
                     <TimePicker label="From"
                                 value={dayjs(eventDetails.startTime)}
                                 views={['hours', 'minutes']}
-                                onChange={(newTime) => setEventDetails({...eventDetails, startTime: newTime})}
+                                onChange={(newTime) => setEventDetails({...eventDetails, startTime: newTime.toDate()})}
                     />
                     <TimePicker label="To"
                                 value={dayjs(eventDetails.endTime)}
                                 views={['hours', 'minutes']}
-                                onChange={(newTime) => setEventDetails({...eventDetails, endTime: newTime})}
+                                onChange={(newTime) => setEventDetails({...eventDetails, endTime: newTime.toDate()})}
                     />
+                    {error &&
+                        <Alert variant="filled" severity="error">
+                            {error}
+                        </Alert>
+                    }
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.onClose} color="error">Cancel</Button>
+                <Button onClick={handleClose} color="error">Cancel</Button>
                 <Button
-                    onClick={onAddButtonClick}
+                    onClick={handleAddButtonClick}
                         variant="contained"
                 >
                     Add

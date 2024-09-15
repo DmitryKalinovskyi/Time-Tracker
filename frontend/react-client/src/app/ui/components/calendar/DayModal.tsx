@@ -33,14 +33,14 @@ export function DayModal(props: DayModalProps){
     const isYourEvents = useIsMe(selectedUser);
 
     return <>
-        <Dialog open={props.isOpen} onClose={props.onClose}>
+        <Dialog open={props.isOpen}
+                onClose={props.onClose}>
             <DialogTitle>
                 Work time for {dayjs(props.day).format("DD/MM/YYYY")}
             </DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{height: "300px", width: "360px"}}>
                 <List sx={{margin: '0 auto',
                     borderRadius: '8px',
-
                 }}>
                     {events && events.length > 0 ? events.map((event: CalendarEvent, index: number) =>
                         <ListItem
