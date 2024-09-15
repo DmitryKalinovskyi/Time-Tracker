@@ -21,18 +21,21 @@ export function MonthCell(props: MonthCellProps) {
 
     return <div
         onClick={() => props.onClick(props.day)}
-        className={`p-2 h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>
+        className={`p-2 max-h-full h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isSameDay(props.day, today) ? 'bg-blue-100 border-blue-500' : ''}`}>
         {props.month != props.day.getMonth() ?
             <Typography variant="body1" className="text-gray-300">
                 {props.day.getDate()}
             </Typography>
         :
-            <Typography variant="body1"
-                        color={isSameDay(props.day, today) ? "primary" : "textPrimary"}>
-                {props.day.getDate()}
-            </Typography>
+            isSameDay(props.day, today) ?
+                <Chip color="secondary" size="small" label={props.day.getDate()}/>
+                :
+                <Typography variant="body1"
+                            color="textPrimary">
+                    {props.day.getDate()}
+                </Typography>
         }
-        {isSameDay(props.day, today) && <Chip label="Today" color="secondary" size="small" sx={{marginTop: 1}}/>}
+        {/*{isSameDay(props.day, today) && <Chip label="Today" color="secondary" size="small" sx={{marginTop: 1}}/>}*/}
         {events.map((d,index) => <Chip key={index}
                                        color="primary"
                                        size="small"

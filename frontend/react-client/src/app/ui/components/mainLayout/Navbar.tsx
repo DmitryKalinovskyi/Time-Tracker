@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { OnlineStyledBadge } from './OnlineStyledBadge';
 import { logout } from '../../../features/authentification/authSlice';
 import {stringAvatar} from "../../../misc/StringHelper.ts";
+import {Link} from "react-router-dom";
+import useAuth from "../../../hooks/useAuth.ts";
 
 
 
@@ -57,9 +59,12 @@ const Navbar: React.FC = () => {
           },
         }}
       >
-        <MenuItem onClick={handleLogout}>
-          <Typography variant="body2" color="text.secondary">Logout</Typography>
-        </MenuItem>
+            <MenuItem component={Link} to={`user/${user.id}`}>
+              <Typography variant="body2" color="text.secondary">Profile</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+                <Typography variant="body2" color="text.secondary">Logout</Typography>
+            </MenuItem>
       </Menu>
       </Toolbar>
   );
