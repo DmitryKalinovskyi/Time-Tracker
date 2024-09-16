@@ -245,7 +245,7 @@ const FiltersModal = ({
         }}>
           <Typography variant='h6' display={'block'} width={'30%'} >Edited By</Typography>
           <Box width={'70%'}>
-            <UserAutoComplete selectedUser={editedBy} onChange={(user) => console.log(user)}  />
+            {/* <UserAutoComplete selectedUser={editedBy} onChange={(user) => console.log(user)}  /> */}
           </Box>
         </Box>
         
