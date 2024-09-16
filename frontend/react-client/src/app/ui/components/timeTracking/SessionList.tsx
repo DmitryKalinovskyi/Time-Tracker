@@ -21,8 +21,6 @@ import Session from './Session';
 import UpdateWorkSessionModal from './UpdateWorkSessionModal';
 import { WorkSession } from '../../../types/WorkSession';
 import CustomPagination from './CustomPagination';
-import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
-import { SQLOperators } from '../../../enums/SQLOperators';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
@@ -31,22 +29,21 @@ const SessionList: React.FC = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<WorkSession | null>(null);
-  
-
-
+ 
   useEffect(() => {
-    const finalFilters = filters ? 
-    [...filters, {filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] 
-    : [{filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] ;
     const PaginationArgs: WorkSessionPaginationRequest = {
       pageNumber: paginationInfo!.currentPage,
       pageSize: paginationInfo!.pageSize,
       sortCriterias: sorts,
-      filterCriterias: finalFilters
+      filterCriterias: filters
     };
+    if(filters)
+    {
+      dispatch(getSessions(PaginationArgs));
+      dispatch(getTotalDurationByFilters(filters));
+    }
+      
 
-    dispatch(getSessions(PaginationArgs));
-    dispatch(getTotalDurationByFilters(finalFilters));
   }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
 
   const handleOpenModal = (session: WorkSession) => {

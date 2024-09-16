@@ -20,7 +20,7 @@ export interface TimeTrackerType {
     currentSession: WorkSession | null;
     isTracking: boolean;
     filters?: FilterCriteria<WorkSessionFilters, SQLOperators>[];
-    sorts?: SortCriteria<WorkSessionSorts>[];
+    sorts: SortCriteria<WorkSessionSorts>[];
     todayTotalDuration: number;
     workSessionsListingTotalDuration: number;
     loading: boolean;
@@ -57,7 +57,11 @@ const initialState: TimeTrackerType = {
         pageSize: 3
     },
     todayTotalDuration: 0,
-    workSessionsListingTotalDuration: 0
+    workSessionsListingTotalDuration: 0,
+    sorts: 
+        [
+           {sortBy: WorkSessionSorts.StartTime, isAscending: false} 
+        ]
 }
 
 const timeTrackerSlice = createSlice({
@@ -132,14 +136,12 @@ const timeTrackerSlice = createSlice({
         setFilters(state, action: PayloadAction<FilterCriteria<WorkSessionFilters, SQLOperators>[]>)
         {
             state.filters = action.payload;
-            state.paginationInfo!.currentPage = 1;
         },
 
         
         setSorts(state, action: PayloadAction<SortCriteria<WorkSessionSorts>[]>)
         {
             state.sorts = action.payload;
-            state.paginationInfo!.currentPage = 1;
         },
 
         addSessionSuccessful(state, action: PayloadAction<WorkSession>) {

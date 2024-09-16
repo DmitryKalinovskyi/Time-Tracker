@@ -1,5 +1,5 @@
-export interface SortCriteria<TSortFields>
+export interface SortCriteria
 {
-    sortBy: TSortFields
+    sortBy: string
     isAscending: boolean
 }

@@ -1,10 +1,10 @@
 import FilterCriteria from "./FilterCriteria"
 import { SortCriteria } from "./SortCriteria"
 
-export default interface PaginatedRequest<TSortFields, TFilterFields, TOperators>
+export default interface PaginatedRequest
 {
     pageNumber: number
     pageSize?: number
-    sortCriterias?: Array<SortCriteria<TSortFields>>
-    filterCriterias?: Array<FilterCriteria<TFilterFields, TOperators>>
+    sortCriterias?: Array<SortCriteria>
+    filterCriterias?: Array<FilterCriteria>
 }

@@ -179,10 +179,10 @@ export const getTotalDurationEpic = (action$: Observable<Action>) => action$.pip
                     return setError(errors[0].message);
                 }
 
-                if (isToday && data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration) {
+                if (isToday && data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration != null) {
                     return getTodayTotalDurationSuccessful(data.timeTrackerQuery.totalDuration);
                 }
-                else if(!isToday && data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration)
+                else if(!isToday && data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration != null)
                 {
                     return getWorkSessionsListingTotalDurationSuccessful(data.timeTrackerQuery.totalDuration);
                 }

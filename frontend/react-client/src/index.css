@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.rs-picker-popup {
+    z-index: 1300 !important; 
+}
+
+.rs-input-group{
+    border: 1px solid #00101D !important;
+    height: 56px;
+}
+
+.rs-date-range-input{
+    font-size: 1rem !important;
+}

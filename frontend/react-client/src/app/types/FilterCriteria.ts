@@ -1,6 +1,6 @@
-export default interface FilterCriteria<TFilterFields, TOperators>
+export default interface FilterCriteria
 {
-    filterBy: TFilterFields
-    operator: TOperators
+    filterBy: string
+    operator: string
     value: string
 }
