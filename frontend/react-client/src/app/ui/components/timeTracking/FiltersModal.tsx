@@ -130,7 +130,7 @@ const FiltersModal = ({
   const me = useAuth().user!;
   const [filters, setFilters] = useState<FilterCriteria[]>([ ]);
   const [origin, setOrigin] = useState<string[]>([]);
-  const [editedBy, setEditedBy] = useState<User>(me);
+  const [editedBy, setEditedBy] = useState<User | null>();
   
 
   const handleApply = () => {
@@ -245,7 +245,7 @@ const FiltersModal = ({
         }}>
           <Typography variant='h6' display={'block'} width={'30%'} >Edited By</Typography>
           <Box width={'70%'}>
-            <UserAutoComplete selectedUser={editedBy} onChange={(user) => console.log(user)}  />
+            <UserAutoComplete selectedUser={editedBy} onChange={(user) => setEditedBy(user)}  />
           </Box>
         </Box>
         

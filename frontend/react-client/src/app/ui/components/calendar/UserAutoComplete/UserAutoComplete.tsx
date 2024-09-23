@@ -11,7 +11,7 @@ import {usersByEmailOrFullNameQuery, UsersByEmailOrFullNameResponse} from "./api
 import {catchError, map, of} from "rxjs";
 
 interface UserAutoCompleteProps{
-    selectedUser: User,
+    selectedUser: User | null,
     onChange: (user: User | null) => void
 }
 export function UserAutoComplete(props: UserAutoCompleteProps){
