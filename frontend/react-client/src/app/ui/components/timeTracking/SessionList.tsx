@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, getTotalDurationByFilters, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -40,7 +40,7 @@ const SessionList: React.FC = () => {
     if(filters)
     {
       dispatch(getSessions(PaginationArgs));
-      dispatch(getTotalDurationByFilters(filters));
+      //dispatch(getTotalDurationByFilters(filters));
     }
       
 

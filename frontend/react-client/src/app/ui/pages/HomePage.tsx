@@ -4,10 +4,8 @@ import { Box } from "@mui/material";
 import StyledButton from "../components/timeTracking/StyledButton.tsx";
 import { useState } from "react";
 import FilterCriteria from "../../types/FilterCriteria.ts";
-import { WorkSessionFilters } from "../../enums/WorkSessionFilters.ts";
 import FiltersModal from "../components/timeTracking/FiltersModal.tsx";
 import { SortCriteria } from "../../types/SortCriteria.ts";
-import { WorkSessionSorts } from "../../enums/WorkSessionSorts.ts";
 import SortsModal from "../components/timeTracking/SortsModal.tsx";
 import { useDispatch } from "react-redux";
 import { setFilters, setSorts } from "../../features/timeTracking/timeTrackingSlice.ts";
@@ -39,6 +37,7 @@ export default function HomePage() {
   const handleApplyFilters = (filters: FilterCriteria[]) => {
 
     console.log(filters);
+    dispatch(setFilters(filters));
     handleCloseFilterModal();
   };
 

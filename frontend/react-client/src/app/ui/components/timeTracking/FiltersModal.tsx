@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import FilterCriteria from '../../../types/FilterCriteria';
 import { DateRangePicker } from 'rsuite';
-import { addDays, addMonths, endOfMonth, endOfWeek, setDate, startOfMonth, startOfWeek } from 'date-fns';
+import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import { UserAutoComplete } from '../calendar/UserAutoComplete/UserAutoComplete';
 import User from '../../../types/User';
 import useAuth from '../../../hooks/useAuth';
@@ -138,6 +138,8 @@ const FiltersModal = ({
   const [durationOperator, setDurationOperator] = useState<string>();
   const [durationValue, setDurationValue] = useState<string>();
   const [dateRange, setDateRange] = useState<[Date, Date]>();
+  const me = useAuth().user;
+
   const handleApply = () => {
     let finalFilters: FilterCriteria[] = [];
     if(dateRange)
@@ -185,6 +187,13 @@ const FiltersModal = ({
         }
       )
     }
+    finalFilters.push(
+      {
+        filterBy: "USER_ID",
+        operator: "EQUAL",
+        value: me!.id.toString()
+      }
+    )
     onApplyFilters(finalFilters);
     onClose();
   };

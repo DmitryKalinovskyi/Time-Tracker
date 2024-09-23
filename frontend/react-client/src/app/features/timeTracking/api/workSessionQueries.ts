@@ -1,5 +1,3 @@
-import { SQLOperators } from "../../../enums/SQLOperators";
-import { WorkSessionFilters } from "../../../enums/WorkSessionFilters";
 import FilterCriteria from "../../../types/FilterCriteria";
 import { WorkSession } from "../../../types/WorkSession";
 import { AddSessionPayload, UpdateSessionPayload, WorkSessionPaginationRequest, WorkSessionPaginationResult } from "../timeTrackingSlice";
@@ -360,7 +358,7 @@ export const getCurrentWorkSessionQuery = (payload: number) => {
     return query;
 }
 
-export const getTotalDurationByFiltersQuery = (payload: Array<FilterCriteria<WorkSessionFilters, SQLOperators>>) => {
+export const getTotalDurationByFiltersQuery = (payload: Array<FilterCriteria>) => {
     const query = 
     `
     query{
