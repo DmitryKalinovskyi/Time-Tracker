@@ -61,7 +61,7 @@ export function UserAutoComplete(props: UserAutoCompleteProps){
 
     return <Autocomplete renderInput={(params) => <TextField {...params} label="Enter user name or email" />}
                          options={options ?? []}
-                         sx={{width:"500px"}}
+                         sx={{width:"100%"}}
                          open={open}
                          loading={loading}
                          value={props.selectedUser}
