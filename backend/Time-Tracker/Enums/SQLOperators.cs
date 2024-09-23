@@ -7,6 +7,10 @@
         Like,
         Contains,
         GreaterThan,
-        LessThen
+        LessThen,
+        GreaterThanOrEqual,
+        LessThanOrEqual,
+        In,
+        Between
     }
 }

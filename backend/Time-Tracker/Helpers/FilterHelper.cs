@@ -36,7 +36,9 @@ namespace Time_Tracker.Helpers
                 var clause = ((SQLOperators)(object)filterCriteria.Operator)
                     .ToSqlClause(fieldName, parameterName);
                 clauses.Add(clause);
-                var parameterValue = (SQLOperators)(object)filterCriteria.Operator == SQLOperators.Contains ? $"\"{filterCriteria.Value}\"" : filterCriteria.Value;
+
+                var parameterValue = filterCriteria.Value;
+
                 parameters.Add(parameterName, parameterValue);
             }
 

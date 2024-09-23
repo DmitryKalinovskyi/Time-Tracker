@@ -144,9 +144,9 @@ const FiltersModal = ({
     {
       let formatedDateRange = "";
       if(dateRange[0].toDateString() == dateRange[1].toDateString())
-        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ' ~ ' + addDays(dateRange[0], 2).toISOString().split('T')[0]; 
+        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ',' + addDays(dateRange[0], 2).toISOString().split('T')[0]; 
       else
-        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ' ~ ' + addDays(dateRange[1], 1).toISOString().split('T')[0]; 
+        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ',' + addDays(dateRange[1], 1).toISOString().split('T')[0]; 
       finalFilters.push(
         {
           filterBy: "START_TIME",
