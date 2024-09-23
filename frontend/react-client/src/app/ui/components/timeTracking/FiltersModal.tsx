@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import FilterCriteria from '../../../types/FilterCriteria';
 import { DateRangePicker } from 'rsuite';
-import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
+import { addDays, addMonths, endOfMonth, endOfWeek, setDate, startOfMonth, startOfWeek } from 'date-fns';
 import { UserAutoComplete } from '../calendar/UserAutoComplete/UserAutoComplete';
 import User from '../../../types/User';
 import useAuth from '../../../hooks/useAuth';
@@ -112,6 +112,12 @@ const origins = [
   { id: "3", name: "Edited" }
 ];
 
+const durationLengthOperators = [
+  {title:  "=", apiTitle: "EQUAL"},
+  {title: ">=", apiTitle: "GREATER_THAN_OR_EQUAL"},
+  {title: "<=", apiTitle: "LESS_THAN_OR_EQUAL"},
+]
+
 function getStyles(id: string , personName: readonly string[], theme: Theme) {
   return {
     fontWeight: personName.includes(id)
@@ -127,20 +133,64 @@ const FiltersModal = ({
   onApplyFilters,
 }: FiltersModalProps): JSX.Element => {
   const theme = useTheme();
-  const me = useAuth().user!;
-  const [filters, setFilters] = useState<FilterCriteria[]>([ ]);
   const [origin, setOrigin] = useState<string[]>([]);
-  const [editedBy, setEditedBy] = useState<User | null>();
-  
-
+  const [editedBy, setEditedBy] = useState<User | null>(null);
+  const [durationOperator, setDurationOperator] = useState<string>();
+  const [durationValue, setDurationValue] = useState<string>();
+  const [dateRange, setDateRange] = useState<[Date, Date]>();
   const handleApply = () => {
-    onApplyFilters(filters);
+    let finalFilters: FilterCriteria[] = [];
+    if(dateRange)
+    {
+      let formatedDateRange = "";
+      if(dateRange[0].toDateString() == dateRange[1].toDateString())
+        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ' ~ ' + addDays(dateRange[0], 2).toISOString().split('T')[0]; 
+      else
+        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ' ~ ' + addDays(dateRange[1], 1).toISOString().split('T')[0]; 
+      finalFilters.push(
+        {
+          filterBy: "START_TIME",
+          operator: "BETWEEN",
+          value: formatedDateRange
+        }
+      )
+    }
+    if(origin.toString())
+    {
+      finalFilters.push(
+        {
+          filterBy: "SESSION_ORIGIN_ID",
+          operator: "IN",
+          value: origin.join(',')
+        }
+      )
+    }
+    if(editedBy)
+    {
+      finalFilters.push(
+        {
+          filterBy: "EDITED_BY",
+          operator: "EQUAL",
+          value: editedBy.id.toString()
+        }
+      )
+    }
+    if(durationOperator && durationValue)
+    {
+      finalFilters.push(
+        {
+          filterBy: "DURATION",
+          operator: durationOperator,
+          value: durationValue
+        }
+      )
+    }
+    onApplyFilters(finalFilters);
     onClose();
   };
 
   const handleOriginChange = (event: SelectChangeEvent<typeof origin>) => {
     const value = event.target.value;
-    console.log(value);
     setOrigin(typeof value === 'string' ? value.split(',') : value,);
   };
 
@@ -188,11 +238,12 @@ const FiltersModal = ({
           <Typography variant='h6' display={'block'} width={'30%'} >Date Range</Typography>
           <DateRangePicker 
               ranges={predefinedRanges} 
+              value={dateRange}
               format="dd.MM.yyyy" 
               character=' - ' 
               style={{width: '70%', height: '56px'}}
               placeholder="Select Date Range"
-              onOk={(date: [Date, Date]) => console.log(date[0].toISOString().split('T')[0] + ' ~ ' + date[1].toISOString().split('T')[0] )}
+              onOk={(date: [Date, Date]) => setDateRange(date)}
                />
         </Box>
 
@@ -247,6 +298,54 @@ const FiltersModal = ({
           <Box width={'70%'}>
             <UserAutoComplete selectedUser={editedBy} onChange={(user) => setEditedBy(user)}  />
           </Box>
+        </Box>
+
+        <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'stretch',
+          alignItems: 'stretch',
+          mt: '1rem',
+          color: '#00101D',
+          height: '56px'
+        }}>
+          <Typography variant='h6' display={'block'} width={'30%'} >Duration</Typography>
+          <FormControl sx={{
+            width: '70%', 
+            height: '56px', 
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '2rem'}}>
+            <InputLabel id="duration-operator-label">Operator</InputLabel>
+            <Select
+            id="duration-operator-selector"
+            labelId='duration-operator-label'
+            label="Operator"
+            sx={{
+              width: "34%"
+            }}
+            value={durationOperator}
+            onChange={(event) => setDurationOperator(event.target.value)}>
+              {durationLengthOperators.map((dur) => (
+                <MenuItem
+                  key={dur.apiTitle}
+                  value={dur.apiTitle}
+                >
+                  {dur.title}
+                </MenuItem>
+              ))}
+            </Select>
+            <TextField 
+            label="Value" 
+            variant='outlined'
+            value={durationValue}
+            onChange={(event) => setDurationValue(event.target.value)}
+            sx={{
+              width: '63%',
+            
+            }} />
+          </FormControl>
+          
         </Box>
         
 

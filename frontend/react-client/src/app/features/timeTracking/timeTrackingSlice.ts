@@ -3,8 +3,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WorkSession} from "../../types/WorkSession";
 import PaginatedRequest from "../../types/PaginatedRequest";
 import { WorkSessionSorts } from "../../enums/WorkSessionSorts";
-import { WorkSessionFilters } from "../../enums/WorkSessionFilters";
-import { SQLOperators } from "../../enums/SQLOperators";
 import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
@@ -19,8 +17,8 @@ export interface TimeTrackerType {
     }
     currentSession: WorkSession | null;
     isTracking: boolean;
-    filters?: FilterCriteria<WorkSessionFilters, SQLOperators>[];
-    sorts: SortCriteria<WorkSessionSorts>[];
+    filters?: FilterCriteria[];
+    sorts: SortCriteria[];
     todayTotalDuration: number;
     workSessionsListingTotalDuration: number;
     loading: boolean;
@@ -42,7 +40,7 @@ export interface UpdateSessionPayload{
     endTime: Date;
 }
 
-export type WorkSessionPaginationRequest = PaginatedRequest<WorkSessionSorts, WorkSessionFilters, SQLOperators>;
+export type WorkSessionPaginationRequest = PaginatedRequest;
 
 export type WorkSessionPaginationResult = PaginatedResult<WorkSession>;
 
@@ -110,7 +108,7 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        getTotalDurationByFilters(state, _action: PayloadAction<Array<FilterCriteria<WorkSessionFilters, SQLOperators>>>)
+        getTotalDurationByFilters(state, _action: PayloadAction<Array<FilterCriteria>>)
         {
             state.loading = true;
             state.error = null;
@@ -133,13 +131,13 @@ const timeTrackerSlice = createSlice({
             state.paginationInfo!.currentPage = action.payload;
         },
         
-        setFilters(state, action: PayloadAction<FilterCriteria<WorkSessionFilters, SQLOperators>[]>)
+        setFilters(state, action: PayloadAction<FilterCriteria[]>)
         {
             state.filters = action.payload;
         },
 
         
-        setSorts(state, action: PayloadAction<SortCriteria<WorkSessionSorts>[]>)
+        setSorts(state, action: PayloadAction<SortCriteria[]>)
         {
             state.sorts = action.payload;
         },
