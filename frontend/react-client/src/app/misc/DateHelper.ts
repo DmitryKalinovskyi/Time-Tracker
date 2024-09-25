@@ -10,7 +10,7 @@ export function getDaysInMonth(year: number, month: number) {
 }
 
 export function toIsoString(date: Date) {
-    console.log(date);
+    console.log("DATE HELPER:" + date);
     const tzo = -date.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
         pad = function(num: number) {

@@ -5,41 +5,39 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  TextField,
   Box,
   CircularProgress,
+  Typography,
 } from '@mui/material';
 import { WorkSession } from '../../../types/WorkSession';
-import { toIsoString } from '../../../misc/DateHelper';
+import { DatePicker } from 'rsuite';
+import useAuth from '../../../hooks/useAuth';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { RootState } from '../../../store';
 
 interface UpdateWorkSessionModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (updatedSession: WorkSession) => void;
   initialData: WorkSession;
 }
 
-const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, onSave, initialData }) => {
-  const [session, setSession] = useState<WorkSession>({
-    ...initialData,
-    startTime: new Date(toIsoString(new Date(initialData.startTime))),
-    endTime: new Date(toIsoString(new Date(initialData.endTime!))),
-  });
-  const [isSaving, setIsSaving] = useState(false);
+const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, initialData }) => {
+  const [session, setSession] = useState<WorkSession>(initialData);
   const [errors, setErrors] = useState<{ startTime?: string; endTime?: string }>({});
+  const { user: me } = useAuth();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state: RootState) => state.timeTracker);
 
   useEffect(() => {
-    setSession({
-      ...initialData,
-      startTime: new Date(toIsoString(new Date(initialData.startTime))),
-      endTime: new Date(toIsoString(new Date(initialData.endTime!))), 
-    });
+    setSession(initialData);
     setErrors({});
   }, [initialData]);
 
-  const validate = () => {
-    let tempErrors: { startTime?: string; endTime?: string } = {};
 
+
+  const validate = () => {
+    const tempErrors: { startTime?: string; endTime?: string } = {};
     const currentTime = new Date();
     const startTime = new Date(session.startTime);
     const endTime = new Date(session.endTime!);
@@ -59,7 +57,6 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
       if (durationInHours > 8) {
         tempErrors.endTime = "Session duration cannot be longer than 8 hours";
       }
-      tempErrors.endTime = "Session duration cannot be longer than 8 hours";
     }
 
     setErrors(tempErrors);
@@ -68,72 +65,68 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
 
   const handleSave = () => {
     if (validate()) {
-      setIsSaving(true);
-
-      const updatedSession: WorkSession = {
-        ...session,
-        startTime: new Date(toIsoString(new Date(session.startTime))),
-        endTime: new Date(toIsoString(new Date(session.endTime!))),
-      };
-
-      onSave(updatedSession);
+      dispatch(updateSession({
+        editorId: me!.id,
+        id: session.id,
+        startTime: session.startTime.toISOString() as unknown as Date,
+        endTime: session.endTime!.toISOString() as unknown as Date
+      }));
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSession({
-      ...session,
-      [name]: value,
-    });
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Update Work Session</DialogTitle>
       <DialogContent>
-        {isSaving && (
+        {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
             <CircularProgress sx={{ color: '#00101D' }} />
           </Box>
         )}
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-          <TextField
-            label="Start Time"
-            name="startTime"
-            type="datetime-local"
-            value={session.startTime}
-            onChange={handleChange}
-            error={!!errors.startTime}
-            helperText={errors.startTime}
-            fullWidth
-            sx={{ mt: 2 }}
-            required
-          />
-          <TextField
-            label="End Time"
-            name="endTime"
-            type="datetime-local"
-            value={session.endTime}
-            onChange={handleChange}
-            error={!!errors.endTime}
-            helperText={errors.endTime}
-            fullWidth
-            required
-          />
+        <Box sx={{ display: 'flex', mt: '1rem', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+          <Box mt={'1rem'} width={'100%'} display={'flex'}>
+            <Typography variant='h6' sx={{ verticalAlign: 'middle' }} width={'30%'}>Start Time</Typography>
+            <DatePicker 
+              value={session.startTime}
+              format="dd.MM.yyyy HH:mm" 
+              style={{ width: '70%' }}
+              placeholder="Select Start Time"
+              onOk={(date) => setSession({ ...session, startTime: date })}
+            />
+          </Box>
+          <Box width={'100%'} display={'flex'}>
+            <Typography variant='h6' sx={{ verticalAlign: 'middle' }} width={'30%'}>End Time</Typography>
+            <DatePicker 
+              value={session.endTime}
+              format="dd.MM.yyyy HH:mm"
+              style={{ width: '70%' }}
+              placeholder="Select End Time"
+              onOk={(date) => setSession({ ...session, endTime: date })}
+            />
+          </Box>
+          {errors.startTime && (
+            <Typography color="error" variant="body2">
+              {errors.startTime}
+            </Typography>
+          )}
+          {errors.endTime && (
+            <Typography color="error" variant="body2">
+              {errors.endTime}
+            </Typography>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary" disabled={isSaving}>
+        <Button onClick={onClose} color="primary" disabled={loading}>
           Cancel
         </Button>
         <Button
           onClick={handleSave}
           color="primary"
           variant="contained"
-          disabled={isSaving}
+          disabled={loading}
         >
-          {isSaving ? 'Saving...' : 'Save'}
+          {loading ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

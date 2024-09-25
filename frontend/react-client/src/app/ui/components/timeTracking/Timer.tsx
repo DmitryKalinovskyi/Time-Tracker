@@ -5,7 +5,7 @@ import { formatDuration, formatDurationToHMS } from '../../../misc/TimeFormatter
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { getCurrentWorkSession, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { getCurrentWorkSession, getTodayTotalDuration, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { useTimerContext } from '../../../features/timeTracking/TimerProvider';
 
 const Timer: React.FC = () => {
@@ -19,6 +19,7 @@ const Timer: React.FC = () => {
 
   useEffect(() => {
     dispatch(getCurrentWorkSession(user!.id));
+    dispatch(getTodayTotalDuration(user!.id));
   }, [dispatch]);
 
   useEffect(() => {
@@ -27,6 +28,11 @@ const Timer: React.FC = () => {
       setInitialIsTracking(timeTracker.isTracking);
     }
   }, [timeTracker.currentSession]);
+
+  useEffect(() => {
+    if(!timeTracker.isTracking)
+      dispatch(getTodayTotalDuration(user!.id));
+  }, [timeTracker.isTracking])
 
   const handleButtonClick = () => {
     if (isTracking) {

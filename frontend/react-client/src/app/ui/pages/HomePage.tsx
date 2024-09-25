@@ -35,8 +35,6 @@ export default function HomePage() {
 
   // Handle the filters when the modal "Apply" button is clicked
   const handleApplyFilters = (filters: FilterCriteria[]) => {
-
-    console.log(filters);
     dispatch(setFilters(filters));
     handleCloseFilterModal();
   };

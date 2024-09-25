@@ -23,6 +23,7 @@ import { DateRangePicker } from 'rsuite';
 import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import { UserAutoComplete } from '../calendar/UserAutoComplete/UserAutoComplete';
 import User from '../../../types/User';
+import { DateRange } from 'rsuite/esm/DateRangePicker';
 import useAuth from '../../../hooks/useAuth';
 
 interface FiltersModalProps {
@@ -135,10 +136,10 @@ const FiltersModal = ({
   const theme = useTheme();
   const [origin, setOrigin] = useState<string[]>([]);
   const [editedBy, setEditedBy] = useState<User | null>(null);
-  const [durationOperator, setDurationOperator] = useState<string>();
-  const [durationValue, setDurationValue] = useState<string>();
-  const [dateRange, setDateRange] = useState<[Date, Date]>();
-  const me = useAuth().user;
+  const [durationOperator, setDurationOperator] = useState<string | null>();
+  const [durationValue, setDurationValue] = useState<string | null>();
+  const [dateRange, setDateRange] = useState<DateRange | null>();
+  const me = useAuth().user!;
 
   const handleApply = () => {
     let finalFilters: FilterCriteria[] = [];
@@ -146,7 +147,7 @@ const FiltersModal = ({
     {
       let formatedDateRange = "";
       if(dateRange[0].toDateString() == dateRange[1].toDateString())
-        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ',' + addDays(dateRange[0], 2).toISOString().split('T')[0]; 
+        formatedDateRange = dateRange[0].toISOString().split('T')[0] + ',' + addDays(dateRange[0], 1).toISOString().split('T')[0]; 
       else
         formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ',' + addDays(dateRange[1], 1).toISOString().split('T')[0]; 
       finalFilters.push(
@@ -189,11 +190,11 @@ const FiltersModal = ({
     }
     finalFilters.push(
       {
-        filterBy: "USER_ID",
-        operator: "EQUAL",
-        value: me!.id.toString()
+          filterBy: "USER_ID",
+          operator: "EQUAL",
+          value: me.id.toString()
       }
-    )
+  )
     onApplyFilters(finalFilters);
     onClose();
   };
@@ -203,174 +204,116 @@ const FiltersModal = ({
     setOrigin(typeof value === 'string' ? value.split(',') : value,);
   };
 
+  // Clear handlers
+  const handleClearDateRange = () => setDateRange(predefinedRanges[4].value());
+  const handleClearOrigin = () => setOrigin([]);
+  const handleClearEditedBy = () => setEditedBy(null);
+  const handleClearDuration = () => {
+    setDurationOperator('');
+    setDurationValue('');
+  };
+
   return (
     <Dialog 
     open={open} 
     onClose={onClose} 
     fullWidth 
-    maxWidth="sm"
-    PaperProps={{
-      sx: {
-        color: '#00101D',
-        borderColor: '#00101D',
-        borderWidth: 2,
-        borderStyle: 'solid',
-      },
-    }}>
-      <DialogTitle
-      sx={{
-        color: '#00101D',
-        borderBottom: '1px solid #00101D',
-      }}
-      >
-          Add Filters
+    maxWidth="md"
+    PaperProps={{ sx: { color: '#00101D', borderColor: '#00101D', borderWidth: 2, borderStyle: 'solid' } }}>
+      <DialogTitle sx={{ color: '#00101D', borderBottom: '1px solid #00101D' }}>
+        Add Filters
       </DialogTitle>
 
-      <DialogContent
-      sx={{
-        display: 'flex',
-        justifyContent: 'stretch',
-        alignItems: 'stretch',
-        flexDirection: 'column',
-        border: "1px solid black",
-        m: '1rem',
-        px: '1rem'
-      }}>
-        <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'stretch',
-          alignItems: 'stretch',
-          mt: '1rem',
-          color: '#00101D'
-        }}>
-          <Typography variant='h6' display={'block'} width={'30%'} >Date Range</Typography>
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', border: "1px solid black", m: '1rem', px: '1rem' }}>
+        {/* Date Range Filter */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
+          <Typography variant='h6' width={'30%'}>Date Range</Typography>
           <DateRangePicker 
-              ranges={predefinedRanges} 
-              value={dateRange}
-              format="dd.MM.yyyy" 
-              character=' - ' 
-              style={{width: '70%', height: '56px'}}
-              placeholder="Select Date Range"
-              onOk={(date: [Date, Date]) => setDateRange(date)}
-               />
+            ranges={predefinedRanges} 
+            value={dateRange}
+            format="dd.MM.yyyy" 
+            style={{ width: '60%', height: '56px' }}
+            placeholder="Select Date Range"
+            onOk={(date: [Date, Date]) => setDateRange(date)}
+            defaultValue={predefinedRanges[4].value()}
+          />
+          <Button onClick={handleClearDateRange} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
 
-        <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'stretch',
-          alignItems: 'stretch',
-          mt: '1rem',
-          color: '#00101D'
-        }}>
-          <Typography variant='h6' display={'block'} width={'30%'} sx={{verticalAlign: 'middle'}} >Origin</Typography>
-          <FormControl sx={{width: '70%', height: '56px'}}>
+        {/* Origin Filter */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
+          <Typography variant='h6' width={'30%'}>Origin</Typography>
+          <FormControl sx={{ width: '60%' }}>
             <InputLabel id="multiple-origin-label">Origin</InputLabel>
             <Select
-            id="session-origin-selector"
-            labelId='multiple-origin-label'
-            multiple
-            value={origin}
-            onChange={handleOriginChange}
-            input={<OutlinedInput id="origin-chip" label="Origin" />} 
-            renderValue={(selected) => (
-              <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
-                {selected.map((value) => (
-                  <Chip key={value} label={origins.find((org) => org.id === value)!.name} />
-                ))}
-              </Box>
-            )}>
+              id="session-origin-select"
+              labelId='multiple-origin-label'
+              multiple
+              value={origin}
+              onChange={handleOriginChange}
+              input={<OutlinedInput id="origin-chip" label="Origin" />} 
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={origins.find((org) => org.id === value)!.name} />
+                  ))}
+                </Box>
+              )}>
               {origins.map((org) => (
-                <MenuItem
-                  key={org.id}
-                  value={org.id}
-                  style={getStyles(org.id, origin, theme)}
-                >
+                <MenuItem key={org.id} value={org.id} style={getStyles(org.id, origin, theme)}>
                   {org.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+          <Button onClick={handleClearOrigin} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
 
-        <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'stretch',
-          alignItems: 'stretch',
-          mt: '1rem',
-          color: '#00101D',
-          height: '56px'
-        }}>
-          <Typography variant='h6' display={'block'} width={'30%'} >Edited By</Typography>
-          <Box width={'70%'}>
-            <UserAutoComplete selectedUser={editedBy} onChange={(user) => setEditedBy(user)}  />
+        {/* Edited By Filter */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
+          <Typography variant='h6' width={'30%'}>Edited By</Typography>
+          <Box width={'60%'}>
+            <UserAutoComplete selectedUser={editedBy} onChange={(user) => setEditedBy(user)} />
           </Box>
+          <Button onClick={handleClearEditedBy} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
 
-        <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'stretch',
-          alignItems: 'stretch',
-          mt: '1rem',
-          color: '#00101D',
-          height: '56px'
-        }}>
-          <Typography variant='h6' display={'block'} width={'30%'} >Duration</Typography>
-          <FormControl sx={{
-            width: '70%', 
-            height: '56px', 
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '2rem'}}>
-            <InputLabel id="duration-operator-label">Operator</InputLabel>
-            <Select
-            id="duration-operator-selector"
-            labelId='duration-operator-label'
+        {/* Duration Filter */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
+          <Typography variant='h6' width={'30%'}>Duration</Typography>
+          <FormControl sx={{ width: '60%', display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+          <InputLabel id="duration-operator-select-label">Operator</InputLabel>
+          <Select
+            id="duration-operator-select"
+            labelId="duration-operator-select-label"
             label="Operator"
-            sx={{
-              width: "34%"
-            }}
+            sx={{ width: '35%' }}
             value={durationOperator}
-            onChange={(event) => setDurationOperator(event.target.value)}>
-              {durationLengthOperators.map((dur) => (
-                <MenuItem
-                  key={dur.apiTitle}
-                  value={dur.apiTitle}
-                >
-                  {dur.title}
-                </MenuItem>
-              ))}
-            </Select>
+            onChange={(event) => setDurationOperator(event.target.value)}
+          >
+            <MenuItem aria-label="None" value="" />
+            {durationLengthOperators.map((dur) => (
+              <MenuItem key={dur.apiTitle} value={dur.apiTitle}>
+                {dur.title}
+              </MenuItem>
+            ))}
+          </Select>
             <TextField 
-            label="Value" 
-            variant='outlined'
-            value={durationValue}
-            onChange={(event) => setDurationValue(event.target.value)}
-            sx={{
-              width: '63%',
-            
-            }} />
+              id="duration-value"
+              label="Value" 
+              variant='outlined'
+              value={durationValue}
+              onChange={(event) => setDurationValue(event.target.value)}
+              sx={{ width: '65%' }}
+            />
           </FormControl>
-          
+          <Button onClick={handleClearDuration} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
-        
-
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} sx={{
-            color: '#00101D',
-            '&:hover': { color: '#003366' },
-          }}>Cancel</Button>
-        <Button onClick={handleApply} variant="contained" sx={{
-            backgroundColor: '#00101D',
-            '&:hover': {
-              backgroundColor: '#003366',
-            },
-          }}>
+        <Button onClick={onClose} sx={{ color: '#00101D' }}>Cancel</Button>
+        <Button onClick={handleApply} variant="contained" sx={{ backgroundColor: '#00101D' }}>
           Apply
         </Button>
       </DialogActions>

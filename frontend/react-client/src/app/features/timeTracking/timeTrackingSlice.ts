@@ -6,7 +6,7 @@ import { WorkSessionSorts } from "../../enums/WorkSessionSorts";
 import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
-
+import { addDays } from "date-fns";
 export interface TimeTrackerType {
     workSessions: Array<WorkSession>;
     paginationInfo?: {
@@ -108,12 +108,16 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        getTotalDurationByFilters(state, _action: PayloadAction<Array<FilterCriteria>>)
+        getWorkSessionsListingTotalDuration(state, _action: PayloadAction<Array<FilterCriteria>>)
         {
             state.loading = true;
             state.error = null;
         },
-
+        getTodayTotalDuration(state, _action: PayloadAction<number>)
+        {
+            state.loading = true;
+            state.error = null;
+        },
         getTodayTotalDurationSuccessful(state, action: PayloadAction<number>)
         {
             state.loading = false;
@@ -133,6 +137,13 @@ const timeTrackerSlice = createSlice({
         
         setFilters(state, action: PayloadAction<FilterCriteria[]>)
         {
+            if(action.payload.length == 1)
+                action.payload.push(
+              {
+                filterBy: "START_TIME",
+                operator: "BETWEEN",
+                value: new Date().toISOString().split('T')[0] + ',' + addDays(new Date(), 1).toISOString().split('T')[0]
+              });
             state.filters = action.payload;
         },
 
@@ -171,7 +182,6 @@ const timeTrackerSlice = createSlice({
 
         getSessionsSuccessful(state, action: PayloadAction<WorkSessionPaginationResult>)
         {
-            console.log(action.payload);
             state.loading = false;
             state.error = null;
             state.workSessions = action.payload.results;
@@ -197,7 +207,6 @@ const timeTrackerSlice = createSlice({
 
         getCurrentWorkSessionSuccessful(state, action: PayloadAction<WorkSession | null>)
         {
-            console.log(action.payload);
             state.loading = false;
             if(action.payload)
             {
@@ -253,9 +262,10 @@ export const {
     setSorts,
     getCurrentWorkSession,
     getCurrentWorkSessionSuccessful,
-    getTotalDurationByFilters,
     getTodayTotalDurationSuccessful,
-    getWorkSessionsListingTotalDurationSuccessful
+    getWorkSessionsListingTotalDurationSuccessful,
+    getWorkSessionsListingTotalDuration,
+    getTodayTotalDuration
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;
