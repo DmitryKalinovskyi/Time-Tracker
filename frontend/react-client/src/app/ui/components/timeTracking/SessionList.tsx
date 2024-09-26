@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, setPage, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -87,6 +87,8 @@ const SessionList: React.FC = () => {
   
   const handleDeleteSession = (sessionId: number) => {
     dispatch(deleteSession(sessionId));
+    if(!loading && !error)
+      dispatch(getSessions(getCurrentPagArgs()));
   };
 
   if (loading && !modalOpen) return (

@@ -113,13 +113,16 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                     var inputSession = context.GetArgument<WorkSession>("input");
                     var editorId = context.GetArgument<int>("editorId");
                     var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(inputSession.Id);
-                    
+
                     if (currentWorkSession is null)
                     {
                         context.Errors.Add(new ExecutionError($"Work session with id = {inputSession.Id} does not exist."));
                         return null;
                     }
-                    else if (!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
+                    else inputSession.UserId = currentWorkSession.UserId;
+
+
+                    if (!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
                     {
                         context.Errors.Add(new ExecutionError("Work session time overlaps with an existing one"));
                         return null;

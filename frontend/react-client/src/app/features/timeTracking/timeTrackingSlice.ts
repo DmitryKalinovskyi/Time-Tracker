@@ -164,13 +164,9 @@ const timeTrackerSlice = createSlice({
             });
         },
         
-        deleteSessionSuccessful(state, action: PayloadAction<number>) {
+        deleteSessionSuccessful(state, _action: PayloadAction<number>) {
             state.loading = false;
             state.error = null;
-    
-            state.workSessions = state.workSessions.filter(session => 
-                session.id !== action.payload
-            );
         },
 
         updateSessionSuccessful(state, _action: PayloadAction<WorkSession>)
