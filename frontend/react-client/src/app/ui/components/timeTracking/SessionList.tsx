@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, setPage, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, setPage, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -27,7 +27,6 @@ import { isTodayStartTimeFilter } from '../../../misc/FiltersHelper';
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
   const { isTracking, workSessions, filters, paginationInfo, sorts, loading, error, workSessionsListingTotalDuration } = useSelector((state: RootState) => state.timeTracker);
-  const user = useSelector((state: RootState) => state.auth.user);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<WorkSession | null>(null);

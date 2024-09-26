@@ -309,6 +309,7 @@ const FiltersModal = ({
           </FormControl>
           <Button onClick={handleClearDuration} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
+        
       </DialogContent>
 
       <DialogActions>
