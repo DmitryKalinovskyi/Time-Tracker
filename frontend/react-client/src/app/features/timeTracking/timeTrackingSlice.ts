@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
 import PaginatedRequest from "../../types/PaginatedRequest";
-import { WorkSessionSorts } from "../../enums/WorkSessionSorts";
 import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
@@ -58,7 +57,7 @@ const initialState: TimeTrackerType = {
     workSessionsListingTotalDuration: 0,
     sorts: 
         [
-           {sortBy: WorkSessionSorts.StartTime, isAscending: false} 
+           {sortBy: "START_TIME", isAscending: false} 
         ]
 }
 

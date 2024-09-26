@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -13,9 +13,6 @@ import {
   MenuItem,
 } from '@mui/material';
 import { SortCriteria } from '../../../types/SortCriteria';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store';
-import FilterCriteria from '../../../types/FilterCriteria';
 
 interface SortsModalProps
 {
