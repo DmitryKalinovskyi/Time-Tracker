@@ -149,7 +149,7 @@ export function CalendarViewByMonth(){
             {/*calendar cells*/}
             <Grid sx={{height: "100%"}} container columns={7}>
                 {days.map((day,index) =>
-                    <Grid item xs={1} key={index} sx={{height: `${100/weeks}%`}}>
+                    <Grid item xs={1} key={index} sx={{height: `${100/weeks}%`, boxSizing: 'border-box'}}>
                         <MonthCell day={day} month={calendarDate.month} events={selectedUser.calendarEvents} onClick={onMonthClick}/>
                     </Grid>
                 )}
