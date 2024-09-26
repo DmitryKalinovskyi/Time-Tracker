@@ -19,7 +19,6 @@ const Timer: React.FC = () => {
 
   useEffect(() => {
     dispatch(getCurrentWorkSession(user!.id));
-    dispatch(getTodayTotalDuration(user!.id));
   }, [dispatch]);
 
   useEffect(() => {

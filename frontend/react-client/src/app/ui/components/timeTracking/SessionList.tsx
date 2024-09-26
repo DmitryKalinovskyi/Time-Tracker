@@ -61,7 +61,7 @@ const SessionList: React.FC = () => {
   useEffect(() => {
     if(filters)
       dispatch(getWorkSessionsListingTotalDuration(filters));
-  }, [filters, isTracking, workSessions]);
+  }, [filters, workSessions]);
 
   const handleOpenModal = (session: WorkSession) => {
     setSelectedSession({
@@ -87,7 +87,6 @@ const SessionList: React.FC = () => {
   
   const handleDeleteSession = (sessionId: number) => {
     dispatch(deleteSession(sessionId));
-    dispatch(getSessions(getCurrentPagArgs()));
   };
 
   if (loading && !modalOpen) return (
