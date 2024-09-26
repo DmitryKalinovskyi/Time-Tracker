@@ -13,7 +13,7 @@ import { WorkSession } from '../../../types/WorkSession';
 import { DatePicker } from 'rsuite';
 import useAuth from '../../../hooks/useAuth';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { setPage, updateSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { RootState } from '../../../store';
 
 interface UpdateWorkSessionModalProps {
@@ -24,47 +24,57 @@ interface UpdateWorkSessionModalProps {
 
 const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, initialData }) => {
   const [session, setSession] = useState<WorkSession>(initialData);
-  const [errors, setErrors] = useState<{ startTime?: string; endTime?: string }>({});
+  const [errors, setErrors] = useState<string>();
+  const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
   const { user: me } = useAuth();
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state: RootState) => state.timeTracker);
 
   useEffect(() => {
     setSession(initialData);
-    setErrors({});
+    setErrors("");
   }, [initialData]);
 
-
+  useEffect(() => {
+    if (hasAttemptedSave && !error) {
+      dispatch(setPage(1));
+      onClose();
+    }
+    if (hasAttemptedSave && error) {
+      setErrors(error);
+    }
+  }, [error]);
 
   const validate = () => {
-    const tempErrors: { startTime?: string; endTime?: string } = {};
+    let localError = "";
     const currentTime = new Date();
     const startTime = new Date(session.startTime);
     const endTime = new Date(session.endTime!);
 
     if (!session.startTime) {
-      tempErrors.startTime = "Start time is required";
+      localError = "Start time is required";
     } else if (startTime > currentTime) {
-      tempErrors.startTime = "Start time cannot be in the future";
+      localError = "Start time cannot be in the future";
     }
 
     if (!session.endTime) {
-      tempErrors.endTime = "End time is required";
+      localError = "End time is required";
     } else if (endTime < startTime) {
-      tempErrors.endTime = "End time cannot be earlier than start time";
+      localError = "End time cannot be earlier than start time";
     } else if (endTime > currentTime) {
       const durationInHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
       if (durationInHours > 8) {
-        tempErrors.endTime = "Session duration cannot be longer than 8 hours";
+        localError = "Session duration cannot be longer than 8 hours";
       }
     }
 
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
+    setErrors(localError);
+    return localError == "";
   };
 
   const handleSave = () => {
     if (validate()) {
+      setHasAttemptedSave(true);
       dispatch(updateSession({
         editorId: me!.id,
         id: session.id,
@@ -104,14 +114,9 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
               onOk={(date) => setSession({ ...session, endTime: date })}
             />
           </Box>
-          {errors.startTime && (
+          {errors && (
             <Typography color="error" variant="body2">
-              {errors.startTime}
-            </Typography>
-          )}
-          {errors.endTime && (
-            <Typography color="error" variant="body2">
-              {errors.endTime}
+              {errors}
             </Typography>
           )}
         </Box>

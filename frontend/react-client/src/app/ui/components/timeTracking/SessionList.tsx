@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setFilters, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, setPage, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -23,7 +23,6 @@ import { WorkSession } from '../../../types/WorkSession';
 import CustomPagination from './CustomPagination';
 import useAuth from '../../../hooks/useAuth';
 import { isTodayStartTimeFilter } from '../../../misc/FiltersHelper';
-import { toIsoString } from '../../../misc/DateHelper';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
@@ -72,13 +71,15 @@ const SessionList: React.FC = () => {
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedSession(null);
+    dispatch(setError(null));
   };
   
   const handleDeleteSession = (sessionId: number) => {
     dispatch(deleteSession(sessionId));
+    dispatch(setPage(1));
   };
 
-  if (loading) return (
+  if (loading && !modalOpen) return (
     <Container
       sx={{
         display: 'flex',
@@ -91,7 +92,7 @@ const SessionList: React.FC = () => {
     </Container>
   );
 
-  if (error) return <div>Error: {error}</div>;
+  if (error && !modalOpen) return <div>Error: {error}</div>;
 
   return (
     <Fade in={!loading} timeout={500}>
