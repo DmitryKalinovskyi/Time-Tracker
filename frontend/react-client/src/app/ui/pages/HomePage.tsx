@@ -4,12 +4,9 @@ import { Box } from "@mui/material";
 import StyledButton from "../components/timeTracking/StyledButton.tsx";
 import { useState } from "react";
 import FilterCriteria from "../../types/FilterCriteria.ts";
-import { WorkSessionFilters } from "../../enums/WorkSessionFilters.ts";
-import { SQLOperators } from "../../enums/SQLOperators.ts";
-import FiltersPickerModal from "../components/timeTracking/FiltersPickerModal.tsx";
+import FiltersModal from "../components/timeTracking/FiltersModal.tsx";
 import { SortCriteria } from "../../types/SortCriteria.ts";
-import { WorkSessionSorts } from "../../enums/WorkSessionSorts.ts";
-import SortsPickerModal from "../components/timeTracking/SortsPickerModal.tsx";
+import SortsModal from "../components/timeTracking/SortsModal.tsx";
 import { useDispatch } from "react-redux";
 import { setFilters, setSorts } from "../../features/timeTracking/timeTrackingSlice.ts";
 
@@ -37,12 +34,12 @@ export default function HomePage() {
   };
 
   // Handle the filters when the modal "Apply" button is clicked
-  const handleApplyFilters = (filters: FilterCriteria<WorkSessionFilters, SQLOperators>[]) => {
+  const handleApplyFilters = (filters: FilterCriteria[]) => {
     dispatch(setFilters(filters));
-    handleCloseFilterModal(); // Close the filter modal after applying the filters
+    handleCloseFilterModal();
   };
 
-  const handleApplySorts = (sorts: SortCriteria<WorkSessionSorts>[]) => {
+  const handleApplySorts = (sorts: SortCriteria[]) => {
     dispatch(setSorts(sorts));
     handleCloseSortModal(); // Close the sort modal after applying the sorts
   };
@@ -59,17 +56,15 @@ export default function HomePage() {
       </Box>
       
       {/* Modal for picking filters */}
-      <FiltersPickerModal<WorkSessionFilters>
+      <FiltersModal
         open={isFilterModalOpen}
-        filtersEnum={Object.values(WorkSessionFilters)} // Pass the user filters enum
         onClose={handleCloseFilterModal}
         onApplyFilters={handleApplyFilters}
       />
 
       {/* Modal for picking sorts */}
-      <SortsPickerModal<WorkSessionSorts>
+      <SortsModal
         open={isSortModalOpen}
-        sortsEnum={Object.values(WorkSessionSorts)}
         onClose={handleCloseSortModal}
         onApplySorts={handleApplySorts}
       />

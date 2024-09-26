@@ -1,6 +1,7 @@
 import Grid from "@mui/material/Grid";
 import {MonthCell} from "./MonthCell.tsx";
 import {
+    Box,
     IconButton,
     Stack
 } from "@mui/material";
@@ -122,10 +123,12 @@ export function CalendarViewByMonth(){
                 </Stack>
 
                 <Stack direction="row"  m={2} spacing={2} alignItems="center">
-                    <UserAutoComplete selectedUser={selectedUser} onChange={(user) => {
-                        if (user) dispatch(changeSelectedUser(user))
-                    }}/>
-                    {/*<Button color="secondary" onClick={() => dispatch(changeSelectedUser(me))} variant="contained">View my</Button>*/}
+                    <Box sx={{width: '500px'}}>
+                        <UserAutoComplete selectedUser={selectedUser} onChange={(user) => {
+                            if (user) dispatch(changeSelectedUser(user))
+                        }}/>
+                    </Box>
+                    <Button color="secondary" onClick={() => dispatch(changeSelectedUser(me))} variant="contained">View my</Button>
                 </Stack>
             </Stack>
 

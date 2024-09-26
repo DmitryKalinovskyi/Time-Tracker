@@ -11,7 +11,7 @@ import {usersByEmailOrFullNameQuery, UsersByEmailOrFullNameResponse} from "./api
 import {catchError, map, of} from "rxjs";
 
 interface UserAutoCompleteProps{
-    selectedUser: User,
+    selectedUser: User | null,
     onChange: (user: User | null) => void
 }
 export function UserAutoComplete(props: UserAutoCompleteProps){
@@ -59,9 +59,10 @@ export function UserAutoComplete(props: UserAutoCompleteProps){
         }
     }, [open]);
 
-    return <Autocomplete options={options ?? []}
-                         renderInput={(params) => <TextField {...params} label="Selected user" />}
-                         sx={{width:"500px"}}
+
+    return <Autocomplete renderInput={(params) => <TextField {...params} label="Enter user name or email" />}
+                         options={options ?? []}
+                         sx={{width:"100%"}}
                          open={open}
                          loading={loading}
                          value={props.selectedUser}

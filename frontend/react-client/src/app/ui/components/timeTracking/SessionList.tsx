@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, getTotalDurationByFilters, updateSession, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, setPage, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -21,61 +21,75 @@ import Session from './Session';
 import UpdateWorkSessionModal from './UpdateWorkSessionModal';
 import { WorkSession } from '../../../types/WorkSession';
 import CustomPagination from './CustomPagination';
-import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
-import { SQLOperators } from '../../../enums/SQLOperators';
+import useAuth from '../../../hooks/useAuth';
+import { isTodayStartTimeFilter } from '../../../misc/FiltersHelper';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
   const { isTracking, workSessions, filters, paginationInfo, sorts, loading, error, workSessionsListingTotalDuration } = useSelector((state: RootState) => state.timeTracker);
-  const user = useSelector((state: RootState) => state.auth.user);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<WorkSession | null>(null);
-  
+  const me = useAuth().user!;
 
-
-  useEffect(() => {
-    const finalFilters = filters ? 
-    [...filters, {filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] 
-    : [{filterBy: "USER_ID" as WorkSessionFilters, operator: SQLOperators.Equal, value: user!.id.toString()}] ;
+  const getCurrentPagArgs = () => {
     const PaginationArgs: WorkSessionPaginationRequest = {
       pageNumber: paginationInfo!.currentPage,
       pageSize: paginationInfo!.pageSize,
       sortCriterias: sorts,
-      filterCriterias: finalFilters
+      filterCriterias: filters
     };
 
-    dispatch(getSessions(PaginationArgs));
-    dispatch(getTotalDurationByFilters(finalFilters));
+    return PaginationArgs;
+  }
+
+  useEffect(() => {
+    dispatch(setFilters([
+      {
+        filterBy: "USER_ID",
+        operator: "EQUAL",
+        value: me.id.toString()
+    }
+    ]));
+  }, [dispatch] )
+
+  useEffect(() => {
+    if(filters)
+      dispatch(getSessions(getCurrentPagArgs()));
   }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
+  
+  useEffect(() => {
+    if(filters)
+      dispatch(getWorkSessionsListingTotalDuration(filters));
+  }, [filters, workSessions]);
 
   const handleOpenModal = (session: WorkSession) => {
-    setSelectedSession(session);
+    setSelectedSession({
+      ...session,
+      startTime: new Date(session.startTime + "Z"),
+      endTime: new Date(session.endTime + "Z")
+    });
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedSession(null);
+    dispatch(setError(null));
   };
 
-  const handleUpdateSession = (updatedSession: WorkSession) => {
-    dispatch(updateSession({
-      editorId: user!.id,
-      id: updatedSession.id,
-      startTime: updatedSession.startTime as Date,
-      endTime: updatedSession.endTime as Date
-    }));
-    
-    handleCloseModal();
-
-  };
+  const onUpdateSuccess = () => {
+    setModalOpen(false);
+    dispatch(setError(null));
+    if(filters)
+      dispatch(getSessions(getCurrentPagArgs()));
+  }
   
   const handleDeleteSession = (sessionId: number) => {
     dispatch(deleteSession(sessionId));
   };
 
-  if (loading) return (
+  if (loading && !modalOpen) return (
     <Container
       sx={{
         display: 'flex',
@@ -88,16 +102,20 @@ const SessionList: React.FC = () => {
     </Container>
   );
 
-  if (error) return <div>Error: {error}</div>;
+  if (error && !modalOpen) return <div>Error: {error}</div>;
 
   return (
     <Fade in={!loading} timeout={500}>
   <Box sx={{height: '100%'}}>
-    {workSessions.length === 0 ? 
+    {workSessions.length == 0 && (filters && !isTodayStartTimeFilter(filters)) ? 
       <Typography variant='h5' color={'#00101D'} height={'100%'} textAlign={'center'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
         It looks like there are no work sessions matching your current filters.
       </Typography>
-      :
+      : workSessions.length == 0 && (!filters || isTodayStartTimeFilter(filters)) ?
+      <Typography variant='h5' color={'#00101D'} height={'100%'} textAlign={'center'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+      It looks like you haven't started any work sessions today.
+      </Typography>
+       :
       <>
         <Box display={'flex'} justifyContent={'flex-start'} alignItems={'center'} px={2}>
           <Typography variant='h5' color={"#00101D"} sx={{ opacity: 0.6 }} mr={1}>Total time: </Typography>
@@ -142,8 +160,8 @@ const SessionList: React.FC = () => {
       <UpdateWorkSessionModal
         open={modalOpen}
         onClose={handleCloseModal}
-        onSave={handleUpdateSession}
         initialData={selectedSession}
+        onUpdateSuccess={onUpdateSuccess}
       />
     )}
   </Box>

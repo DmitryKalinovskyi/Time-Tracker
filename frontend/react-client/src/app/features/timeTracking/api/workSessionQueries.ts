@@ -1,5 +1,4 @@
-import { SQLOperators } from "../../../enums/SQLOperators";
-import { WorkSessionFilters } from "../../../enums/WorkSessionFilters";
+import { addDays } from "date-fns";
 import FilterCriteria from "../../../types/FilterCriteria";
 import { WorkSession } from "../../../types/WorkSession";
 import { AddSessionPayload, UpdateSessionPayload, WorkSessionPaginationRequest, WorkSessionPaginationResult } from "../timeTrackingSlice";
@@ -360,7 +359,7 @@ export const getCurrentWorkSessionQuery = (payload: number) => {
     return query;
 }
 
-export const getTotalDurationByFiltersQuery = (payload: Array<FilterCriteria<WorkSessionFilters, SQLOperators>>) => {
+export const getTotalDurationByFiltersQuery = (payload: Array<FilterCriteria>) => {
     const query = 
     `
     query{
@@ -370,6 +369,26 @@ export const getTotalDurationByFiltersQuery = (payload: Array<FilterCriteria<Wor
                         ${  payload.map(filterCriteria => {
                                return `{ filterBy: ${filterCriteria.filterBy} operator: ${filterCriteria.operator} value: "${filterCriteria.value}"}`
                             })}
+                        ]
+                    )
+        }
+    }
+    `;
+
+    return query;
+}
+
+
+export const getTodayTotalDurationByUserIdQuery = (payload: number) => {
+    const today = new Date().toISOString().split('T')[0] + ',' + addDays(new Date(), 1).toISOString().split('T')[0];
+    const query = 
+    `
+    query{
+        timeTrackerQuery{
+            totalDuration(
+                    input: [
+                         { filterBy: START_TIME operator: BETWEEN value: "${today}" },
+                         { filterBy: USER_ID operator: EQUAL value: "${payload}" }
                         ]
                     )
         }

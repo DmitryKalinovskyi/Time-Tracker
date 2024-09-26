@@ -1,14 +1,12 @@
-import { catchError, from, map, mergeMap, Observable, of, switchMap, withLatestFrom } from "rxjs";
+import { catchError, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
 import { ofType, StateObservable } from "redux-observable";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
-import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getCurrentWorkSession, getCurrentWorkSessionSuccessful, getSessions, getSessionsSuccessful, getTodayTotalDurationSuccessful, getTotalDurationByFilters, getWorkSessionsListingTotalDurationSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, WorkSessionPaginationRequest, } from "./timeTrackingSlice";
+import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getCurrentWorkSession, getCurrentWorkSessionSuccessful, getSessions, getSessionsSuccessful, getTodayTotalDuration, getTodayTotalDurationSuccessful, getWorkSessionsListingTotalDuration, getWorkSessionsListingTotalDurationSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, WorkSessionPaginationRequest, } from "./timeTrackingSlice";
 import { ajax } from "rxjs/ajax";
 import { createRequest } from "../../misc/RequestCreator";
-import { getCurrentWorkSessionQuery, addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse, CurrentWorkSessionResponse, getTotalDurationByFiltersQuery, TotalDurationRespone } from "./api/workSessionQueries.ts";
+import { getCurrentWorkSessionQuery, addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse, CurrentWorkSessionResponse, getTotalDurationByFiltersQuery, TotalDurationRespone, getTodayTotalDurationByUserIdQuery } from "./api/workSessionQueries.ts";
 import { RootState } from "../../store.ts";
 import FilterCriteria from "../../types/FilterCriteria.ts";
-import { WorkSessionFilters } from "../../enums/WorkSessionFilters.ts";
-import { SQLOperators } from "../../enums/SQLOperators.ts";
 
 
 export const startSessionEpic = (action$: Observable<Action>) => action$.pipe(
@@ -156,19 +154,10 @@ export const getCurrentSessionEpic = (action$: Observable<Action>) => action$.pi
     })
 );
 
-export const getTotalDurationEpic = (action$: Observable<Action>) => action$.pipe(
-    ofType(getTotalDurationByFilters.type),
-    mergeMap((action: PayloadAction<Array<FilterCriteria<WorkSessionFilters, SQLOperators>>>) => {
+export const getWorkSessionsListingTotalDurationEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(getWorkSessionsListingTotalDuration.type),
+    switchMap((action: PayloadAction<Array<FilterCriteria>>) => {
         const request$ = ajax(createRequest(getTotalDurationByFiltersQuery(action.payload)));
-
-        const filterDay = action.payload.find(filter => filter.filterBy == WorkSessionFilters.Day)?.value.toString();
-        const filterMonth = action.payload.find(filter => filter.filterBy == WorkSessionFilters.Month)?.value.toString();
-        const filterYear = action.payload.find(filter => filter.filterBy == WorkSessionFilters.Year)?.value.toString();
-        const today = new Date();
-
-        const isToday = filterDay == today.getUTCDate().toString() && 
-                        filterMonth == (today.getUTCMonth() + 1).toString() &&
-                        filterYear == today.getUTCFullYear().toString() ;
 
         return from(request$).pipe(
             map((ajaxResponse: any) => {
@@ -178,16 +167,48 @@ export const getTotalDurationEpic = (action$: Observable<Action>) => action$.pip
                 if (errors && errors.length > 0) {
                     return setError(errors[0].message);
                 }
-
-                if (isToday && data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration) {
-                    return getTodayTotalDurationSuccessful(data.timeTrackerQuery.totalDuration);
-                }
-                else if(!isToday && data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration)
+                if(data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration != null)
                 {
                     return getWorkSessionsListingTotalDurationSuccessful(data.timeTrackerQuery.totalDuration);
                 }
                 else {
-                    throw new Error('[Getting Total Duration] Unexpected response format or missing login data');
+                    throw new Error('[Getting Total Duration For Listing] Unexpected response format or missing login data');
+                }
+            }),
+            catchError((error: any) => {
+                let errorMessage = 'An unexpected error occurred';
+
+                if (error.status === 0) {
+                    errorMessage = 'Connection time out';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
+                return of(setError(errorMessage));
+            })
+        );
+    })
+);
+
+export const getTodayTotalDurationEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(getTodayTotalDuration.type),
+    switchMap((action: PayloadAction<number>) => {
+        const request$ = ajax(createRequest(getTodayTotalDurationByUserIdQuery(action.payload)));
+
+        return from(request$).pipe(
+            map((ajaxResponse: any) => {
+                const errors = ajaxResponse.response.errors;
+                const data: TotalDurationRespone = ajaxResponse.response.data;
+
+                if (errors && errors.length > 0) {
+                    return setError(errors[0].message);
+                }
+                if(data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration != null)
+                {
+                    return getTodayTotalDurationSuccessful(data.timeTrackerQuery.totalDuration);
+                }
+                else {
+                    throw new Error('[Getting Today Total Duration By Id] Unexpected response format or missing login data');
                 }
             }),
             catchError((error: any) => {

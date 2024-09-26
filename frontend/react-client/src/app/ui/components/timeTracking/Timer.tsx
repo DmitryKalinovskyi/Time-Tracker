@@ -5,10 +5,8 @@ import { formatDuration, formatDurationToHMS } from '../../../misc/TimeFormatter
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { getCurrentWorkSession, getTotalDurationByFilters, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { getCurrentWorkSession, getTodayTotalDuration, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { useTimerContext } from '../../../features/timeTracking/TimerProvider';
-import { WorkSessionFilters } from '../../../enums/WorkSessionFilters';
-import { SQLOperators } from '../../../enums/SQLOperators';
 
 const Timer: React.FC = () => {
   const timeTracker = useSelector((state: RootState) => state.timeTracker);
@@ -20,29 +18,20 @@ const Timer: React.FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getCurrentWorkSession(user!.id)); 
-    dispatch(getTotalDurationByFilters(
-      [
-        {filterBy: WorkSessionFilters.Year, operator: SQLOperators.Equal, value: new Date().getUTCFullYear().toString()},
-        {filterBy: WorkSessionFilters.Month, operator: SQLOperators.Equal, value: (new Date().getUTCMonth() + 1).toString()},
-        {filterBy: WorkSessionFilters.Day, operator: SQLOperators.Equal, value: new Date().getUTCDate().toString()}
-      ]
-    ));
-  }, [])
+    dispatch(getCurrentWorkSession(user!.id));
+  }, [dispatch]);
 
   useEffect(() => {
     if (timeTracker.currentSession) {
       setInitialDuration(timeTracker.currentSession?.duration ?? 0);
       setInitialIsTracking(timeTracker.isTracking);
     }
-    dispatch(getTotalDurationByFilters(
-      [
-        {filterBy: WorkSessionFilters.Year, operator: SQLOperators.Equal, value: new Date().getUTCFullYear().toString()},
-        {filterBy: WorkSessionFilters.Month, operator: SQLOperators.Equal, value: (new Date().getUTCMonth() + 1).toString()},
-        {filterBy: WorkSessionFilters.Day, operator: SQLOperators.Equal, value: new Date().getUTCDate().toString()}
-      ]
-    ));
   }, [timeTracker.currentSession]);
+
+  useEffect(() => {
+    if(!timeTracker.isTracking)
+      dispatch(getTodayTotalDuration(user!.id));
+  }, [timeTracker.isTracking])
 
   const handleButtonClick = () => {
     if (isTracking) {

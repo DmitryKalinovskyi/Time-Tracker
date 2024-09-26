@@ -3,10 +3,7 @@
     public enum TotalDurationOfWorkSessionsFilters
     {
         UserId = WorkSessionFilterableFields.UserId,
-        Year = WorkSessionFilterableFields.Year,
-        Month = WorkSessionFilterableFields.Month,
-        Week = WorkSessionFilterableFields.Week,
-        Day = WorkSessionFilterableFields.Day,
+        StartTime = WorkSessionFilterableFields.StartTime,
         SessionOriginId = WorkSessionFilterableFields.SessionOriginId
     }
 }
