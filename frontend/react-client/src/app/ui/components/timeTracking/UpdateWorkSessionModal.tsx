@@ -13,7 +13,7 @@ import { WorkSession } from '../../../types/WorkSession';
 import { DatePicker } from 'rsuite';
 import useAuth from '../../../hooks/useAuth';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPage, updateSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { updateSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { RootState } from '../../../store';
 
 interface UpdateWorkSessionModalProps {
@@ -36,41 +36,63 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
   }, [initialData]);
 
   useEffect(() => {
-    if (hasAttemptedSave && !error) {
-      dispatch(setPage(1));
+    if (!loading && hasAttemptedSave && !error) {
       onClose();
+      setHasAttemptedSave(false);
     }
-    if (hasAttemptedSave && error) {
+    if (!loading && hasAttemptedSave && error) {
       setErrors(error);
+      setHasAttemptedSave(false);
     }
-  }, [error]);
+  }, [loading, error]);
 
   const validate = () => {
     let localError = "";
     const currentTime = new Date();
     const startTime = new Date(session.startTime);
     const endTime = new Date(session.endTime!);
-
+  
+    const getHour = (date: Date) => date.getHours();
+  
+    // Define acceptable time range (6:00 to 22:00)
+    const minHour = 6;
+    const maxHour = 22;
+  
+    // Check if startTime is present
     if (!session.startTime) {
       localError = "Start time is required";
-    } else if (startTime > currentTime) {
+    } 
+    else if (startTime > currentTime) {
       localError = "Start time cannot be in the future";
+    } 
+    else if (getHour(startTime) < minHour || getHour(startTime) >= maxHour) {
+      localError = `Start time must be between ${minHour}:00 and ${maxHour}:00`;
     }
-
+  
+    // Check if endTime is present
     if (!session.endTime) {
       localError = "End time is required";
-    } else if (endTime < startTime) {
+    } 
+    else if (endTime < startTime) {
       localError = "End time cannot be earlier than start time";
-    } else if (endTime > currentTime) {
+    } 
+    else if (endTime > currentTime) {
+      localError = "End time cannot be in the future";
+    } 
+    else if (getHour(endTime) < minHour || getHour(endTime) > maxHour) {
+      localError = `End time must be between ${minHour}:00 and ${maxHour}:00`;
+    }
+    else if (endTime > startTime) {
       const durationInHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
       if (durationInHours > 8) {
         localError = "Session duration cannot be longer than 8 hours";
       }
     }
-
+  
     setErrors(localError);
-    return localError == "";
+    return localError === "";
   };
+  
 
   const handleSave = () => {
     if (validate()) {
@@ -129,9 +151,9 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
           onClick={handleSave}
           color="primary"
           variant="contained"
-          disabled={loading}
+          disabled={hasAttemptedSave}
         >
-          {loading ? 'Saving...' : 'Save'}
+          {hasAttemptedSave ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

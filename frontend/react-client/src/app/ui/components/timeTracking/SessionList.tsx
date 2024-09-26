@@ -51,7 +51,7 @@ const SessionList: React.FC = () => {
     };
     if(filters)
       dispatch(getSessions(PaginationArgs));
-  }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
+  }, [paginationInfo!.currentPage, sorts, filters, isTracking, modalOpen]);
   
   useEffect(() => {
     if(filters)
