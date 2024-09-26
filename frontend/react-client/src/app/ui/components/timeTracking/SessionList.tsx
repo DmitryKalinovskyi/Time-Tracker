@@ -32,6 +32,17 @@ const SessionList: React.FC = () => {
   const [selectedSession, setSelectedSession] = useState<WorkSession | null>(null);
   const me = useAuth().user!;
 
+  const getCurrentPagArgs = () => {
+    const PaginationArgs: WorkSessionPaginationRequest = {
+      pageNumber: paginationInfo!.currentPage,
+      pageSize: paginationInfo!.pageSize,
+      sortCriterias: sorts,
+      filterCriterias: filters
+    };
+
+    return PaginationArgs;
+  }
+
   useEffect(() => {
     dispatch(setFilters([
       {
@@ -43,20 +54,14 @@ const SessionList: React.FC = () => {
   }, [dispatch] )
 
   useEffect(() => {
-    const PaginationArgs: WorkSessionPaginationRequest = {
-      pageNumber: paginationInfo!.currentPage,
-      pageSize: paginationInfo!.pageSize,
-      sortCriterias: sorts,
-      filterCriterias: filters
-    };
     if(filters)
-      dispatch(getSessions(PaginationArgs));
-  }, [paginationInfo!.currentPage, sorts, filters, isTracking, modalOpen]);
+      dispatch(getSessions(getCurrentPagArgs()));
+  }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
   
   useEffect(() => {
     if(filters)
       dispatch(getWorkSessionsListingTotalDuration(filters));
-  }, [filters, isTracking]);
+  }, [filters, isTracking, workSessions]);
 
   const handleOpenModal = (session: WorkSession) => {
     setSelectedSession({
@@ -72,10 +77,17 @@ const SessionList: React.FC = () => {
     setSelectedSession(null);
     dispatch(setError(null));
   };
+
+  const onUpdateSuccess = () => {
+    setModalOpen(false);
+    dispatch(setError(null));
+    if(filters)
+      dispatch(getSessions(getCurrentPagArgs()));
+  }
   
   const handleDeleteSession = (sessionId: number) => {
     dispatch(deleteSession(sessionId));
-    dispatch(setPage(1));
+    dispatch(getSessions(getCurrentPagArgs()));
   };
 
   if (loading && !modalOpen) return (
@@ -150,6 +162,7 @@ const SessionList: React.FC = () => {
         open={modalOpen}
         onClose={handleCloseModal}
         initialData={selectedSession}
+        onUpdateSuccess={onUpdateSuccess}
       />
     )}
   </Box>

@@ -19,10 +19,11 @@ import { RootState } from '../../../store';
 interface UpdateWorkSessionModalProps {
   open: boolean;
   onClose: () => void;
+  onUpdateSuccess: () => void;
   initialData: WorkSession;
 }
 
-const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, initialData }) => {
+const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, onUpdateSuccess, initialData }) => {
   const [session, setSession] = useState<WorkSession>(initialData);
   const [errors, setErrors] = useState<string>();
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
@@ -37,7 +38,7 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
 
   useEffect(() => {
     if (!loading && hasAttemptedSave && !error) {
-      onClose();
+      onUpdateSuccess();
       setHasAttemptedSave(false);
     }
     if (!loading && hasAttemptedSave && error) {
