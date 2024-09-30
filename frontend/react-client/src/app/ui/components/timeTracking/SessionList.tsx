@@ -130,12 +130,12 @@ const SessionList: React.FC = () => {
                 <TableRow>
                   <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Date</TableCell>
                   <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>User</TableCell>
-                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>TimeRange</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Time Range</TableCell>
                   <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Status</TableCell>
                   <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Duration</TableCell>
                   <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Origin</TableCell>
-                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>EditedBy</TableCell>
-                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>LastUpdatedAt</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Edited By</TableCell>
+                  <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Last Updated At</TableCell>
                   <TableCell sx={{ color: "white", width: '10%', textAlign: 'center' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>

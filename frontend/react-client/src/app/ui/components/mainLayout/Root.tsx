@@ -9,17 +9,14 @@ import {Stack} from "@mui/material";
 export default function Root(){
     return (
         <>
-          <Box 
-              sx={{ minHeight: '100vh', 
-                display: 'flex', 
+          <Box
+              sx={{ minHeight: '100vh',
+                display: 'flex',
               }}
-              p={2}
-              bgcolor={"#DEDEDE"}
               >
             <Grid container 
                   spacing={3} 
                   bgcolor={'#FAFAFA'}
-                  borderRadius={'1.7rem'}
                   m={0}
                   width={'100%'}
                   flexGrow={1}
@@ -34,7 +31,8 @@ export default function Root(){
                         elevation={3} 
                         sx={{ 
                               flex: 1, 
-                              display: 'flex', 
+                              display: 'flex',
+                              overflow: 'hidden',
                               flexDirection: 'column',
                               borderRadius: '1.5rem'
                             }}>

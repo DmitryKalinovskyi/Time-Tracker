@@ -9,7 +9,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import {getDaysInMonth} from "../../../misc/DateHelper.ts";
 import {UserAutoComplete} from "./UserAutoComplete/UserAutoComplete.tsx";
 import {CreateEventDialog} from "./CreateEventDialog.tsx";
@@ -19,10 +19,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {changeSelectedUser} from "../../../features/calendar/calendarSlice.ts";
 import {RootState} from "../../../store.ts";
 
+interface CalendarDate{
+    year: number,
+    month: number
+}
+
 export function CalendarViewByMonth(){
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const [calendarDate, setCalendarDate] = useState({
+    const [calendarDate, setCalendarDate] = useState<CalendarDate>({
         year: new Date().getFullYear(),
         month: new Date().getMonth()
     })
@@ -36,24 +41,26 @@ export function CalendarViewByMonth(){
 
     const dispatch = useDispatch();
     const me = useAuth().user;
-    useEffect(() => {
+
+    // in first render select me
+    useLayoutEffect(() => {
         if(me)
             dispatch(changeSelectedUser(me));
+        changeCalendarDate(calendarDate);
     }, []);
 
-
-    useEffect(() => {
+    const changeCalendarDate = (date: CalendarDate) => {
         const firstDay = new Date();
-        firstDay.setFullYear(calendarDate.year);
-        firstDay.setMonth(calendarDate.month);
+        firstDay.setFullYear(date.year);
+        firstDay.setMonth(date.month);
         firstDay.setDate(1);
         const calendarDays: Date[] = [];
 
         // how many weeks we need to display our month?
-        const daysInMonth = getDaysInMonth(calendarDate.year, calendarDate.month);
+        const daysInMonth = getDaysInMonth(date.year, date.month);
         const daysNeedToDisplay = firstDay.getDay() + daysInMonth;
-        const w = Math.ceil(daysNeedToDisplay/7);
-        for(let i = 0; i < w*7; i++){
+        const w = Math.ceil(daysNeedToDisplay / 7);
+        for (let i = 0; i < w * 7; i++) {
             const day = new Date(firstDay);
 
             day.setDate(firstDay.getDate() + i - firstDay.getDay());
@@ -61,12 +68,13 @@ export function CalendarViewByMonth(){
             calendarDays.push(day);
         }
 
+        setCalendarDate(date);
         setWeeks(w);
         setDays(calendarDays);
-    }, [calendarDate]);
+    }
 
-    const setToday = () => {
-        setCalendarDate({
+    const setCurrentMonth = () => {
+        changeCalendarDate({
             year: new Date().getFullYear(),
             month: new Date().getMonth()
         });
@@ -76,23 +84,22 @@ export function CalendarViewByMonth(){
         return monthNames[calendarDate.month];
     }
 
-    const moveNext = () =>{
-        setCalendarDate({
+    const moveNextMonth = () =>{
+        changeCalendarDate({
             year: calendarDate.year + (calendarDate.month == 11 ? 1: 0),
             month: ((calendarDate.month + 1) % 12)
         })
     }
 
-    const movePrevious = () =>{
-        setCalendarDate({
+    const movePreviousMonth = () =>{
+        changeCalendarDate({
             year: calendarDate.year + (calendarDate.month == 0 ? -1: 0),
             month: ((calendarDate.month+11) % 12)
         })
     }
 
-    function onMonthClick(day: Date){
+    function handleMonthClick(day: Date){
         setDay(day);
-
         setIsDayModalOpen(true);
     }
 
@@ -101,11 +108,11 @@ export function CalendarViewByMonth(){
         setIsCreateDialogOpen(true);
     }
 
-    const onCreateDialogClose = () => {
+    const handleCreateDialogClose = () => {
         setIsCreateDialogOpen(false);
     }
 
-    const onDayModalClose = () => {
+    const handleDayModalClose = () => {
         setIsDayModalOpen(false);
     }
 
@@ -114,9 +121,9 @@ export function CalendarViewByMonth(){
             {/*toolbar*/}
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" m={2} spacing={2} alignItems="center">
-                    <Button color="secondary" variant="contained" onClick={() => setToday()}>Today</Button>
-                    <IconButton onClick={() => movePrevious()}><ArrowBackIcon/></IconButton>
-                    <IconButton onClick={() => moveNext()}><ArrowForwardIcon/></IconButton>
+                    <Button color="secondary" variant="contained" onClick={() => setCurrentMonth()}>Current month</Button>
+                    <IconButton onClick={() => movePreviousMonth()}><ArrowBackIcon/></IconButton>
+                    <IconButton onClick={() => moveNextMonth()}><ArrowForwardIcon/></IconButton>
                     <Typography variant="h5">
                         {`${getMonth()} ${calendarDate.year}`}
                     </Typography>
@@ -128,7 +135,7 @@ export function CalendarViewByMonth(){
                             if (user) dispatch(changeSelectedUser(user))
                         }}/>
                     </Box>
-                    <Button color="secondary" onClick={() => dispatch(changeSelectedUser(me))} variant="contained">View my</Button>
+                    {/*<Button color="secondary" onClick={() => dispatch(changeSelectedUser(me))} variant="contained">View my</Button>*/}
                 </Stack>
             </Stack>
 
@@ -147,21 +154,24 @@ export function CalendarViewByMonth(){
             </Grid>
 
             {/*calendar cells*/}
-            <Grid sx={{height: "100%"}} container columns={7}>
+            <Grid sx={{height: "100%"}}
+                  container
+                  columns={7} >
                 {days.map((day,index) =>
                     <Grid item xs={1} key={index} sx={{height: `${100/weeks}%`, boxSizing: 'border-box'}}>
-                        <MonthCell day={day} month={calendarDate.month} events={selectedUser.calendarEvents} onClick={onMonthClick}/>
+                        <MonthCell day={day} month={calendarDate.month} events={selectedUser.calendarEvents} onClick={handleMonthClick}/>
                     </Grid>
                 )}
             </Grid>
 
-            <DayModal day={day} onClose={onDayModalClose}
+            <DayModal day={day} onClose={handleDayModalClose}
                       isOpen={isDayModalOpen}
-                      onCreateEvent={() => switchModalToDialog()}
+                      onCreateEvent={switchModalToDialog}
             />
+
             <CreateEventDialog isOpen={isCreateDialogOpen}
                                day={day}
-                               onClose={() => onCreateDialogClose()}/>
+                               onClose={handleCreateDialogClose}/>
         </Stack>
     </>
 }
