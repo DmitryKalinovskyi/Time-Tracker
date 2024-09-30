@@ -1,28 +1,35 @@
-export const getUsersQuery = () => {
-    const query = `
-    query usersQuery($first: Int, $after: String, $last: Int, $before: String){
-    usersQuery {
-      users(first: $first, after: $after, last: $last, before: $before) {
-        totalCount
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
+import User from "../../../types/User.ts";
+
+export interface GetUsersQueryResponseType {
+    errors?: [],
+    data:{
+        usersQuery:{
+            users:{
+                results: User[],
+                totalRecords: number
+                totalPages: number
+                currentPage: number
+                pageSize: number
+            }
         }
-        edges {
-          cursor
-          node {
-            id
-            fullName
-            email
-            permissions
-            isActive
-          }
-        }
-      }
+    }
+}
+
+export const getUsersQuery = () => `
+query UsersQuery($input: PaginationRequestInputGraphType_UserSortableFields!){
+  usersQuery{
+    users(input: $input){
+      results{
+        id
+        fullName
+        email
+        permissions
+        isActive
+      },
+      totalRecords,
+      totalPages,
+      currentPage,
+      pageSize
     }
   }
-  `;
-    return query;
-  }
+}`

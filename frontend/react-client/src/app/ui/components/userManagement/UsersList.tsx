@@ -6,37 +6,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../../features/users/usersEpics";
 import { RootState } from "../../../store";
 import { useNavigate } from 'react-router-dom';
+import Pagination from "@mui/material/Pagination";
+import {UsersPage} from "../../../features/users/usersSlice.ts";
 
 export default function UsersList() {
     const navigate = useNavigate();
     const [itemsPerPage, _setItemsPerPage] = useState<number>(5);
 
-    const usersPage = useSelector((state: RootState) => state.users.usersPage);
+    const usersPage: UsersPage = useSelector((state: RootState) => state.users.usersPage);
+    console.log(usersPage);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(fetchUsers({ first: itemsPerPage, after: null, last: null, before: null }));
-    }, [itemsPerPage]);
+        dispatch(fetchUsers({pageNumber: 1, pageSize: itemsPerPage}));
+    }, [dispatch, itemsPerPage]);
 
-    const handlePreviousPage = () => {
-        if (!usersPage.pageInfo.hasPreviousPage) return;
-        dispatch(fetchUsers({ first: null, after: null, last: itemsPerPage, before: usersPage.pageInfo.startCursor }));
-    };
-
-    const handleNextPage = () => {
-        if (!usersPage.pageInfo.hasNextPage) return;
-        dispatch(fetchUsers({ first: itemsPerPage, after: usersPage.pageInfo.endCursor, last: null, before: null }));
-    };
+    const handlePageChange = (page: number) => {
+        dispatch(fetchUsers({pageNumber: page, pageSize: itemsPerPage}));
+    }
 
     return (
         <>
             <Container maxWidth="md">
-                {usersPage.edges ?
+                {usersPage.results ?
                     <Box my={4}>
                         <Grid container direction="column" spacing={1}>
 
-                            {usersPage.edges.map((node) => (
-                                <Grid item xs={12} sm={6} key={node.node.id}>
+                            {usersPage.results.map((user) => (
+                                <Grid item xs={12} sm={6} key={user.id}>
                                     <Card variant="outlined" sx={{ padding: '8px' }}>
                                         <CardContent sx={{
                                             display: 'flex',
@@ -47,27 +44,32 @@ export default function UsersList() {
                                         }}>
                                             <Box>
                                                 <Typography variant="h6" component="div">
-                                                    {node.node.fullName}
+                                                    {user.fullName}
                                                 </Typography>
                                                 <Typography color="text.secondary">
-                                                    {node.node.email}
+                                                    {user.email}
                                                 </Typography>
                                             </Box>
-                                            <Button size="small" variant="outlined" onClick={() => navigate("/user/" + node.node.id)}>View Profile</Button>
+                                            <Button size="small" variant="outlined" onClick={() => navigate("/user/" + user.id)}>View Profile</Button>
                                         </CardContent>
                                     </Card>
                                 </Grid>
                             ))}
                         </Grid>
                         <Box mt={4} display="flex" justifyContent="center">
-                            <IconButton disabled={!usersPage.pageInfo.hasPreviousPage}
-                                onClick={handlePreviousPage}>
-                                <NavigateBeforeIcon />
-                            </IconButton>
-                            <IconButton disabled={!usersPage.pageInfo.hasNextPage}
-                                onClick={handleNextPage}>
-                                <NavigateNextIcon />
-                            </IconButton>
+                            {usersPage.totalPages > 1 &&
+                            <Pagination count={usersPage.totalPages}
+                                        page={usersPage.currentPage}
+                                        onChange={(e, page) => handlePageChange(page)}/>
+                            }
+                            {/*<IconButton disabled={!usersPage.pageInfo.hasPreviousPage}*/}
+                            {/*    onClick={handlePreviousPage}>*/}
+                            {/*    <NavigateBeforeIcon />*/}
+                            {/*</IconButton>*/}
+                            {/*<IconButton disabled={!usersPage.pageInfo.hasNextPage}*/}
+                            {/*    onClick={handleNextPage}>*/}
+                            {/*    <NavigateNextIcon />*/}
+                            {/*</IconButton>*/}
                         </Box>
                     </Box>
                     : <></>

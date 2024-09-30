@@ -1,17 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { catchError, map, mergeMap, Observable, of } from "rxjs";
-import { ajax } from "rxjs/ajax";
+import {ajax, AjaxResponse} from "rxjs/ajax";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { createRequest } from "../../misc/RequestCreator";
-import { getUsersQuery } from "./api/usersQueries";
+import {getUsersQuery, GetUsersQueryResponseType} from "./api/usersQueries";
 import { fetchUsersFailure, fetchUsersSuccess } from "./usersSlice";
 
 export interface FetchUsersPayload {
-  first: number | null,
-  after: string | null
-  last: number | null,
-  before: string | null
+    pageNumber: number,
+    pageSize: number,
 }
 
 export const fetchUsers = (fetchUsersPayload: FetchUsersPayload) => ({ type: "FETCH_USERS", payload: fetchUsersPayload });
@@ -21,27 +19,22 @@ export const getUsersEpic = (action$: Observable<Action>) =>
     mergeMap((action: PayloadAction<FetchUsersPayload>) => {
       return ajax(createRequest(getUsersQuery(),
         {
-          "first": action.payload.first,
-          "after": action.payload.after,
-          "last": action.payload.last,
-          "before": action.payload.before,
+            "input": action.payload
         }))
         .pipe(
-          map((ajaxResponse: any) => {
-            const errors = ajaxResponse.response.errors;
-            const data = ajaxResponse.response.data;
+          map((ajaxResponse: AjaxResponse<GetUsersQueryResponseType>) => {
+              const response = ajaxResponse.response;
+            console.log(response);
 
-            if (errors && errors.length > 0) {
-              return fetchUsersFailure(errors[0].message);
+            if (response.errors && response.errors.length > 0) {
+              return fetchUsersFailure(response.errors[0].message);
             }
-            if (data && data.usersQuery.users) {
-              return fetchUsersSuccess(data.usersQuery.users);
-            } else {
-              throw new Error('[FETCH_USERS] Unexpected response format or missing user data');
-            }
+
+              return fetchUsersSuccess(response);
           }),
-          catchError((error: any) =>
-            of(fetchUsersFailure(error.message || 'An unexpected error occurred'))
+          catchError((error: any) =>{
+            return of(fetchUsersFailure(error.message || 'An unexpected error occurred'))
+          }
           )
         )
     })
