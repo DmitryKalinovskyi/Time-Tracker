@@ -1,8 +1,8 @@
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
 import { Observable, catchError, map, mergeMap, of } from "rxjs";
-import { ajax } from "rxjs/ajax";
-import { getPermissionsQuery } from "./api/permissionQueries";
+import {ajax, AjaxResponse} from "rxjs/ajax";
+import {getPermissionsQuery, GetPermissionsQueryResponse} from "./api/permissionQueries";
 import { createRequest } from "../../misc/RequestCreator";
 import { fetchPermissionsFailure, fetchPermissionsSuccess } from "./permissionsSlice";
 
@@ -13,20 +13,17 @@ export const getPermissionsEpic = (action$: Observable<Action>) =>
     mergeMap(() => {
       return ajax(createRequest(getPermissionsQuery()))
         .pipe(
-          map((ajaxResponse: any) => {
+          map((ajaxResponse: AjaxResponse<GetPermissionsQueryResponse>) => {
             const errors = ajaxResponse.response.errors;
             const data = ajaxResponse.response.data;
 
             if (errors && errors.length > 0) {
               return fetchPermissionsFailure(errors[0].message);
             }
-            if (data && data.permissionsQuery.availablePermissions) {
-              return fetchPermissionsSuccess(data.permissionsQuery.availablePermissions);
-            } else {
-              throw new Error('[FETCH_PERMISSIONS] Unexpected response format or missing user data');
-            }
+
+            return fetchPermissionsSuccess(data.permissionsQuery.availablePermissions);
           }),
-          catchError((error: any) =>
+          catchError((error) =>
             of(fetchPermissionsFailure(error.message || 'An unexpected error occurred'))
           )
         )

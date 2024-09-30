@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Avatar, Button, TextField, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { regUserFailure } from '../../features/registration/regSlice.ts';
+import { registerUserFailure } from '../../features/registration/registerSlice.ts';
 import { RootState } from '../../store.ts';
-import { regUserRequest } from '../../features/registration/regSlice.ts';
+import { registerUserRequest } from '../../features/registration/registerSlice.ts';
 
 const CreateUserPage: React.FC = () => {
     const [fullName, setFullName] = useState('');
@@ -25,13 +25,13 @@ const CreateUserPage: React.FC = () => {
         event.preventDefault();
     
         if (fullName === '' || email === '') {
-            dispatch(regUserFailure('Please fill in all fields'));
+            dispatch(registerUserFailure('Please fill in all fields'));
             return;
         }
     
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            dispatch(regUserFailure('Please enter a valid email address'));
+            dispatch(registerUserFailure('Please enter a valid email address'));
             return;
         }
     
@@ -39,11 +39,11 @@ const CreateUserPage: React.FC = () => {
         const nameValidation = nameParts.every(name => /^[A-Z][a-z]*$/.test(name));
         
         if (!nameValidation) {
-            dispatch(regUserFailure('Each name must start with a capital letter'));
+            dispatch(registerUserFailure('Each name must start with a capital letter'));
             return;
         }
     
-        dispatch(regUserRequest({ fullName, email }));
+        dispatch(registerUserRequest({ fullName, email }));
     };
 
     return (

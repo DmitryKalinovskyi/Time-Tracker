@@ -1,41 +1,41 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import User  from '../../types/User';
 
-export interface RegType {
+export interface RegisterType {
     user: User | null;
     error: string | null;
     loading: boolean;
     success: boolean | null;
 }
 
-const initialState: RegType = {
+const initialState: RegisterType = {
     user: null,
     error: null,
     loading: false,
     success: null
 };
 
-export interface RegPayload {
+export interface RegisterPayload {
     fullName: string, 
     email: string
 }
 
-const regSlice = createSlice({
+const registerSlice = createSlice({
     name: 'reg',
     initialState,
     reducers: {
-        regUserRequest: (state, _action: PayloadAction<RegPayload>) => {
+        registerUserRequest: (state, _action: PayloadAction<RegisterPayload>) => {
             state.loading = true;
             state.error = null;
             state.success = null;
         },
-        regUserSuccess: (state, action: PayloadAction<User>) => {
+        registerUserSuccess: (state, action: PayloadAction<User>) => {
             state.user = action.payload;
             state.loading = false;
             state.error = null;
             state.success = true;
         },
-        regUserFailure: (state, action: PayloadAction<string>) => {
+        registerUserFailure: (state, action: PayloadAction<string>) => {
             state.user = null;
             state.error = action.payload;
             state.loading = false;
@@ -44,6 +44,6 @@ const regSlice = createSlice({
     }
 });
 
-export const { regUserRequest, regUserSuccess, regUserFailure } = regSlice.actions;
+export const { registerUserRequest, registerUserSuccess, registerUserFailure } = registerSlice.actions;
 
-export default regSlice.reducer;
+export default registerSlice.reducer;

@@ -1,28 +1,24 @@
 import User from "../../../types/User.ts";
 
-export interface regUserQueryResponse{
-    userMutation: {
-        createUser: User
+export interface RegisterUserQueryResponse {
+    errors?: [],
+    data:{
+        userMutation: {
+            createUser: User
+        }
     }
 }
 
-export const regUserQuery = (
-    fullName: string,
-    email: string,
-) => {
-    const query = `
-      mutation Registration{
-              userMutation{
-                createUser(user: {fullName: "${fullName}" email: "${email}"  }) {
-                id
-                fullName
-                email
-                permissions
-              }
-              }
-          }
-      `;
-
-    return query;
-
+export const registerUserQuery = () =>
+`
+mutation Registration($input: CreateUserInput!){
+    userMutation{
+      createUser(user: $input) {
+        id
+        fullName
+        email
+        permissions
+      }
+    }
 }
+`;

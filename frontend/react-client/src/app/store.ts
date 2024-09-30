@@ -2,7 +2,7 @@ import {combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 
 import authReducer from "./features/authentification/authSlice.ts";
-import regReducer from "./features/registration/regSlice.ts";
+import registerReducer from "./features/registration/registerSlice.ts";
 import verifReducer  from "./features/verification/verifSlice.ts";
 import usersReducer from "./features/users/usersSlice.ts";
 import userReducer from "./features/user/userSlice.ts";
@@ -13,7 +13,7 @@ import calendarReducer from "./features/calendar/calendarSlice.ts";
 
 import {authUserEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
-import { regUserEpic } from "./features/registration/regEpics.ts";
+import { registerUserEpic } from "./features/registration/registerEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
 import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
 import { addSessionEpic, deleteSessionEpic, getCurrentSessionEpic, getSessionsEpic, getTodayTotalDurationEpic, getWorkSessionsListingTotalDurationEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
@@ -30,7 +30,7 @@ import {
 
 const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, any, any>(
     authUserEpic,
-    regUserEpic,
+    registerUserEpic,
     verifUserEpic,
     getUsersEpic,
     getUserEpic,
@@ -61,7 +61,7 @@ const epicMiddleware = createEpicMiddleware<Action, Action, any, any>();
 export const store = configureStore({
     reducer: {
         auth: authReducer,
-        reg: regReducer,
+        reg: registerReducer,
         verif: verifReducer,
         users: usersReducer,
         user: userReducer,

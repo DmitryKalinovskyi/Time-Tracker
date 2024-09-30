@@ -1,4 +1,4 @@
-import {catchError, map, mergeMap, Observable, of, tap} from "rxjs";
+import {catchError, map, mergeMap, Observable, of} from "rxjs";
 import {Action, PayloadAction} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
 import {ajax, AjaxResponse} from "rxjs/ajax";
@@ -28,12 +28,12 @@ export const addCalendarEventEpic = (action$: Observable<Action>) =>
                     const errors = ajaxResponse.response.errors;
                     const data = ajaxResponse.response.data;
                     if (errors && errors.length > 0) {
-                        throw new Error(errors[0]);
+                        throw new Error(errors[0].message);
                     }
                     ShowSuccess("Work time added.")
                     return addCalendarEvent(data.calendarMutation.createCalendarEvent);
                 }),
-                catchError((error: any) => {
+                catchError((error) => {
                     console.log(error)
                     ShowFailure("An error occurred while trying to add the calendar event.");
                     return of();
@@ -61,13 +61,14 @@ export const updateCalendarEventEpic = (action$: Observable<Action>) =>
                     const data = ajaxResponse.response.data;
 
                     if (errors && errors.length > 0) {
-                        throw new Error(errors[0]);
+                        throw new Error(errors[0].message);
                     }
 
                     ShowSuccess("Work time updated.")
                     return updateCalendarEvent(data.calendarMutation.updateCalendarEvent);
                 }),
-                catchError((error: any) => {
+                catchError((error) => {
+                    console.log(error)
                     ShowFailure("Error while trying to add calendar event.");
                     return of();
                 })
@@ -87,13 +88,14 @@ export const deleteCalendarEventEpic = (action$: Observable<Action>) =>
                     const errors = ajaxResponse.response.errors;
 
                     if (errors && errors.length > 0) {
-                        throw new Error(errors[0]);
+                        throw new Error(errors[0].message);
                     }
 
                     ShowSuccess("Work time removed.")
                     return removeCalendarEvent(action.payload);
                 }),
-                catchError((error: any) => {
+                catchError((error) => {
+                    console.log(error)
                     ShowFailure("Error while trying to add calendar event.");
                     return of();
                 })
