@@ -2,7 +2,6 @@ import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import PersonIcon from '@mui/icons-material/Person';
@@ -11,7 +10,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {Link as RouterLink, Navigate} from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
 import {useDispatch} from "react-redux";
-import {authUser, authUserFailure} from "../../features/authentification/authSlice.ts";
+import {loginUser, loginFailure} from "../../features/authentification/authSlice.ts";
 import useIsAuthenticated from "../../hooks/useIsAuthenticated.ts";
 import useAuth from "../../hooks/useAuth.ts";
 import { useEffect, useState } from 'react';
@@ -41,18 +40,18 @@ const LoginPage: React.FC = () => {
     
         // Check if email or password is missing
         if (!email || !password) {
-            dispatch(authUserFailure('Please fill in all fields'));
+            dispatch(loginFailure('Please fill in all fields'));
             return;
         }
     
         // Check if the email is valid
         if (!emailRegex.test(email)) {
-            dispatch(authUserFailure('Please enter a valid email address'));
+            dispatch(loginFailure('Please enter a valid email address'));
             return;
         }
     
         // Dispatch the authUser action
-        dispatch(authUser({ email, password }));
+        dispatch(loginUser({ email, password }));
     };
 
     if(isAuthenticated)
@@ -102,6 +101,13 @@ const LoginPage: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    {auth.error &&
+                        <Typography
+                            color={"error.main"}
+                            sx={{ width: '100%', textAlign: 'center' }}>
+                            {auth.error}
+                        </Typography>
+                    }
                     <Button
                         type="submit"
                         fullWidth

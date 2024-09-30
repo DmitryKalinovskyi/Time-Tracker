@@ -1,6 +1,4 @@
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import { Box, Button, Card, CardContent, Container, Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../../features/users/usersEpics";
@@ -28,7 +26,7 @@ export default function UsersList() {
     return (
         <>
             <Container maxWidth="md">
-                {usersPage.results ?
+                {usersPage.results &&
                     <Box my={4}>
                         <Grid container direction="column" spacing={1}>
 
@@ -62,17 +60,8 @@ export default function UsersList() {
                                         page={usersPage.currentPage}
                                         onChange={(e, page) => handlePageChange(page)}/>
                             }
-                            {/*<IconButton disabled={!usersPage.pageInfo.hasPreviousPage}*/}
-                            {/*    onClick={handlePreviousPage}>*/}
-                            {/*    <NavigateBeforeIcon />*/}
-                            {/*</IconButton>*/}
-                            {/*<IconButton disabled={!usersPage.pageInfo.hasNextPage}*/}
-                            {/*    onClick={handleNextPage}>*/}
-                            {/*    <NavigateNextIcon />*/}
-                            {/*</IconButton>*/}
                         </Box>
                     </Box>
-                    : <></>
                 }
             </Container>
         </>

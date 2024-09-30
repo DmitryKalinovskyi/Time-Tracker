@@ -31,7 +31,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        authUser : (state) => {
+        loginUser : (state) => {
             state.loading = true;
         },
         refreshToken : (state, action: PayloadAction<{user: User, accessToken: Token, refreshToken: Token}>) => {
@@ -44,23 +44,21 @@ const authSlice = createSlice({
             state.isRefreshed = true;
             state.refreshRejects++;
         },
-
-        authUserSuccess: (state, action: PayloadAction<{user: User, accessToken: Token}>) => {
+        loginSuccess: (state, action: PayloadAction<{user: User, accessToken: Token}>) => {
             state.accessToken = action.payload.accessToken;
             state.user = action.payload.user;
             state.loading = false;
             state.error = null;
             state.refreshRejects = 0;
         },
-        authUserFailure: (state, action: PayloadAction<any>) => {
+        loginFailure: (state, action: PayloadAction<string>) => {
             console.log(`Error while authentification user: ${action.payload} `);
             
             state.accessToken = null;
             state.user = null;
-            state.error = action.payload.toString();
+            state.error = action.payload;
             state.loading = false;
         },
-
         logout: (state) => {
             state.accessToken = null;
             state.user = null;
@@ -71,11 +69,11 @@ const authSlice = createSlice({
     }
 })
 
-export const {authUser,
+export const {loginUser,
     refreshToken,
     refreshTokenReject,
-    authUserSuccess,
-    authUserFailure,
+    loginSuccess,
+    loginFailure,
     logout} = authSlice.actions;
 
 export default authSlice.reducer;

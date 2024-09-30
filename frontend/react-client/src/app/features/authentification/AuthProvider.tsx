@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect} from "react";
+import {useEffect} from "react";
 import {store} from "../../store.ts";
 import {useSelector} from "react-redux";
 import {CircularProgress} from "@mui/material";

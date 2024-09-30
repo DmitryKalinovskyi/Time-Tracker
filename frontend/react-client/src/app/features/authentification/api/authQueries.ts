@@ -1,64 +1,62 @@
 import Token from "../../../types/Token.ts";
 import User from "../../../types/User.ts";
 
-export interface authUserQueryResponse{
-    identityMutation: {
-        login: {
-            user: User,
-            accessToken: Token,
-            refreshToken: Token
-        }
-    }
-}
-
-export interface refreshTokenQueryResponse{
+export interface LoginQueryResponseType {
     errors?: []
-    identityMutation:{
-        refreshToken:{
-            user: User,
-            accessToken: Token,
-            refreshToken: Token
+    data:{
+        identityMutation: {
+            login: {
+                user: User,
+                accessToken: Token,
+                refreshToken: Token
+            }
+        }
+    }
+}
+
+export interface RefreshTokenQueryResponseType {
+    errors?: []
+    data:{
+        identityMutation:{
+            refreshToken:{
+                user: User,
+                accessToken: Token,
+                refreshToken: Token
+            }
         }
     }
 }
 
 
-export const authUserQuery = (
-    email: string,
-    password: string,
-) => {
-    const query = `
-      mutation Login{
-                  identityMutation{
-                    login(input: {email: "${email}", password: "${password}"}){
-                      accessToken{
-                       value,
-                       dateIssued,
-                       dateExpires
-                      }, 
-                      refreshToken{
-                        value,
-                        dateIssued,
-                        dateExpires
-                      },
-                      user{
-                        id,
-                        fullName,
-                        email,
-                        permissions,
-                        calendarEvents{
-                            id,
-                            startTime,
-                            endTime
-                        }
-                      }
-                    }
-                }
-            }
-    `;
-
-    return query;
-};
+export const loginQuery = () =>
+`
+mutation Login($input: LoginInput!){
+  identityMutation{
+    login(input: $input){
+      accessToken{
+       value,
+       dateIssued,
+       dateExpires
+      }, 
+      refreshToken{
+        value,
+        dateIssued,
+        dateExpires
+      },
+      user{
+        id,
+        fullName,
+        email,
+        permissions,
+        calendarEvents{
+          id,
+          startTime,
+          endTime
+        }
+      }
+    }
+  }
+}`;
 
 export const refreshTokenQuery = () =>
     `
