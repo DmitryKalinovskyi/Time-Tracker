@@ -19,6 +19,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import RequirePermission from "./gates/RequirePermission.tsx";
 import {ManageUsersPermission} from "./features/permissions/permissions.ts";
+import {ReportsPage} from "./ui/pages/ReportsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -35,14 +36,16 @@ const router = createBrowserRouter([
             { element: <RequirePermission permission={ManageUsersPermission}/>, children: [
               { path: "/register", element: <RegisterUserPage /> },
               ]},
-            { path: "/calendar", element: <CalendarPage/> }
+            { path: "/calendar", element: <CalendarPage/> },
+            { path: "/workers-time", element: <ReportsPage /> },
+
           ]
         }
       ]
     },
     { path: "/login", element: <LoginPage /> },
     { path: "/verification", element: <AccountVerificationPage /> },
-    { path: "/reset", element: <ResetUserPasswordPage /> },
+      { path: "/reset", element: <ResetUserPasswordPage /> },
     ]
   }
 ])
