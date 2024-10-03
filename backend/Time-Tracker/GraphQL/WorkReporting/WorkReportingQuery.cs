@@ -19,7 +19,7 @@ namespace Time_Tracker.GraphQL.WorkReporting
 
                     var workReportBuilder = new WorkReportBuilder(sqlConnectionFactory);
 
-                    return workReportBuilder
+                    return await workReportBuilder
                         .From(request.From)
                         .To(request.To)
                         .BuildReport();

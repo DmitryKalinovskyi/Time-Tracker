@@ -6,7 +6,7 @@ namespace Time_Tracker.Services.WorkReport
     {
         public User User { get; set; }
 
-        public int TrackedTime { get; set; }
+        public int TrackedHours { get; set; }
 
         //public int DaysOffWork { get; set; }
     }

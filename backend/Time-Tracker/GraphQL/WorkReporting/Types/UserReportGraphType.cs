@@ -9,7 +9,7 @@ namespace Time_Tracker.GraphQL.WorkReporting.Types
         public UserReportGraphType()
         {
             Field(x => x.User, type: typeof(NonNullGraphType<UserGraphType>));
-            Field(x => x.TrackedTime);
+            Field(x => x.TrackedHours);
         }
     }
 }
