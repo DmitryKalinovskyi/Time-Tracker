@@ -4,5 +4,7 @@
     {
         public DateTimeOffset From { get; set; }
         public DateTimeOffset To { get; set; }
+        public int PageSize { get; set; }
+        public int Page { get; set; }
     }
 }

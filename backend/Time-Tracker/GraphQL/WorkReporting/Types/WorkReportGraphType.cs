@@ -8,6 +8,9 @@ namespace Time_Tracker.GraphQL.WorkReporting.Types
         public WorkReportGraphType()
         {
             Field(x => x.Users, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<UserReportGraphType>>>));
+            Field(x => x.PageSize);
+            Field(x => x.Page);
+            Field(x => x.PageCount);
         }
     }
 }

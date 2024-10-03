@@ -10,6 +10,8 @@ namespace Time_Tracker.GraphQL.WorkReporting.Types
         {
             Field(x => x.From);
             Field(x => x.To);
+            Field(x => x.Page);
+            Field(x => x.PageSize);
         }
     }
 }

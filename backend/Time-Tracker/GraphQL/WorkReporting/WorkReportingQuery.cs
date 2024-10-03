@@ -22,6 +22,7 @@ namespace Time_Tracker.GraphQL.WorkReporting
                     return await workReportBuilder
                         .From(request.From)
                         .To(request.To)
+                        .Paginate(request.Page, request.PageSize)
                         .BuildReport();
                 });
 

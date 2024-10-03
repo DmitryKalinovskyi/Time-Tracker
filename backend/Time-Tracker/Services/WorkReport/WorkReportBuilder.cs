@@ -8,6 +8,8 @@ namespace Time_Tracker.Services.WorkReport
     {
         private DateTimeOffset? _from;
         private DateTimeOffset? _to;
+        private int _page = 0;
+        private int _pageSize = 10;
 
         public WorkReportBuilder From(DateTimeOffset from)
         {
@@ -18,6 +20,14 @@ namespace Time_Tracker.Services.WorkReport
         public WorkReportBuilder To(DateTimeOffset to)
         {
             _to = to;
+            return this;
+        }
+
+        public WorkReportBuilder Paginate(int page, int pageSize)
+        {
+            if (page < 0 || pageSize < 0) throw new ArgumentException("Page and PageSize is non-negative numbers.");
+            _page = page;
+            _pageSize = pageSize;
             return this;
         }
 
@@ -33,6 +43,17 @@ namespace Time_Tracker.Services.WorkReport
 
             using var sqlConnection = sqlConnectionFactory.GetSqlConnection();
 
+            var rowsCountSQL = $@"
+                SELECT COUNT(*) from (
+SELECT UserId
+FROM WorkSessions
+WHERE WorkSessions.StartTime >=  @StartTime
+  AND WorkSessions.EndTime <= @EndTime
+GROUP BY UserId) as Subquery;
+            ";
+
+            var rowsCount = await sqlConnection.QuerySingleAsync<int>(rowsCountSQL, new{ StartTime = _from, EndTime = _to});
+
             var sql = $@"SELECT Users.*, 
        WorkSessionsSummary.TrackedTime
 FROM Users
@@ -43,9 +64,12 @@ INNER JOIN (
     WHERE WorkSessions.StartTime >= @StartTime 
       AND WorkSessions.EndTime <= @EndTime
     GROUP BY UserId
+    ORDER By UserId
+    OFFSET @Offset ROWS
+    FETCH NEXT @PageSize ROWS ONLY
 ) AS WorkSessionsSummary ON Users.Id = WorkSessionsSummary.UserId;";
 
-            var results = await sqlConnection.QueryAsync(sql, new { StartTime = _from, EndTime = _to });
+            var results = await sqlConnection.QueryAsync(sql, new { StartTime = _from, EndTime = _to, Offset = _page * _pageSize, PageSize = _pageSize});
 
             var users = results.Select(result =>
             {
@@ -72,7 +96,10 @@ INNER JOIN (
 
             var report = new WorkReport()
             {
-                Users = users.ToList()
+                Users = users.ToList(),
+                Page = _page,
+                PageSize = _pageSize,
+                PageCount = (int)Math.Ceiling((double)rowsCount / _pageSize)
             };
 
             return report;
