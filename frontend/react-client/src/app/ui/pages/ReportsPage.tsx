@@ -1,6 +1,7 @@
 import Button from "@mui/material/Button";
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
+    CircularProgress,
     FormControlLabel, FormGroup,
     Paper,
     Stack, Switch,
@@ -13,47 +14,64 @@ import {
     TableSortLabel
 } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import {useDispatch, useSelector} from "react-redux";
+import {fetchWorkReport, WorkReportingState} from "../../features/workReporting/workReportingSlice.ts";
+import {RootState} from "../../store.ts";
+import {getMonthTimeRange} from "../../misc/DateHelper.ts";
+import dayjs from "dayjs";
+import Typography from "@mui/material/Typography";
+import Pagination from "@mui/material/Pagination";
 
-
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-    createData('Dmytro Kalinovskyi', 159, 6.0, 24, 4.0),
-    createData('Sasha ZAi', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
 
 export function ReportsPage(){
     const [dense, setDense] = useState(true);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [page, setPage] = useState(0);
+    const [pagination, setPagination] = useState({
+        page: 0,
+        pageSize: 5,
+        from: new Date(),
+        to: new Date()
+    });
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+    const workReportingState: WorkReportingState = useSelector((state: RootState) => state.workReporting);
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
+    const dispatch = useDispatch();
+    useEffect(() => {
+        handleChangeMonth(new Date());
+    }, []);
+
+    useEffect(() => {
+        dispatch(fetchWorkReport({
+            pageSize: pagination.pageSize,
+            page: pagination.page,
+            from: pagination.from,
+            to: pagination.to
+        }));
+    }, [dispatch, pagination]);
+
+    const handleChangePage = (page: number) => {
+        console.log(page);
+        setPagination({...pagination, page});
+    }
+
+    // const handleChangeRowsPerPage = (pageSize: number) => {
+    //     setPagination({...pagination, pageSize});
+    // }
+
+    const handleChangeMonth = (month: Date) => {
+        const {from, to} = getMonthTimeRange(month);
+        setPagination({...pagination, from, to});
+    }
 
     return <>
         <Stack m={2}>
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" m={2} spacing={2} alignItems="center">
                     <Button variant="contained">Download .xlsm</Button>
-                    <Button variant="contained">Download .csv</Button>
+                    {/*<Button variant="contained">Download .csv</Button>*/}
 
                     <DatePicker
+                        value={dayjs(pagination.from)}
+                        onChange={(value) => handleChangeMonth(value.toDate())}
                         label={'View by Month'}
                         openTo="month"
                         views={['year', 'month']}
@@ -64,6 +82,10 @@ export function ReportsPage(){
                     {/*<Button color="secondary" onClick={() => dispatch(changeSelectedUser(me))} variant="contained">View my</Button>*/}
                 </Stack>
             </Stack>
+            {workReportingState.isFetching &&
+                <CircularProgress/>
+            }
+            {workReportingState.workReport && !workReportingState.isFetching &&
             <Paper>
                 <TableContainer>
                     <Table sx={{ minWidth: 750 }}
@@ -79,17 +101,17 @@ export function ReportsPage(){
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row) => (
+                            { workReportingState.workReport.users.map((userReport) => (
                                 <TableRow
-                                    key={row.name}
+                                    key={userReport.user.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
-                                        {row.name}
+                                        {userReport.user.fullName}
                                     </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    <TableCell align="right">{row.fat}</TableCell>
-                                    <TableCell align="right">{row.carbs}</TableCell>
+                                    <TableCell align="right">{userReport.trackedHours}</TableCell>
+                                    <TableCell align="right">0</TableCell>
+                                    <TableCell align="right">0</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -99,17 +121,24 @@ export function ReportsPage(){
                         <FormControlLabel sx={{m: 0}} control={<Switch checked={dense}
                                                                        onChange={(e, checked) => setDense(checked)}/>}
                                           label="Dense" />
-                    <TablePagination
-                        sx={{m: 0}}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        count={rows.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
+                    {workReportingState.workReport.pageCount > 1 &&
+                    <Pagination count={workReportingState.workReport.pageCount}
+                                page={pagination.page + 1}
+                                onChange={(e, page) => handleChangePage(page-1)}
+
+                    />}
+                    {/*<TablePagination*/}
+                    {/*    sx={{m: 0}}*/}
+                    {/*    rowsPerPageOptions={[5, 10, 25]}*/}
+                    {/*    count={workReportingState.workReport.users.length}*/}
+                    {/*    rowsPerPage={workReportingState.workReport.pageSize}*/}
+                    {/*    page={workReportingState.workReport.page}*/}
+                    {/*    onPageChange={(e, page) => handleChangePage(page)}*/}
+                    {/*    onRowsPerPageChange={(e) => handleChangeRowsPerPage(e.target.value)}*/}
+                    {/*/>*/}
                 </Stack>
             </Paper>
+            }
 
 
         </Stack>

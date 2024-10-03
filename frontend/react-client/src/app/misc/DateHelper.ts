@@ -25,4 +25,15 @@ export function toIsoString(date: Date) {
         ':' + pad(date.getSeconds()) +
         dif + pad(Math.floor(Math.abs(tzo) / 60)) +
         ':' + pad(Math.abs(tzo) % 60);
-  }
+}
+
+
+export function getMonthTimeRange(month: Date){
+    // First day of the month
+    const from = new Date(month.getFullYear(), month.getMonth(), 1, 0, 0, 0, 0);
+
+    // Last day of the month
+    const to = new Date(month.getFullYear(), month.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    return { from, to };
+}

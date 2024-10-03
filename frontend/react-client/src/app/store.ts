@@ -10,6 +10,7 @@ import permissionsReducer from "./features/permissions/permissionsSlice.ts";
 import resetReducer  from "./features/resetPassword/resetSlice.ts";
 import timeTrackerReducer from './features/timeTracking/timeTrackingSlice.ts';
 import calendarReducer from "./features/calendar/calendarSlice.ts";
+import workReportingReducer from "./features/workReporting/workReportingSlice.ts";
 
 import {authUserEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +26,7 @@ import {
     deleteCalendarEventEpic,
     updateCalendarEventEpic
 } from "./features/calendar/calendarEpic.ts";
+import {fetchWorkReportEpic} from "./features/workReporting/workReportingEpic.ts";
 
 
 
@@ -49,10 +51,11 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     deleteSessionEpic,
     addSessionEpic,
     refreshTokenEpic,
-
     addCalendarEventEpic,
     updateCalendarEventEpic,
-    deleteCalendarEventEpic
+    deleteCalendarEventEpic,
+
+    fetchWorkReportEpic
   );
 
 const epicMiddleware = createEpicMiddleware<Action, Action, any, any>();
@@ -69,6 +72,7 @@ export const store = configureStore({
         reset: resetReducer,
         timeTracker: timeTrackerReducer,
         calendar: calendarReducer,
+        workReporting: workReportingReducer
     },
     middleware: () => new Tuple(epicMiddleware)
 })
