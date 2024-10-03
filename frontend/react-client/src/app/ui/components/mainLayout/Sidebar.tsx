@@ -112,11 +112,11 @@ const Sidebar: React.FC = () => {
 
         <Divider sx={{ my: 2, borderColor: '#2C3E50', borderBottomWidth: 2.5}} />
 
-        <ListItemButton component={Link} to="/reports" sx={buttonSx}>
+        <ListItemButton component={Link} to="/workers-time" sx={buttonSx}>
           <ListItemIcon sx={iconSx}>
             <BarChart sx={{ color: '#FFF' }} />
           </ListItemIcon>
-          <ListItemText primary="Reports" sx={textSx} />
+          <ListItemText primary="Workers Time" sx={textSx} />
         </ListItemButton>
 
         <ListItemButton component={Link} to="/users" sx={buttonSx}>

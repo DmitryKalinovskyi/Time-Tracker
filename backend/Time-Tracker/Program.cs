@@ -10,6 +10,7 @@ using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
 using Time_Tracker.Services;
 using Time_Tracker.Services.Mail;
+using Time_Tracker.Services.WorkReport;
 
 var builder = WebApplication.CreateBuilder(args);
 
