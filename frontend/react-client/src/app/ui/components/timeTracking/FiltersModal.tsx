@@ -138,7 +138,7 @@ const FiltersModal = ({
   const [editedBy, setEditedBy] = useState<User | null>(null);
   const [durationOperator, setDurationOperator] = useState<string | null>();
   const [durationValue, setDurationValue] = useState<string | null>();
-  const [dateRange, setDateRange] = useState<DateRange | null>();
+  const [dateRange, setDateRange] = useState<DateRange | null>(predefinedRanges[4].value());
   const me = useAuth().user!;
 
   const handleApply = () => {
