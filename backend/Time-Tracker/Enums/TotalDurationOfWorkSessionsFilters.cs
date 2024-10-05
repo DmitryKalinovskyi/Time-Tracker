@@ -4,6 +4,7 @@
     {
         UserId = WorkSessionFilterableFields.UserId,
         StartTime = WorkSessionFilterableFields.StartTime,
-        SessionOriginId = WorkSessionFilterableFields.SessionOriginId
+        SessionOriginId = WorkSessionFilterableFields.SessionOriginId,
+        Duration = WorkSessionFilterableFields.Duration
     }
 }

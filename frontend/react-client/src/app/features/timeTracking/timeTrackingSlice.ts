@@ -6,14 +6,16 @@ import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
 import { addDays } from "date-fns";
+
+export interface PaginationInfo{
+    totalRecords?: number
+    totalPages?: number
+    currentPage: number
+    pageSize?: number
+}
 export interface TimeTrackerType {
     workSessions: Array<WorkSession>;
-    paginationInfo?: {
-        totalRecords?: number
-        totalPages?: number
-        currentPage: number
-        pageSize?: number
-    }
+    paginationInfo?: PaginationInfo;
     currentSession: WorkSession | null;
     isTracking: boolean;
     filters?: FilterCriteria[];
@@ -38,8 +40,6 @@ export interface UpdateSessionPayload{
     startTime: Date;
     endTime: Date;
 }
-
-export type WorkSessionPaginationRequest = PaginatedRequest;
 
 export type WorkSessionPaginationResult = PaginatedResult<WorkSession>;
 
@@ -67,7 +67,6 @@ const timeTrackerSlice = createSlice({
     reducers: {
         startSession(state, _action: PayloadAction<number>)
         {
-            state.loading = true; 
             state.error = null;
         },
 
@@ -77,7 +76,7 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        getSessions(state, _action: PayloadAction<WorkSessionPaginationRequest>)
+        getSessions(state, _action: PayloadAction<PaginatedRequest>)
         {
             state.loading = true;
             state.error = null;
@@ -167,6 +166,7 @@ const timeTrackerSlice = createSlice({
         deleteSessionSuccessful(state, _action: PayloadAction<number>) {
             state.loading = false;
             state.error = null;
+            state.paginationInfo!.currentPage = 1
         },
 
         updateSessionSuccessful(state, _action: PayloadAction<WorkSession>)
