@@ -48,7 +48,7 @@ public class IdentityMutation : ObjectGraphType
                 var userId = tokenService.GetRefreshTokenClaimsPrincipal(input.RefreshToken).GetUserId();
 
                 var user = await usersRepository.FindAsync(userId) ??
-                    throw new UserNotFoundedExecutionError("User not founded.");
+                    throw new InvalidRefreshTokenExecutionError("Refresh token is inalid.");
 
                 if (user.RefreshToken == null
                 || user.RefreshTokenDateExpires == null
@@ -76,7 +76,7 @@ public class IdentityMutation : ObjectGraphType
                 var userId = context.User.GetUserId();
 
                 var user = await usersRepository.FindAsync(userId) ?? 
-                    throw new UserNotFoundedExecutionError("User not founded.");
+                    throw new InvalidOperationException("User not founded.");
 
                 user.RefreshToken = null;
                 user.RefreshTokenDateExpires = null;
