@@ -51,7 +51,7 @@ const initialState: TimeTrackerType = {
     error: null,
     paginationInfo: {
         currentPage: 1,
-        pageSize: 3
+        pageSize: window.innerWidth >= 2000 ? 6 : 3
     },
     todayTotalDuration: 0,
     workSessionsListingTotalDuration: 0,
