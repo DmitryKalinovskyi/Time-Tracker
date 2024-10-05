@@ -24,6 +24,11 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                         context.Errors.Add(new ExecutionError($"User with id = {userId} does not exist."));
                         return null;
                     }
+                    if(await workSessionRepository.GetCurrentWorkSessionByUserIdAsync(userId) is not null)
+                    {
+                        context.Errors.Add(new ExecutionError($"User with id = {userId} has already started work session."));
+                        return null;
+                    }
 
                     var newWorkSession = new WorkSession()
                     {
