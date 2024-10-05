@@ -1,7 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Time_Tracker.Dtos;
-using Time_Tracker.GraphQL.Authorization.Exceptions;
+using Time_Tracker.GraphQL.Authorization.Errors;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;

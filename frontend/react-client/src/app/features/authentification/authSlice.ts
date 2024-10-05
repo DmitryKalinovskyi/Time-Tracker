@@ -9,6 +9,7 @@ export interface AuthType {
     loading: boolean,
     error: string | null
     refreshRejects: number,
+    isRefreshing: boolean,
     isRefreshed: boolean
 }
 
@@ -24,6 +25,7 @@ const initialState: AuthType =
     loading: false,
     error: null,
     refreshRejects: 0,
+    isRefreshing: false,
     isRefreshed: false
 };
 
@@ -34,13 +36,18 @@ const authSlice = createSlice({
         loginUser : (state) => {
             state.loading = true;
         },
+        beginRefreshToken: (state) => {
+            state.isRefreshing = true;
+        },
         refreshToken : (state, action: PayloadAction<{user: User, accessToken: Token, refreshToken: Token}>) => {
             state.accessToken = action.payload.accessToken;
             state.user = action.payload.user;
+            state.isRefreshing = false;
             state.isRefreshed = true;
             saveRefreshToken(action.payload.refreshToken);
         },
         refreshTokenReject: (state)=> {
+            state.isRefreshing = false;
             state.isRefreshed = true;
             state.refreshRejects++;
         },
@@ -52,8 +59,6 @@ const authSlice = createSlice({
             state.refreshRejects = 0;
         },
         loginFailure: (state, action: PayloadAction<string>) => {
-            console.log(`Error while authentification user: ${action.payload} `);
-            
             state.accessToken = null;
             state.user = null;
             state.error = action.payload;
@@ -70,6 +75,7 @@ const authSlice = createSlice({
 })
 
 export const {loginUser,
+    beginRefreshToken,
     refreshToken,
     refreshTokenReject,
     loginSuccess,

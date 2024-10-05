@@ -1,6 +1,6 @@
 ﻿using GraphQL;
 
-namespace Time_Tracker.GraphQL.Authorization.Exceptions
+namespace Time_Tracker.GraphQL.Authorization.Errors
 {
     public class InvalidRefreshTokenExecutionError: ExecutionError
     {
