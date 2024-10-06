@@ -32,6 +32,8 @@ import {fetchWorkReportEpic} from "./features/workReporting/workReportingEpic.ts
 
 const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, any, any>(
     authUserEpic,
+    beginRefreshTokenEpic,
+    refreshTokenEpic,
     registerUserEpic,
     verifUserEpic,
     getUsersEpic,
@@ -50,8 +52,6 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     updateSessionEpic,
     deleteSessionEpic,
     addSessionEpic,
-    beginRefreshTokenEpic,
-    refreshTokenEpic,
     addCalendarEventEpic,
     updateCalendarEventEpic,
     deleteCalendarEventEpic,

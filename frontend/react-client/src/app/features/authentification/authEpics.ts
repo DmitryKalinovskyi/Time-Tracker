@@ -42,7 +42,8 @@ export const beginRefreshTokenEpic = (action$: Observable<Action>, state$: State
         return true;
     }),
     tap(() => console.log('Access token expired. We need to make request with our refresh to receive new access.')),
-    mergeMap(action => {
+    mergeMap((action) => {
+        // action will be dispatched again to the store, this can lead to some issues
        return concat(of(beginRefreshToken()), of(action));
     }),
 )
