@@ -1,7 +1,14 @@
 import {ofType, StateObservable} from "redux-observable";
 import {map, from, catchError, of, mergeMap, Observable, tap, filter, concat, delay} from "rxjs";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {loginSuccess, loginFailure, AuthPayload, refreshToken, refreshTokenReject} from "./authSlice.ts";
+import {
+    loginSuccess,
+    loginFailure,
+    AuthPayload,
+    refreshToken,
+    refreshTokenReject,
+    beginRefreshToken
+} from "./authSlice.ts";
 import { createRequest } from "../../misc/RequestCreator.ts";
 import {loginQuery, LoginQueryResponseType, refreshTokenQuery, RefreshTokenQueryResponseType} from "./api/authQueries.ts"
 import { loginUser } from "./authSlice.ts";
@@ -9,14 +16,19 @@ import { Action, PayloadAction } from "@reduxjs/toolkit";
 import {RootState} from "../../store.ts"
 import {isTokenExpired} from "../../misc/tokenValidation.ts";
 import {getAvailableRefreshToken, saveRefreshToken} from "./refreshTokenManager.ts";
+import {InvalidCredentialsExecutionError} from "./errors/InvalidCredentialsExecutionError.ts";
+import {InvalidRefreshTokenExecutionError} from "./errors/InvalidRefreshTokenExecutionError.ts";
 
-export const refreshTokenEpic = (action$: Observable<Action>, state$: StateObservable<RootState>) => action$.pipe(
+export const beginRefreshTokenEpic = (action$: Observable<Action>, state$: StateObservable<RootState>) => action$.pipe(
     filter(() => {
         const auth = state$.value.auth;
         if(auth.accessToken != null && !isTokenExpired(auth.accessToken)){
             // we already have valid access token.
             return false;
         }
+
+        if(auth.isRefreshing)
+            return false;
 
         if(auth.refreshRejects >= 5){
             console.log("Too many refreshes. Refresh will not be completed.");
@@ -29,9 +41,16 @@ export const refreshTokenEpic = (action$: Observable<Action>, state$: StateObser
 
         return true;
     }),
-    delay(1000),
     tap(() => console.log('Access token expired. We need to make request with our refresh to receive new access.')),
-    mergeMap((action) => from(
+    mergeMap((action) => {
+        // action will be dispatched again to the store, this can lead to some issues
+       return concat(of(beginRefreshToken()), of(action));
+    }),
+)
+
+export const refreshTokenEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(beginRefreshToken.type),
+    mergeMap(() => from(
         ajax(createRequest(refreshTokenQuery(),
             {
                 input: {
@@ -40,7 +59,10 @@ export const refreshTokenEpic = (action$: Observable<Action>, state$: StateObser
             map((ajaxResponse: AjaxResponse<RefreshTokenQueryResponseType>) => {
                 const errors = ajaxResponse.response.errors;
                 if(errors && errors.length > 0){
-                    throw new Error("Refresh token request contains errors." + errors)
+                    if(errors[0].extensions.code === "INVALID_REFRESH_TOKEN")
+                        throw new InvalidRefreshTokenExecutionError(errors[0].message);
+
+                    throw new Error(errors[0].message)
                 }
 
                 const refreshTokenQueryResult = ajaxResponse.response.data.identityMutation.refreshToken;
@@ -50,13 +72,9 @@ export const refreshTokenEpic = (action$: Observable<Action>, state$: StateObser
                     refreshToken: refreshTokenQueryResult.refreshToken
                 });
             }),
-            mergeMap(refreshTokenAction => {
-                return concat(of(refreshTokenAction), of(action));
-            }),
             catchError(error => {
-                console.log(error)
-
-                return concat(of(refreshTokenReject()), of(action));
+                console.log(error);
+                return of(refreshTokenReject())
             })
         )
     ))
@@ -74,6 +92,9 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                         const errors = ajaxResponse.response.errors;
 
                         if(errors && errors.length > 0){
+                            if(errors[0].extensions.code === "INVALID_CREDENTIALS")
+                                throw new InvalidCredentialsExecutionError(errors[0].message);
+
                             throw new Error(errors[0].message)
                         }
 
@@ -87,15 +108,11 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
                         });
                     }),
                     catchError((error) => {
-                        let errorMessage = 'An unexpected error occurred';
-
-                        if (error.status === 0) {
-                            errorMessage = 'Connection time out';
-                        } else if (error.message) {
-                            errorMessage = error.message;
+                        if(error instanceof InvalidCredentialsExecutionError){
+                            return of(loginFailure(error.message));
                         }
 
-                        return of(loginFailure(errorMessage));
+                        return of(loginFailure('An unexpected error occurred'));
                     })
                 )
             )

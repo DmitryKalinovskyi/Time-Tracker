@@ -5,11 +5,12 @@ import {CircularProgress} from "@mui/material";
 import useIsHaveRefreshToken from "../../hooks/useIsHaveRefreshToken.ts";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import {beginRefreshToken} from "./authSlice.ts";
 
 export function AuthProvider({children}){
     // dispatch auth action and wait, then return inner component.
     useEffect(() => {
-        store.dispatch({type: "DUMMY_ACTION"})
+        store.dispatch(beginRefreshToken())
     }, []);
 
     const isHaveRefreshToken = useIsHaveRefreshToken();

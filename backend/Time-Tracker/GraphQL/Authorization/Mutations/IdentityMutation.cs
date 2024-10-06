@@ -1,7 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Time_Tracker.Dtos;
-using Time_Tracker.GraphQL.Authorization.Exceptions;
+using Time_Tracker.GraphQL.Authorization.Errors;
 using Time_Tracker.GraphQL.Authorization.Types;
 using Time_Tracker.Helpers;
 using Time_Tracker.Repositories;
@@ -48,7 +48,7 @@ public class IdentityMutation : ObjectGraphType
                 var userId = tokenService.GetRefreshTokenClaimsPrincipal(input.RefreshToken).GetUserId();
 
                 var user = await usersRepository.FindAsync(userId) ??
-                    throw new UserNotFoundedExecutionError("User not founded.");
+                    throw new InvalidRefreshTokenExecutionError("Refresh token is inalid.");
 
                 if (user.RefreshToken == null
                 || user.RefreshTokenDateExpires == null
@@ -76,7 +76,7 @@ public class IdentityMutation : ObjectGraphType
                 var userId = context.User.GetUserId();
 
                 var user = await usersRepository.FindAsync(userId) ?? 
-                    throw new UserNotFoundedExecutionError("User not founded.");
+                    throw new InvalidOperationException("User not founded.");
 
                 user.RefreshToken = null;
                 user.RefreshTokenDateExpires = null;
