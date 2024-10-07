@@ -6,14 +6,13 @@ import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store.ts";
 import {isSameDay} from "../../../misc/DateHelper.ts";
 import {useIsMe} from "../../../hooks/useIsMe.ts";
-import {apiDeleteCalendarEvent} from "../../../features/calendar/calendarEpic.ts";
 import {CalendarEvent} from "../../../types/CalendarEvent.ts";
+import {apiDeleteCalendarEvent} from "../../../features/calendar/calendarSlice.ts";
 interface DayModalProps{
     isOpen: boolean
     day: Date,
@@ -62,11 +61,6 @@ export function DayModal(props: DayModalProps){
                             />
                             {isYourEvents &&
                             <div className="ml-4">
-                                {/*<IconButton color="primary"*/}
-                                {/*    // onClick={() => onEdit(event)}*/}
-                                {/*>*/}
-                                {/*    <EditIcon />*/}
-                                {/*</IconButton>*/}
                                 <IconButton color="error"
                                     onClick={() => dispatch(apiDeleteCalendarEvent(event.id))}
                                 >

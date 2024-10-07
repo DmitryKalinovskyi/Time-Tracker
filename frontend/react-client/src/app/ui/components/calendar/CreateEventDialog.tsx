@@ -3,8 +3,8 @@ import dayjs from "dayjs";
 import {TimePicker} from "@mui/x-date-pickers";
 import Button from "@mui/material/Button";
 import React, {useRef, useState} from "react";
-import {AddCalendarEventInputType, apiAddCalendarEvent} from "../../../features/calendar/calendarEpic.ts";
 import {useDispatch} from "react-redux";
+import {AddCalendarEventInputType, apiCreateCalendarEvent} from "../../../features/calendar/calendarSlice.ts";
 
 interface CreateEventModalProps{
     day: Date,
@@ -13,50 +13,57 @@ interface CreateEventModalProps{
     props?
 }
 
+const getInitialEventDetails = (day): AddCalendarEventInputType => {
+    const initialStartTime = new Date(day);
+    initialStartTime.setHours(8, 0);
+    const initialEndTime = new Date(day);
+    initialEndTime.setHours(16, 0);
+
+    return {
+        startTime: initialStartTime,
+        endTime: initialEndTime
+    };
+}
+
+const extractDetails = (day, eventDetails) => {
+    const details: AddCalendarEventInputType = {
+        startTime: new Date(day),
+        endTime: new Date(day),
+    };
+
+    details.startTime.setHours(eventDetails.startTime.getHours());
+    details.startTime.setMinutes(eventDetails.startTime.getMinutes());
+
+    details.endTime.setHours(eventDetails.endTime.getHours());
+    details.endTime.setMinutes(eventDetails.endTime.getMinutes());
+
+    return details;
+}
+
 export function CreateEventDialog(props: CreateEventModalProps){
     const dispatch = useDispatch();
 
-    const initialStartTime = new Date(props.day);
-    initialStartTime.setHours(8, 0);
-    const initialEndTime = new Date(props.day);
-    initialEndTime.setHours(16, 0);
-
     const [error, setError] = useState<string | null>(null);
-
-    const [eventDetails, setEventDetails] = useState<AddCalendarEventInputType>({
-        startTime: initialStartTime,
-        endTime: initialEndTime
-    });
-
+    const [eventDetails, setEventDetails] = useState(() => getInitialEventDetails(props.day));
     const lastClicked = useRef<Date>(new Date());
 
     const handleAddButtonClick = () => {
+        // prevent double click
         if (new Date().getTime() - lastClicked < 1300) return;
-
         lastClicked.current = new Date();
-        const details: AddCalendarEventInputType = {
-            startTime: new Date(props.day),
-            endTime: new Date(props.day),
-        };
 
-        details.startTime.setHours(eventDetails.startTime.getHours());
-        details.startTime.setMinutes(eventDetails.startTime.getMinutes());
-
-        details.endTime.setHours(eventDetails.endTime.getHours());
-        details.endTime.setMinutes(eventDetails.endTime.getMinutes());
+        const details = extractDetails(props.day, eventDetails);
 
         if (details.endTime < details.startTime) {
             setError("The end time cannot be earlier than the start time. Please select a valid time range.");
             return;
         }
 
-        setError(null);
-        dispatch(apiAddCalendarEvent(details));
+        dispatch(apiCreateCalendarEvent(details));
         props.onClose();
     }
 
     const handleClose = () => {
-        setError(null);
         props.onClose();
     }
 
@@ -68,12 +75,6 @@ export function CreateEventDialog(props: CreateEventModalProps){
             </DialogTitle>
                 <DialogContent sx={{width: "360px"}}>
                 <Stack spacing={2} sx={{pt: 2}}>
-                    {/*<TextField fullWidth placeholder="Going to a party."*/}
-                    {/*           onChange={(e) => setDayOff({...dayOff, name: e.target.value})}/>*/}
-                    {/*<DatePicker label="Day"*/}
-                    {/*            value={dayjs(eventDetails.startTime)}*/}
-                    {/*            onChange={(newDate) => updateDay(newDate)}*/}
-                    {/*/>*/}
                     <TimePicker label="From"
                                 value={dayjs(eventDetails.startTime)}
                                 views={['hours', 'minutes']}
