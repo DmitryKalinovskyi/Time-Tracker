@@ -12,13 +12,13 @@ namespace Time_Tracker.Repositories
         {
             public int Id { get; set; }
 
-            public string FullName { get; set; }
+            public required string FullName { get; set; }
 
-            public string Email { get; set; }
+            public required string Email { get; set; }
 
-            public string HashedPassword { get; set; }
+            public string? HashedPassword { get; set; }
 
-            public string Salt { get; set; }
+            public string? Salt { get; set; }
 
             public bool IsActive { get; set; } = false;
 
@@ -27,6 +27,11 @@ namespace Time_Tracker.Repositories
             public string? RefreshToken { get; set; }
 
             public DateTime? RefreshTokenDateExpires { get; set; }
+
+            public required string Position { get; set; }
+
+            public int WorkHoursPerMonth { get; set; }
+
 
             public static User Deserialize(DBUser dbUser)
             {
@@ -41,6 +46,8 @@ namespace Time_Tracker.Repositories
                     Permissions = dbUser.Permissions?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList() ?? [],
                     RefreshToken = dbUser.RefreshToken,
                     RefreshTokenDateExpires = dbUser.RefreshTokenDateExpires,
+                    Position = dbUser.Position,
+                    WorkHoursPerMonth = dbUser.WorkHoursPerMonth,
                 };
             }
 
@@ -57,6 +64,8 @@ namespace Time_Tracker.Repositories
                     Permissions = user.Permissions.Count > 0? string.Join(" ", user.Permissions): null,
                     RefreshToken = user.RefreshToken,
                     RefreshTokenDateExpires = user.RefreshTokenDateExpires,
+                    Position = user.Position,
+                    WorkHoursPerMonth = user.WorkHoursPerMonth,
                 };
             }
         }
@@ -149,7 +158,9 @@ namespace Time_Tracker.Repositories
                             IsActive = @IsActive,
                             Permissions = @Permissions,
                             RefreshToken = @RefreshToken,
-                            RefreshTokenDateExpires = @RefreshTokenDateExpires
+                            RefreshTokenDateExpires = @RefreshTokenDateExpires,
+                            Position = @Position,
+                            WorkHoursPerMonth = @WorkHoursPerMonth
                             WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);

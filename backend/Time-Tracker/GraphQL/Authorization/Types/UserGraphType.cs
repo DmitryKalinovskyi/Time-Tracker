@@ -14,6 +14,8 @@ public class UserGraphType : ObjectGraphType<User>
         Field(t => t.Email);
         Field(t => t.Permissions, nullable: true);
         Field(t => t.IsActive);
+        Field(t => t.Position);
+        Field(t => t.WorkHoursPerMonth);
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<CalendarEventGraphType>>>>("calendarEvents")
             .ResolveAsync(async context => await calendarEventsRepository.FindAllByUserIdAsync(context.Source.Id));
