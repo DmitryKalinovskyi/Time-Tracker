@@ -17,7 +17,9 @@ const initialState: RegisterType = {
 
 export interface RegisterPayload {
     fullName: string, 
-    email: string
+    email: string,
+    position: string,
+    workHoursPerMonth: number
 }
 
 const registerSlice = createSlice({

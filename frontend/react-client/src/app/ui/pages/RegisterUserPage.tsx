@@ -9,6 +9,8 @@ import { registerUserRequest } from '../../features/registration/registerSlice.t
 const CreateUserPage: React.FC = () => {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
+    const [position, setPosition] = useState('');
+    const [workHoursPerMonth, setWorkHoursPerMonth] = useState(160);
 
     const dispatch = useDispatch();
 
@@ -17,7 +19,9 @@ const CreateUserPage: React.FC = () => {
     useEffect(() => {
         if (success) {
             setFullName('');
-            setEmail(''); 
+            setEmail('');
+            setPosition('');
+            setWorkHoursPerMonth(160);
         }
     }, [success]);
 
@@ -43,7 +47,7 @@ const CreateUserPage: React.FC = () => {
             return;
         }
     
-        dispatch(registerUserRequest({ fullName, email }));
+        dispatch(registerUserRequest({ fullName, email, position, workHoursPerMonth}));
     };
 
     return (
@@ -88,6 +92,24 @@ const CreateUserPage: React.FC = () => {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Position"
+                    autoComplete="position"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    inputProps={{ type: 'number'}}
+                    label="Work hours per month"
+                    value={workHoursPerMonth}
+                    onChange={(e) => setWorkHoursPerMonth(+e.target.value)}
                 />
                 {(success !== null) && 
                 <Typography
