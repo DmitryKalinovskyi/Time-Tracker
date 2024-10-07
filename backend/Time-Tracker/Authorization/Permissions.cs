@@ -4,6 +4,8 @@
     {
         public const string ManageUsers = "ManageUsers";
         public const string ManageUsersPermissions = "ManageUsersPermissions";
+        public const string TimeTracking = "TimeTracking";
+        public const string ManageUsersSessions = "ManageUsersSessions";
 
         public static List<string> GetAllPermissions()
         {

@@ -1,7 +1,12 @@
 ﻿using GraphQL;
+using GraphQL.Server.Transports.AspNetCore.Errors;
 using GraphQL.Types;
+using Time_Tracker.Authorization;
 using Time_Tracker.Enums;
+using Time_Tracker.GraphQL.Authorization;
+using Time_Tracker.GraphQL.TimeTracking.Errors;
 using Time_Tracker.GraphQL.TimeTracking.Types;
+using Time_Tracker.Helpers;
 using Time_Tracker.Models;
 using Time_Tracker.Repositories;
 
@@ -11,23 +16,23 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
     {
         public TimeTrackerMutation(IWorkSessionRepository workSessionRepository,
                                    IUsersRepository userRepository,
-                                   ISessionOriginRepository sessionOriginRepository)
+                                   ISessionOriginRepository sessionOriginRepository,
+                                   IPermissionsService permissionsService)
         {
             Field<StartSessionResponseGraphType>("startSession")
-                .Argument<NonNullGraphType<IntGraphType>>("userId")
+                .RequirePermission(Permissions.TimeTracking)
                 .ResolveAsync(async context =>
                 {
-                    var userId = context.GetArgument<int>("userId");
+                    var userId = context.User.GetUserId();
 
                     if (await userRepository.FindAsync(userId) is null)
                     {
-                        context.Errors.Add(new ExecutionError($"User with id = {userId} does not exist."));
-                        return null;
+                        throw new InvalidOperationException($"User with id = {userId} not founded.");
                     }
+
                     if(await workSessionRepository.GetCurrentWorkSessionByUserIdAsync(userId) is not null)
                     {
-                        context.Errors.Add(new ExecutionError($"User with id = {userId} has already started work session."));
-                        return null;
+                        throw new SessionAlreadyStartedExecutionError($"User with id = {userId} has already started work session.");
                     }
 
                     var newWorkSession = new WorkSession()
@@ -45,24 +50,17 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                 });
 
             Field<WorkSessionGraphType>("stopSession")
-                .Argument<NonNullGraphType<IntGraphType>>("workSessionId")
+                .Authorize()
                 .ResolveAsync(async context =>
                 {
-                    var workSessionId = context.GetArgument<int>("workSessionId");
+                    var userId = context.User.GetUserId();
 
-                    var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(workSessionId);
+                    var currentWorkSession = await workSessionRepository.GetCurrentWorkSessionByUserIdAsync(userId);
 
                     if (currentWorkSession is null)
                     {
-                        context.Errors.Add(new ExecutionError($"Works session with id = {workSessionId} does not exist."));
                         return null;
                     }  
-                    
-                    if(currentWorkSession.EndTime is not null)
-                    {
-                        context.Errors.Add(new ExecutionError($"Works session with id = {workSessionId} alredy stopped."));
-                        return null;
-                    }
 
                     var updatedWorkSession = await workSessionRepository.UpdateWorkSessionAsync(currentWorkSession);
 
@@ -71,6 +69,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
 
             Field<WorkSessionGraphType>("addSession")
                 .Argument<NonNullGraphType<AddSessionInputGraphType>>("input")
+                .Authorize()
                 .ResolveAsync(async context =>
                 {
                     var inputSession = context.GetArgument<WorkSession>("input");
@@ -111,13 +110,18 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                 });
 
             Field<WorkSessionGraphType>("updateSession")
-                .Argument<NonNullGraphType<IntGraphType>>("editorId")
                 .Argument<NonNullGraphType<UpdateSessionInputGraphType>>("input")
+                .Authorize()
                 .ResolveAsync(async context =>
                 {
                     var inputSession = context.GetArgument<WorkSession>("input");
-                    var editorId = context.GetArgument<int>("editorId");
+                    var editorId = context.User.GetUserId();
                     var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(inputSession.Id);
+
+                    if (await userRepository.FindAsync(editorId) is null)
+                    {
+                        throw new InvalidOperationException($"User with id = {editorId} not founded.");
+                    }
 
                     if (currentWorkSession is null)
                     {
@@ -126,6 +130,12 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                     }
                     else inputSession.UserId = currentWorkSession.UserId;
 
+                    // restrict access
+                    if (inputSession.UserId != editorId &&
+                    !await permissionsService.HasRequiredPermission(editorId, Permissions.ManageUsersSessions))
+                    {
+                        throw new AccessDeniedError("updateSession");
+                    }
 
                     if (!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
                     {
@@ -133,11 +143,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                         return null;
                     }
 
-                    if (await userRepository.FindAsync(editorId) is null)
-                    {
-                        context.Errors.Add(new ExecutionError($"Editor with id = {editorId} does not exist."));
-                        return null;
-                    }
+                    
 
                     currentWorkSession.SessionOriginId = (int)WorkSessionOrigins.Edited;
                     currentWorkSession.EditedBy = editorId;
@@ -151,21 +157,28 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
 
             Field<StringGraphType>("deleteSession")
                 .Argument<IntGraphType>("workSessionId")
+                .Authorize()
                 .ResolveAsync(async context =>
                 {
                     int workSessionId = context.GetArgument<int>("workSessionId");
 
-                    if(await workSessionRepository.GetWorkSessionByIdAsync(workSessionId) is null)
+                    var workSession = await workSessionRepository.GetWorkSessionByIdAsync(workSessionId);
+                    if (workSession is null)
                     {
                         context.Errors.Add(new ExecutionError($"Work session with id = {workSessionId} does not exist."));
                         return null;
                     }
 
+                    // restrict access
+                    var userId = context.User.GetUserId();
+                    if(workSession.UserId != userId &&
+                    !await permissionsService.HasRequiredPermission(userId, Permissions.ManageUsersSessions)){
+                        throw new AccessDeniedError("deleteSession");
+                    }
+
                     await workSessionRepository.DeleteWorkSessionAsync(workSessionId);
-
                     return $"Work session with id = {workSessionId} has been successfully deleted.";
-
-                }); 
+                });
         }
     }
 }
