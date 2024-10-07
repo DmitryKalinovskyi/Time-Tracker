@@ -135,9 +135,9 @@ namespace Time_Tracker.Repositories
         public async Task<int> AddAsync(User user)
         {
             string sql = $@"INSERT INTO Users 
-                            (FullName, Email, IsActive) 
+                            (FullName, Email, IsActive, Position, WorkHoursPerMonth) 
                             OUTPUT INSERTED.Id
-                            VALUES (@FullName, @Email, @IsActive)";
+                            VALUES (@FullName, @Email, @IsActive, @Position, @WorkHoursPerMonth)";
 
             using var connection = new SqlConnection(_connectionString);
 
