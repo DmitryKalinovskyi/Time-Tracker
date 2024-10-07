@@ -23,7 +23,7 @@ import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPerm
 import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
 import {
     addCalendarEventEpic,
-    deleteCalendarEventEpic,
+    deleteCalendarEventEpic, fetchAndSetSelectedUserEpic,
     updateCalendarEventEpic
 } from "./features/calendar/calendarEpic.ts";
 import {fetchWorkReportEpic} from "./features/workReporting/workReportingEpic.ts";
@@ -52,9 +52,11 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     updateSessionEpic,
     deleteSessionEpic,
     addSessionEpic,
+
     addCalendarEventEpic,
     updateCalendarEventEpic,
     deleteCalendarEventEpic,
+    fetchAndSetSelectedUserEpic,
 
     fetchWorkReportEpic
   );

@@ -5,10 +5,21 @@ import {ajax, AjaxResponse} from "rxjs/ajax";
 import {createRequest} from "../../misc/RequestCreator.ts";
 import {
     createCalendarEventQuery,
-    CreateCalendarEventQueryResponseType, deleteCalendarEventQuery, DeleteCalendarEventQueryResponseType,
-    updateCalendarEventQuery, UpdateCalendarEventQueryResponseType
+    CreateCalendarEventQueryResponseType,
+    deleteCalendarEventQuery,
+    DeleteCalendarEventQueryResponseType,
+    fetchUserById,
+    FetchUserByIdResponseType,
+    updateCalendarEventQuery,
+    UpdateCalendarEventQueryResponseType
 } from "./api/calendarQueries.ts";
-import {addCalendarEvent, removeCalendarEvent, updateCalendarEvent} from "./calendarSlice.ts";
+import {
+    addCalendarEvent,
+    fetchAndSetSelectedUser,
+    removeCalendarEvent,
+    setSelectedUser,
+    updateCalendarEvent
+} from "./calendarSlice.ts";
 import {ShowFailure, ShowSuccess} from "../../misc/SnackBarHelper.ts";
 
 export interface AddCalendarEventInputType {
@@ -102,3 +113,25 @@ export const deleteCalendarEventEpic = (action$: Observable<Action>) =>
             )
         )
     );
+
+export const fetchAndSetSelectedUserEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(fetchAndSetSelectedUser.type),
+    mergeMap((action: PayloadAction<number>) =>
+        ajax(createRequest(fetchUserById(), {userId: action.payload})).pipe(
+            map((ajaxResponse: AjaxResponse<FetchUserByIdResponseType>) => {
+                const errors = ajaxResponse.response.errors;
+
+                if (errors && errors.length > 0) {
+                    throw new Error(errors[0].message);
+                }
+
+                return setSelectedUser(ajaxResponse.response.data.usersQuery.user);
+            }),
+            catchError((error) => {
+                console.log(error)
+                ShowFailure("Error while fetching user calendar.");
+                return of();
+            })
+        )
+    )
+);
