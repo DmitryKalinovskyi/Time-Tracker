@@ -21,7 +21,7 @@ import {
 import FilterCriteria from '../../../types/FilterCriteria';
 import { DateRangePicker } from 'rsuite';
 import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
-import { UserAutoComplete } from '../calendar/UserAutoComplete/UserAutoComplete';
+import { UserAutoComplete } from '../shared/UserAutoCompolete/UserAutoComplete.tsx';
 import User from '../../../types/User';
 import { DateRange } from 'rsuite/esm/DateRangePicker';
 import useAuth from '../../../hooks/useAuth';

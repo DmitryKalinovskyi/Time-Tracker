@@ -49,11 +49,6 @@ mutation Login($input: LoginInput!){
         fullName,
         email,
         permissions,
-        calendarEvents{
-          id,
-          startTime,
-          endTime
-        }
       }
     }
   }
@@ -69,11 +64,6 @@ export const refreshTokenQuery = () =>
         fullName,
         email,
         permissions,
-        calendarEvents{
-            id,
-            startTime,
-            endTime
-        }
       },
       accessToken{
         value,
