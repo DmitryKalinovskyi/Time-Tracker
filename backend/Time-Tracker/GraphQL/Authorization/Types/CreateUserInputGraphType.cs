@@ -8,5 +8,7 @@ public class CreateUserInputGraphType : InputObjectGraphType
     {
         Field<NonNullGraphType<StringGraphType>>("fullName");
         Field<NonNullGraphType<StringGraphType>>("email");
+        Field<NonNullGraphType<StringGraphType>>("position");
+        Field<NonNullGraphType<IntGraphType>>("workHoursPerMonth");
     }
 }

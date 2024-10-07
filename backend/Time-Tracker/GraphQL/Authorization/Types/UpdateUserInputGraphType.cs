@@ -10,6 +10,8 @@ namespace Time_Tracker.GraphQL.Authorization.Types
             Field<NonNullGraphType<IntGraphType>>("id");
             Field<NonNullGraphType<StringGraphType>>("fullName");
             Field<NonNullGraphType<StringGraphType>>("email");
+            Field<NonNullGraphType<StringGraphType>>("position");
+            Field<NonNullGraphType<IntGraphType>>("workHoursPerMonth");
         }
     }
 }

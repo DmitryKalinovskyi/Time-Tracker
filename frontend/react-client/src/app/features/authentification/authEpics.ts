@@ -30,11 +30,6 @@ export const beginRefreshTokenEpic = (action$: Observable<Action>, state$: State
         if(auth.isRefreshing)
             return false;
 
-        if(auth.refreshRejects >= 5){
-            console.log("Too many refreshes. Refresh will not be completed.");
-            return false;
-        }
-
         const token = getAvailableRefreshToken();
         if(token == null)
             return false;

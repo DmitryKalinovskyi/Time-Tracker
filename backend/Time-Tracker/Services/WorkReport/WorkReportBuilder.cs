@@ -83,7 +83,9 @@ INNER JOIN (
                     Permissions = ((string)result.Permissions)?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList() ?? [],
                     RefreshTokenDateExpires = result.RefreshTokenDateExpires,
                     RefreshToken = result.RefreshToken,
-                    Salt = result.Salt
+                    Salt = result.Salt,
+                    Position = result.Position,
+                    WorkHoursPerMonth = result.WorkHoursPerMonth,
                 };
 
                 var userReport = new UserReport()

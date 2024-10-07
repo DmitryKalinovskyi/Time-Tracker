@@ -83,6 +83,8 @@ public class UserMutation : ObjectGraphType
 
                 user.FullName = userInput.FullName;
                 user.Email = userInput.Email;
+                user.WorkHoursPerMonth = userInput.WorkHoursPerMonth;
+                user.Position = userInput.Position;
 
                 await userRepository.UpdateAsync(user);
 
