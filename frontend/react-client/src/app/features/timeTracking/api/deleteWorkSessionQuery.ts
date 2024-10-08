@@ -5,7 +5,7 @@ export interface DeleteSessionResponse{
     data: string
 }
 
-export const deleteSessionQuery = () => `
+export const deleteWorkSessionQuery = () => `
 mutation DeleteSession($workSessionId: Int){
   timeTrackerMutation{
     deleteSession(workSessionId: $workSessionId)

@@ -1,7 +1,7 @@
 import {catchError, from, map, Observable, of, switchMap} from "rxjs";
 import {Action} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
-import {setError, startSession, startSuccessful} from "../timeTrackingSlice.ts";
+import {startSession, startSuccessful} from "../timeTrackingSlice.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {createRequest} from "../../../misc/RequestCreator.ts";
 import {startSessionQuery, StartSessionResponse} from "../api/startSessionQuery.ts";

@@ -1,16 +1,16 @@
 import {catchError, from, map, Observable, of, switchMap} from "rxjs";
 import {Action, PayloadAction} from "@reduxjs/toolkit";
-import {deleteSession} from "../timeTrackingSlice.ts";
+import {deleteWorkSession} from "../timeTrackingSlice.ts";
 import {ofType} from "redux-observable";
 import {ajax} from "rxjs/ajax";
 import {createRequest} from "../../../misc/RequestCreator.ts";
-import {deleteSessionQuery} from "../api/deleteSessionQuery.ts";
+import {deleteWorkSessionQuery} from "../api/deleteWorkSessionQuery.ts";
 import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
 
-export const deleteSessionEpic = (action$: Observable<Action>) => action$.pipe(
-    ofType(deleteSession.type),
+export const deleteWorkSessionEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(deleteWorkSession.type),
     switchMap((action: PayloadAction<number>) => from(
-            ajax(createRequest(deleteSessionQuery(), {workSessionId: action.payload}))
+            ajax(createRequest(deleteWorkSessionQuery(), {workSessionId: action.payload}))
                 .pipe(
                     map((ajaxResponse) => {
                         const errors = ajaxResponse.response.errors;

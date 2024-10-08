@@ -80,7 +80,7 @@ const timeTrackerSlice = createSlice({
         // },
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        deleteSession(state, action: PayloadAction<number>)
+        deleteWorkSession(state, action: PayloadAction<number>)
         {
             state.loading = true;
         },
@@ -189,7 +189,7 @@ export const {
     startSuccessful,
     stopSession,
     stopSuccessful,
-    deleteSession,
+    deleteWorkSession,
     getCurrentWorkSession,
     getCurrentWorkSessionSuccessful
 } = timeTrackerSlice.actions;
