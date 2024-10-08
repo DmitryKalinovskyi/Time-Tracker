@@ -43,7 +43,7 @@ namespace Time_Tracker.Helpers
             }
 
 
-            var whereClause =  " WHERE " + string.Join(" AND ", clauses);
+            var whereClause =  " WHERE DURATION is not NULL AND " + string.Join(" AND ", clauses);
             return (whereClause, parameters);
         }
     }

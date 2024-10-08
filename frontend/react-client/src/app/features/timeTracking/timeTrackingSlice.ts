@@ -6,14 +6,16 @@ import PaginatedResult from "../../types/PaginatedResult";
 import FilterCriteria from "../../types/FilterCriteria";
 import { SortCriteria } from "../../types/SortCriteria";
 import { addDays } from "date-fns";
+
+export interface PaginationInfo{
+    totalRecords?: number
+    totalPages?: number
+    currentPage: number
+    pageSize?: number
+}
 export interface TimeTrackerType {
     workSessions: Array<WorkSession>;
-    paginationInfo?: {
-        totalRecords?: number
-        totalPages?: number
-        currentPage: number
-        pageSize?: number
-    }
+    paginationInfo?: PaginationInfo;
     currentSession: WorkSession | null;
     isTracking: boolean;
     filters?: FilterCriteria[];
@@ -39,8 +41,6 @@ export interface UpdateSessionPayload{
     endTime: Date;
 }
 
-export type WorkSessionPaginationRequest = PaginatedRequest;
-
 export type WorkSessionPaginationResult = PaginatedResult<WorkSession>;
 
 const initialState: TimeTrackerType = {
@@ -51,7 +51,7 @@ const initialState: TimeTrackerType = {
     error: null,
     paginationInfo: {
         currentPage: 1,
-        pageSize: 3
+        pageSize: window.innerWidth >= 2000 ? 6 : 3
     },
     todayTotalDuration: 0,
     workSessionsListingTotalDuration: 0,
@@ -67,7 +67,6 @@ const timeTrackerSlice = createSlice({
     reducers: {
         startSession(state, _action: PayloadAction<number>)
         {
-            state.loading = true; 
             state.error = null;
         },
 
@@ -77,7 +76,7 @@ const timeTrackerSlice = createSlice({
             state.error = null;
         },
 
-        getSessions(state, _action: PayloadAction<WorkSessionPaginationRequest>)
+        getSessions(state, _action: PayloadAction<PaginatedRequest>)
         {
             state.loading = true;
             state.error = null;
@@ -167,6 +166,7 @@ const timeTrackerSlice = createSlice({
         deleteSessionSuccessful(state, _action: PayloadAction<number>) {
             state.loading = false;
             state.error = null;
+            state.paginationInfo!.currentPage = 1
         },
 
         updateSessionSuccessful(state, _action: PayloadAction<WorkSession>)

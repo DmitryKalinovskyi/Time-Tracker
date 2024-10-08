@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, WorkSessionPaginationRequest} from '../../../features/timeTracking/timeTrackingSlice';
+import { deleteSession, getSessions, getWorkSessionsListingTotalDuration, setError, setFilters, setPage} from '../../../features/timeTracking/timeTrackingSlice';
 import {
   Box,
   CircularProgress,
@@ -23,6 +23,7 @@ import { WorkSession } from '../../../types/WorkSession';
 import CustomPagination from './CustomPagination';
 import useAuth from '../../../hooks/useAuth';
 import { isTodayStartTimeFilter } from '../../../misc/FiltersHelper';
+import { getCurrentPagArgs } from '../../../misc/PaginationHelper';
 
 const SessionList: React.FC = () => {
   const dispatch = useDispatch();
@@ -31,17 +32,6 @@ const SessionList: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<WorkSession | null>(null);
   const me = useAuth().user!;
-
-  const getCurrentPagArgs = () => {
-    const PaginationArgs: WorkSessionPaginationRequest = {
-      pageNumber: paginationInfo!.currentPage,
-      pageSize: paginationInfo!.pageSize,
-      sortCriterias: sorts,
-      filterCriterias: filters
-    };
-
-    return PaginationArgs;
-  }
 
   useEffect(() => {
     dispatch(setFilters([
@@ -55,13 +45,29 @@ const SessionList: React.FC = () => {
 
   useEffect(() => {
     if(filters)
-      dispatch(getSessions(getCurrentPagArgs()));
-  }, [paginationInfo!.currentPage, sorts, filters, isTracking]);
+      dispatch(getSessions(getCurrentPagArgs(paginationInfo!, sorts, filters)));
+  }, [paginationInfo!.currentPage]);
+
+  useEffect(() => {
+    if(filters && sorts)
+    {
+      dispatch(setPage(1));
+      dispatch(getSessions(getCurrentPagArgs(paginationInfo!, sorts, filters)));
+    }
+    }, [sorts, filters]);
+
+ useEffect(() => {
+  if(filters && !isTracking){
+    dispatch(setPage(1));
+    dispatch(getSessions(getCurrentPagArgs(paginationInfo!, sorts, filters)));
+    dispatch(getWorkSessionsListingTotalDuration(filters));
+  }
+}, [isTracking]);
   
   useEffect(() => {
     if(filters)
       dispatch(getWorkSessionsListingTotalDuration(filters));
-  }, [filters, workSessions]);
+  }, [filters]);
 
   const handleOpenModal = (session: WorkSession) => {
     setSelectedSession({
@@ -82,16 +88,14 @@ const SessionList: React.FC = () => {
     setModalOpen(false);
     dispatch(setError(null));
     if(filters)
-      dispatch(getSessions(getCurrentPagArgs()));
+      dispatch(getSessions(getCurrentPagArgs(paginationInfo!, sorts, filters)));
   }
   
   const handleDeleteSession = (sessionId: number) => {
     dispatch(deleteSession(sessionId));
-    if(!loading && !error)
-      dispatch(getSessions(getCurrentPagArgs()));
   };
 
-  if (loading && !modalOpen) return (
+  if (!workSessions && !modalOpen) return (
     <Container
       sx={{
         display: 'flex',
@@ -115,7 +119,7 @@ const SessionList: React.FC = () => {
       </Typography>
       : workSessions.length == 0 && (!filters || isTodayStartTimeFilter(filters)) ?
       <Typography variant='h5' color={'#00101D'} height={'100%'} textAlign={'center'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-      It looks like you haven't started any work sessions today.
+      It looks like you haven't finished any work sessions today.
       </Typography>
        :
       <>

@@ -24,8 +24,7 @@ namespace Time_Tracker.GraphQL.TimeTracking.Queries
                     return workSession;
                 });
 
-            Field<PaginatedResultResponseGraphType<WorkSession, WorkSessionGraphType>>
-                ("workSessions")
+            Field<PaginatedResultResponseGraphType<WorkSession, WorkSessionGraphType>>("workSessions")
                 .Argument<NonNullGraphType<PaginationRequestInputGraphType<WorkSessionSortableFields, WorkSessionFilterableFields, SQLOperators>>>("input")
                 .ResolveAsync(async context =>
                 {

@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { getCurrentWorkSession, getTodayTotalDuration, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { useTimerContext } from '../../../features/timeTracking/TimerProvider';
+import { isTodayStartTimeFilter } from '../../../misc/FiltersHelper';
 
 const Timer: React.FC = () => {
   const timeTracker = useSelector((state: RootState) => state.timeTracker);
@@ -29,9 +30,9 @@ const Timer: React.FC = () => {
   }, [timeTracker.currentSession]);
 
   useEffect(() => {
-    if(!timeTracker.isTracking)
-      dispatch(getTodayTotalDuration(user!.id));
-  }, [timeTracker.isTracking])
+    if(timeTracker.filters && isTodayStartTimeFilter(timeTracker.filters))
+      dispatch(getTodayTotalDuration(user!.id))
+  }, [timeTracker.workSessions])
 
   const handleButtonClick = () => {
     if (isTracking) {

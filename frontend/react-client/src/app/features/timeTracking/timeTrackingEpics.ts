@@ -1,12 +1,14 @@
 import { catchError, from, map, Observable, of, switchMap, withLatestFrom } from "rxjs";
 import { ofType, StateObservable } from "redux-observable";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
-import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getCurrentWorkSession, getCurrentWorkSessionSuccessful, getSessions, getSessionsSuccessful, getTodayTotalDuration, getTodayTotalDurationSuccessful, getWorkSessionsListingTotalDuration, getWorkSessionsListingTotalDurationSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, WorkSessionPaginationRequest, } from "./timeTrackingSlice";
+import { addSession, AddSessionPayload, addSessionSuccessful, deleteSession, deleteSessionSuccessful, getCurrentWorkSession, getCurrentWorkSessionSuccessful, getSessions, getSessionsSuccessful, getTodayTotalDuration, getTodayTotalDurationSuccessful, getWorkSessionsListingTotalDuration, getWorkSessionsListingTotalDurationSuccessful, setError, startSession, startSuccessful, stopSession, stopSuccessful, updateSession, UpdateSessionPayload, updateSessionSuccessful, } from "./timeTrackingSlice";
 import { ajax } from "rxjs/ajax";
 import { createRequest } from "../../misc/RequestCreator";
 import { getCurrentWorkSessionQuery, addSessionQuery, AddSessionResponse, deleteSessionQuery, getWorkSessionsWithPagination, startSessionQuery, StartSessionResponse, stopSessionQuery, StopSessionResponse, updateSessionQuery, UpdateSessionResponse, WorkSessionsWithPaginationResponse, CurrentWorkSessionResponse, getTotalDurationByFiltersQuery, TotalDurationRespone, getTodayTotalDurationByUserIdQuery } from "./api/workSessionQueries.ts";
 import { RootState } from "../../store.ts";
 import FilterCriteria from "../../types/FilterCriteria.ts";
+import PaginatedRequest from "../../types/PaginatedRequest.ts";
+import { getCurrentPagArgs } from "../../misc/PaginationHelper.ts";
 
 
 export const startSessionEpic = (action$: Observable<Action>) => action$.pipe(
@@ -90,7 +92,7 @@ export const stopSessionEpic = (action$: Observable<Action>, state$: StateObserv
 
 export const getSessionsEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(getSessions.type),
-    switchMap((action: PayloadAction<WorkSessionPaginationRequest>) => {
+    switchMap((action: PayloadAction<PaginatedRequest>) => {
         const request$ = ajax(createRequest(getWorkSessionsWithPagination(action.payload)));
 
         return from(request$).pipe(
@@ -299,6 +301,17 @@ export const deleteSessionEpic = (action$: Observable<Action>) => action$.pipe(
             )
     )
 );
+
+export const deleteSessionSuccessfullEpic = (action$: Observable<Action>, state$: Observable<RootState>) => action$.pipe(
+    ofType(deleteSessionSuccessful.type),
+    withLatestFrom(state$),
+    map(([_action, state]: [any, RootState]) => 
+        getSessions(getCurrentPagArgs(state.timeTracker.paginationInfo!,
+            state.timeTracker.sorts,
+            state.timeTracker.filters!
+    )))
+);
+
 
 export const addSessionEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(addSession.type),
