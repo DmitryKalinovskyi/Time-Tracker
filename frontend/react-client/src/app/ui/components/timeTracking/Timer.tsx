@@ -1,48 +1,25 @@
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { formatDuration, formatDurationToHMS } from '../../../misc/TimeFormatter';
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { getCurrentWorkSession, getTodayTotalDuration, startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
-import { useTimerContext } from '../../../features/timeTracking/TimerProvider';
-import { isTodayStartTimeFilter } from '../../../misc/FiltersHelper';
+import { startSession, stopSession } from '../../../features/timeTracking/timeTrackingSlice';
+import {useTimer} from "./hooks/useTimer.ts";
 
 const Timer: React.FC = () => {
   const timeTracker = useSelector((state: RootState) => state.timeTracker);
 
-  const { duration, isTracking, startTimer, stopTimer, setInitialDuration, setInitialIsTracking } = useTimerContext();
+  const [duration, isTracking] = useTimer();
 
-  const user = useSelector((state: RootState) => state.auth.user);
-  
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getCurrentWorkSession(user!.id));
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (timeTracker.currentSession) {
-      setInitialDuration(timeTracker.currentSession?.duration ?? 0);
-      setInitialIsTracking(timeTracker.isTracking);
-    }
-  }, [timeTracker.currentSession]);
-
-  useEffect(() => {
-    if(timeTracker.filters && isTodayStartTimeFilter(timeTracker.filters))
-      dispatch(getTodayTotalDuration(user!.id))
-  }, [timeTracker.workSessions])
 
   const handleButtonClick = () => {
     if (isTracking) {
-      stopTimer();
-      dispatch(stopSession()); 
+        dispatch(stopSession());
     } else {
-      if (user) {
-        startTimer();
-        dispatch(startSession(user.id));
-      }
+        dispatch(startSession());
     }
   };
   
@@ -80,7 +57,7 @@ const Timer: React.FC = () => {
             typography: 'body1',
             color: '#00101D',
             opacity: 0.85,
-          }}>Total time tracked today: {formatDurationToHMS(timeTracker.todayTotalDuration)} </Typography>
+          }}>Total time tracked today: {formatDurationToHMS(duration + timeTracker.todayTotalDuration)} </Typography>
           <Box>
             <IconButton
               onClick={handleButtonClick}
