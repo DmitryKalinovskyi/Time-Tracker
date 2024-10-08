@@ -4,7 +4,7 @@ import {TimePicker} from "@mui/x-date-pickers";
 import Button from "@mui/material/Button";
 import React, {useRef, useState} from "react";
 import {useDispatch} from "react-redux";
-import {AddCalendarEventInputType, apiCreateCalendarEvent} from "../../../features/calendar/calendarSlice.ts";
+import {AddCalendarEventInputType, apiCreateCalendarEvent} from "../../../../features/calendar/calendarSlice.ts";
 
 interface CreateEventModalProps{
     day: Date,

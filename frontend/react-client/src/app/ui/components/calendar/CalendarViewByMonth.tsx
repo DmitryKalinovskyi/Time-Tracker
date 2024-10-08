@@ -9,10 +9,8 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {UserAutoComplete} from "../shared/UserAutoCompolete/UserAutoComplete.tsx";
-import {CreateEventDialog} from "./CreateEventDialog.tsx";
-import {DayModal} from "./DayModal.tsx";
 import useAuth from "../../../hooks/useAuth.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -21,19 +19,16 @@ import {
 import {RootState} from "../../../store.ts";
 import {useMonthDetails} from "./hooks/useMonthDetails.ts";
 import {useMonthSetters} from "./hooks/useMonthSetters.ts";
+import {useDayModal} from "./hooks/useDayModal.ts";
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export function CalendarViewByMonth(){
-    const [day, setDay] = useState<Date>(new Date());
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-    const [isDayModalOpen, setIsDayModalOpen] = useState(false);
     const selectedUser = useSelector((state: RootState) => state.calendar.selectedUser);
-
     const [selectedMonth, setCurrentMonth, moveToPreviousMonth, moveToNextMonth] = useMonthSetters();
     const [days, weeksCount] = useMonthDetails(selectedMonth);
-
+    const openDayModal = useDayModal();
     const dispatch = useDispatch();
     const me = useAuth().user;
 
@@ -52,21 +47,7 @@ export function CalendarViewByMonth(){
     }
 
     function handleMonthClick(day: Date){
-        setDay(day);
-        setIsDayModalOpen(true);
-    }
-
-    const switchModalToDialog = () => {
-        setIsDayModalOpen(false);
-        setIsCreateDialogOpen(true);
-    }
-
-    const handleCreateDialogClose = () => {
-        setIsCreateDialogOpen(false);
-    }
-
-    const handleDayModalClose = () => {
-        setIsDayModalOpen(false);
+        openDayModal(day);
     }
 
     if(selectedUser == null) return null;
@@ -126,16 +107,6 @@ export function CalendarViewByMonth(){
                     </Grid>
                 )}
             </Grid>
-
-            <DayModal isOpen={isDayModalOpen}
-                      day={day}
-                      onClose={handleDayModalClose}
-                      onCreateEvent={switchModalToDialog}
-            />
-
-            <CreateEventDialog isOpen={isCreateDialogOpen}
-                               day={day}
-                               onClose={handleCreateDialogClose}/>
         </Stack>
     </>
 }

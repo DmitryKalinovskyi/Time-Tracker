@@ -8,11 +8,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../store.ts";
-import {isSameDay} from "../../../misc/DateHelper.ts";
-import {useIsMe} from "../../../hooks/useIsMe.ts";
-import {CalendarEvent} from "../../../types/CalendarEvent.ts";
-import {apiDeleteCalendarEvent} from "../../../features/calendar/calendarSlice.ts";
+import {RootState} from "../../../../store.ts";
+import {isSameDay} from "../../../../misc/DateHelper.ts";
+import {useIsMe} from "../../../../hooks/useIsMe.ts";
+import {CalendarEvent} from "../../../../types/CalendarEvent.ts";
+import {apiDeleteCalendarEvent} from "../../../../features/calendar/calendarSlice.ts";
 interface DayModalProps{
     isOpen: boolean
     day: Date,
