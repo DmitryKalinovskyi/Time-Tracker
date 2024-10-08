@@ -1,5 +1,10 @@
 import {CalendarViewByMonth} from "../components/calendar/CalendarViewByMonth.tsx";
+import {CalendarModalsProvider} from "../components/calendar/modals/CalendarModalsProvider.tsx";
 
 export function CalendarPage(){
-    return <CalendarViewByMonth/>
+    return <>
+        <CalendarModalsProvider>
+            <CalendarViewByMonth/>
+        </CalendarModalsProvider>
+    </>
 }

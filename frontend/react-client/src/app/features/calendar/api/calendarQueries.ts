@@ -8,14 +8,13 @@ export interface CreateCalendarEventQueryResponseType{
             createCalendarEvent: CalendarEvent
         }
     },
-    errors?: []
+    errors?: GraphQLExecutionErrorType[]
 }
 export const createCalendarEventQuery = () => `
 mutation CreateCalendarEvent($createCalendarEventInput: CreateCalendarEventInput!){
   calendarMutation{
     createCalendarEvent(calendarEvent: $createCalendarEventInput){
       id,
-      userId,
       startTime,
       endTime
     }
@@ -28,14 +27,13 @@ export interface UpdateCalendarEventQueryResponseType{
             updateCalendarEvent: CalendarEvent
         }
     },
-    errors?: []
+    errors?: GraphQLExecutionErrorType[]
 }
 export const updateCalendarEventQuery = () => `
 mutation UpdateEvent($updateCalendarEventInput: UpdateCalendarEventInput!){
   calendarMutation{
     updateCalendarEvent(calendarEvent: $updateCalendarEventInput){
       id,
-      userId,
       startTime,
       endTime
     }
@@ -46,7 +44,7 @@ export interface DeleteCalendarEventQueryResponseType{
     data: {
         calendarMutation: string
     },
-    errors?: []
+    errors?: GraphQLExecutionErrorType[]
 }
 export const deleteCalendarEventQuery = () => `
 mutation DeleteCalendarEvent($calendarEventId: Int!){

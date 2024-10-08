@@ -22,10 +22,27 @@ const initialState: CalendarStateType = {
     isFetching: false
 }
 
+export interface AddCalendarEventInputType {
+    startTime: Date,
+    endTime: Date
+}
+
+export interface UpdateCalendarEventInputType{
+    startTime: Date,
+    endTime: Date,
+    id: number
+}
+
 const calendarSlice = createSlice({
     name: "calendar",
     initialState,
     reducers: {
+        apiCreateCalendarEvent : (state, action: PayloadAction<AddCalendarEventInputType>) => {
+        },
+        apiUpdateCalendarEvent : (state, action: PayloadAction<UpdateCalendarEventInputType>) => {
+        },
+        apiDeleteCalendarEvent : (state, action: PayloadAction<number>) => {
+        },
         addCalendarEvent : (state, action: PayloadAction<CalendarEvent>) => {
             state.selectedUser!.calendarEvents.push(action.payload);
         },
@@ -52,6 +69,9 @@ const calendarSlice = createSlice({
 })
 
 export const {
+    apiCreateCalendarEvent,
+    apiUpdateCalendarEvent,
+    apiDeleteCalendarEvent,
     addCalendarEvent,
     updateCalendarEvent,
     removeCalendarEvent,

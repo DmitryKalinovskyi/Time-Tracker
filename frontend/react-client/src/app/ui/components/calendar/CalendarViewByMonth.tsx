@@ -9,31 +9,26 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {UserAutoComplete} from "../shared/UserAutoCompolete/UserAutoComplete.tsx";
-import {CreateEventDialog} from "./CreateEventDialog.tsx";
-import {DayModal} from "./DayModal.tsx";
 import useAuth from "../../../hooks/useAuth.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    changeSelectedMonth,
-    MonthType,
     fetchAndSetSelectedUser
 } from "../../../features/calendar/calendarSlice.ts";
 import {RootState} from "../../../store.ts";
 import {useMonthDetails} from "./hooks/useMonthDetails.ts";
+import {useMonthSetters} from "./hooks/useMonthSetters.ts";
+import {useDayModal} from "./hooks/useDayModal.ts";
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export function CalendarViewByMonth(){
-    const [day, setDay] = useState<Date>(new Date());
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-    const [isDayModalOpen, setIsDayModalOpen] = useState(false);
     const selectedUser = useSelector((state: RootState) => state.calendar.selectedUser);
-    const calendarDate: MonthType = useSelector((state: RootState) => state.calendar.selectedMonth);
-    const [days, weeksCount] = useMonthDetails(calendarDate);
-
+    const [selectedMonth, setCurrentMonth, moveToPreviousMonth, moveToNextMonth] = useMonthSetters();
+    const [days, weeksCount] = useMonthDetails(selectedMonth);
+    const openDayModal = useDayModal();
     const dispatch = useDispatch();
     const me = useAuth().user;
 
@@ -47,54 +42,15 @@ export function CalendarViewByMonth(){
         dispatch(fetchAndSetSelectedUser(me.id));
     }
 
-    const changeCalendarDate = (month: MonthType) => {
-        dispatch(changeSelectedMonth(month));
-    }
-
-    const setCurrentMonth = () => {
-        changeCalendarDate({
-            year: new Date().getFullYear(),
-            month: new Date().getMonth()
-        });
-    }
-
     function getMonthName(){
-        return monthNames[calendarDate.month];
-    }
-
-    const moveNextMonth = () =>{
-        changeCalendarDate({
-            year: calendarDate.year + (calendarDate.month == 11 ? 1: 0),
-            month: ((calendarDate.month + 1) % 12)
-        })
-    }
-
-    const movePreviousMonth = () =>{
-        changeCalendarDate({
-            year: calendarDate.year + (calendarDate.month == 0 ? -1: 0),
-            month: ((calendarDate.month+11) % 12)
-        })
+        return monthNames[selectedMonth.month];
     }
 
     function handleMonthClick(day: Date){
-        setDay(day);
-        setIsDayModalOpen(true);
+        openDayModal(day);
     }
 
-    const switchModalToDialog = () => {
-        setIsDayModalOpen(false);
-        setIsCreateDialogOpen(true);
-    }
-
-    const handleCreateDialogClose = () => {
-        setIsCreateDialogOpen(false);
-    }
-
-    const handleDayModalClose = () => {
-        setIsDayModalOpen(false);
-    }
-
-    if(selectedUser == null) return <div></div>
+    if(selectedUser == null) return null;
 
     return <>
         <Stack sx={{height: "100%"}}>
@@ -102,10 +58,10 @@ export function CalendarViewByMonth(){
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" m={2} spacing={2} alignItems="center">
                     <Button color="secondary" variant="contained" onClick={() => setCurrentMonth()}>Current month</Button>
-                    <IconButton onClick={() => movePreviousMonth()}><ArrowBackIcon/></IconButton>
-                    <IconButton onClick={() => moveNextMonth()}><ArrowForwardIcon/></IconButton>
+                    <IconButton onClick={() => moveToPreviousMonth()}><ArrowBackIcon/></IconButton>
+                    <IconButton onClick={() => moveToNextMonth()}><ArrowForwardIcon/></IconButton>
                     <Typography variant="h5">
-                        {`${getMonthName()} ${calendarDate.year}`}
+                        {`${getMonthName()} ${selectedMonth.year}`}
                     </Typography>
                 </Stack>
 
@@ -141,20 +97,16 @@ export function CalendarViewByMonth(){
                   container
                   columns={7} >
                 {days.map((day,index) =>
-                    <Grid item xs={1} key={index} sx={{height: `${100/weeksCount}%`, boxSizing: 'border-box'}}>
-                        <MonthCell day={day} month={calendarDate.month} events={selectedUser.calendarEvents} onClick={handleMonthClick}/>
+                    <Grid item
+                          xs={1}
+                          key={index}
+                          sx={{height: `${100/weeksCount}%`, boxSizing: 'border-box'}}>
+                        <MonthCell day={day}
+                                   month={selectedMonth.month}
+                                   onClick={handleMonthClick}/>
                     </Grid>
                 )}
             </Grid>
-
-            <DayModal day={day} onClose={handleDayModalClose}
-                      isOpen={isDayModalOpen}
-                      onCreateEvent={switchModalToDialog}
-            />
-
-            <CreateEventDialog isOpen={isCreateDialogOpen}
-                               day={day}
-                               onClose={handleCreateDialogClose}/>
         </Stack>
     </>
 }

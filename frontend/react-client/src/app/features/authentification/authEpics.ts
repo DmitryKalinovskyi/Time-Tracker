@@ -1,5 +1,5 @@
 import {ofType, StateObservable} from "redux-observable";
-import {map, from, catchError, of, mergeMap, Observable, tap, filter, concat, delay} from "rxjs";
+import {map, from, catchError, of, mergeMap, Observable, tap, delay} from "rxjs";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {
     loginSuccess,
@@ -14,33 +14,27 @@ import {loginQuery, LoginQueryResponseType, refreshTokenQuery, RefreshTokenQuery
 import { loginUser } from "./authSlice.ts";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
 import {RootState} from "../../store.ts"
-import {isTokenExpired} from "../../misc/tokenValidation.ts";
 import {getAvailableRefreshToken, saveRefreshToken} from "./refreshTokenManager.ts";
 import {InvalidCredentialsExecutionError} from "./errors/InvalidCredentialsExecutionError.ts";
 import {InvalidRefreshTokenExecutionError} from "./errors/InvalidRefreshTokenExecutionError.ts";
 
+
+const getAccessTokenRefreshDelay = (dateExpires: string) => {
+    return new Date(dateExpires) - new Date() - 60 * 1000;
+}
+
+
+/*
+Strategy of epic:
+    When user retrieve new accessToken (refreshToken and loginSuccess action),
+ invoke beginRefreshToken action after delay (1 minute before).
+ */
 export const beginRefreshTokenEpic = (action$: Observable<Action>, state$: StateObservable<RootState>) => action$.pipe(
-    filter(() => {
-        const auth = state$.value.auth;
-        if(auth.accessToken != null && !isTokenExpired(auth.accessToken)){
-            // we already have valid access token.
-            return false;
-        }
-
-        if(auth.isRefreshing)
-            return false;
-
-        const token = getAvailableRefreshToken();
-        if(token == null)
-            return false;
-
-        return true;
-    }),
-    tap(() => console.log('Access token expired. We need to make request with our refresh to receive new access.')),
-    mergeMap((action) => {
-        // action will be dispatched again to the store, this can lead to some issues
-       return concat(of(beginRefreshToken()), of(action));
-    }),
+    ofType(refreshToken.type, loginSuccess.type),
+    mergeMap(() => of(beginRefreshToken()).pipe(
+        delay(getAccessTokenRefreshDelay(state$.value.auth.accessToken.dateExpires)),
+        tap(() => console.log('Access token expired. We need to make request with our refresh to receive new access.')),
+    ))
 )
 
 export const refreshTokenEpic = (action$: Observable<Action>) => action$.pipe(
