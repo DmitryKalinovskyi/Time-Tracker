@@ -1,6 +1,8 @@
 import {DayModal} from "./DayModal.tsx";
 import {CreateEventDialog} from "./CreateEventDialog.tsx";
 import React, {createContext, useState} from "react";
+import {CalendarEvent} from "../../../../types/CalendarEvent.ts";
+import {UpdateEventDialog} from "./UpdateEventDialog.tsx";
 
 interface CalendarModalsContextType{
     openDayModal: (day: Date) => void
@@ -14,38 +16,57 @@ interface CalendarModalsProviderProps{
 }
 
 export function CalendarModalsProvider(props: CalendarModalsProviderProps){
-    const [day, setDay] = useState(new Date());
+    const [day, setDay] = useState<Date | null>();
+    const [calendarEvent, setCalendarEvent] = useState<CalendarEvent | null>(null)
     const [isDayModalOpen, setIsDayModalOpen] = useState(false);
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-
-    const openDayModal = (day: Date) =>{
+    const [isCreateCalendarEventDialogOpen, setIsCreateCalendarEventDialogOpen] = useState(false);
+    const [isUpdateCalendarEventDialogOpen, setIsUpdateCalendarEventDialogOpen] = useState(false);
+    const openDayModal = (day: Date) => {
         setDay(day);
         setIsDayModalOpen(true);
-    }
+    };
 
-    const switchModalToDialog = () => {
+    const handleCreateCalendarEvent = () => {
         setIsDayModalOpen(false);
-        setIsCreateDialogOpen(true);
+        setIsCreateCalendarEventDialogOpen(true);
     }
 
-    const handleCreateDialogClose = () => {
-        setIsCreateDialogOpen(false);
+    const handleUpdateCalendarEvent = (calendarEvent: CalendarEvent) => {
+        setIsDayModalOpen(false)
+        setCalendarEvent(calendarEvent);
+        setIsUpdateCalendarEventDialogOpen(true);
     }
 
     const handleDayModalClose = () => {
         setIsDayModalOpen(false);
     }
 
-    return <>
-        <DayModal isOpen={isDayModalOpen}
-                  day={day}
-                  onClose={handleDayModalClose}
-                  onCreateEvent={switchModalToDialog}
-        />
+    const handleCreateCalendarEventDialogClose = () => {
+        setIsCreateCalendarEventDialogOpen(false);
+        setIsDayModalOpen(true);
+    }
 
-        <CreateEventDialog isOpen={isCreateDialogOpen}
+    const handleUpdateCalendarEventDialogClose = () => {
+        setIsUpdateCalendarEventDialogOpen(false);
+        setIsDayModalOpen(true);
+    }
+
+    return <>
+        {day && <DayModal isOpen={isDayModalOpen}
+                          day={day}
+                          onClose={handleDayModalClose}
+                          onUpdateEvent={handleUpdateCalendarEvent}
+                          onCreateEvent={handleCreateCalendarEvent}/>}
+
+        {day && <CreateEventDialog isOpen={isCreateCalendarEventDialogOpen}
                            day={day}
-                           onClose={handleCreateDialogClose}/>
+                           onClose={handleCreateCalendarEventDialogClose}/>}
+
+        {calendarEvent && <UpdateEventDialog calendarEvent={calendarEvent}
+                                             key={calendarEvent.id}
+                                             isOpen={isUpdateCalendarEventDialogOpen}
+                                             onClose={handleUpdateCalendarEventDialogClose}/>}
+
         <CalendarModalsContext.Provider value={{openDayModal}}>
             {props.children}
         </CalendarModalsContext.Provider>

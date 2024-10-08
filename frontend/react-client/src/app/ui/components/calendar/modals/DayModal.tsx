@@ -7,6 +7,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import EditIcon from '@mui/icons-material/Edit';
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store.ts";
 import {isSameDay} from "../../../../misc/DateHelper.ts";
@@ -17,7 +18,8 @@ interface DayModalProps{
     isOpen: boolean
     day: Date,
     onClose: () => void,
-    onCreateEvent: () => void
+    onCreateEvent: () => void,
+    onUpdateEvent: (calendarEvent: CalendarEvent) => void
 }
 
 export function DayModal(props: DayModalProps){
@@ -61,6 +63,11 @@ export function DayModal(props: DayModalProps){
                             />
                             {isYourEvents &&
                             <div className="ml-4">
+                                <IconButton color="primary"
+                                            onClick={() => props.onUpdateEvent(event)}
+                                >
+                                    <EditIcon/>
+                                </IconButton>
                                 <IconButton color="error"
                                     onClick={() => dispatch(apiDeleteCalendarEvent(event.id))}
                                 >

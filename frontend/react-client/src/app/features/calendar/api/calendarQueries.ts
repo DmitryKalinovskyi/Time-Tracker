@@ -15,7 +15,6 @@ mutation CreateCalendarEvent($createCalendarEventInput: CreateCalendarEventInput
   calendarMutation{
     createCalendarEvent(calendarEvent: $createCalendarEventInput){
       id,
-      userId,
       startTime,
       endTime
     }
@@ -35,7 +34,6 @@ mutation UpdateEvent($updateCalendarEventInput: UpdateCalendarEventInput!){
   calendarMutation{
     updateCalendarEvent(calendarEvent: $updateCalendarEventInput){
       id,
-      userId,
       startTime,
       endTime
     }
