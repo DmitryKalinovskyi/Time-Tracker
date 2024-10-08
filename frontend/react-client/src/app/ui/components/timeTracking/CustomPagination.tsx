@@ -2,16 +2,15 @@ import React from 'react';
 import Pagination from '@mui/material/Pagination';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { setPage } from '../../../features/timeTracking/timeTrackingSlice';
+import {setWorkSessionsPage} from "../../../features/timeTracking/timeTrackingSlice.ts";
 
 
-const CustomPagination: React.FC= ({
-}) => {
+export default function CustomPagination() {
   const {paginationInfo} = useSelector((state: RootState) => state.timeTracker);
   const dispatch = useDispatch();
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, nextPage: number) => {
-    dispatch(setPage(nextPage));
+    dispatch(setWorkSessionsPage(nextPage));
   };
 
   return (
@@ -36,6 +35,4 @@ const CustomPagination: React.FC= ({
         }}
       />
   );
-};
-
-export default CustomPagination;
+}

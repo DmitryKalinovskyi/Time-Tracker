@@ -1,7 +1,7 @@
 import {catchError, from, map, Observable, of, switchMap} from "rxjs";
 import {Action} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
-import {startSession, startSuccessful} from "../timeTrackingSlice.ts";
+import {startSession, startSessionSuccessful} from "../timeTrackingSlice.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {createRequest} from "../../../misc/RequestCreator.ts";
 import {startSessionQuery, StartSessionResponse} from "../api/startSessionQuery.ts";
@@ -19,7 +19,7 @@ export const startSessionEpic = (action$: Observable<Action>) => action$.pipe(
                         throw new Error(errors[0].message);
                     }
 
-                    return startSuccessful(ajaxResponse.response.data.timeTrackerMutation.startSession);
+                    return startSessionSuccessful(ajaxResponse.response.data.timeTrackerMutation.startSession);
                 }),
                 catchError((error) => {
                     ShowFailure(error.message);

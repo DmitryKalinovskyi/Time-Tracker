@@ -1,36 +1,37 @@
-// export const getTodayTotalDurationEpic = (action$: Observable<Action>) => action$.pipe(
-//     ofType(getTodayTotalDuration.type),
-//     switchMap((action: PayloadAction<number>) => {
-//         const request$ = ajax(createRequest(getTodayTotalDurationByUserIdQuery(action.payload)));
-//
-//         return from(request$).pipe(
-//             map((ajaxResponse: any) => {
-//                 const errors = ajaxResponse.response.errors;
-//                 const data: TotalDurationRespone = ajaxResponse.response.data;
-//
-//                 if (errors && errors.length > 0) {
-//                     return setError(errors[0].message);
-//                 }
-//                 if(data && data.timeTrackerQuery && data.timeTrackerQuery.totalDuration != null)
-//                 {
-//                     return getTodayTotalDurationSuccessful(data.timeTrackerQuery.totalDuration);
-//                 }
-//                 else {
-//                     throw new Error('[Getting Today Total Duration By Id] Unexpected response format or missing login data');
-//                 }
-//             }),
-//             catchError((error: any) => {
-//                 let errorMessage = 'An unexpected error occurred';
-//
-//                 if (error.status === 0) {
-//                     errorMessage = 'Connection time out';
-//                 } else if (error.message) {
-//                     errorMessage = error.message;
-//                 }
-//
-//                 return of(setError(errorMessage));
-//             })
-//         );
-//     })
-// );
-//
+import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
+import {catchError, map, Observable, of, switchMap} from "rxjs";
+import {ofType, StateObservable} from "redux-observable";
+import {Action, PayloadAction} from "@reduxjs/toolkit";
+import {
+    deleteWorkSessionSuccess,
+    getTodayTotalDuration,
+    getTodayTotalDurationSuccessful, stopSessionSuccessful
+} from "../timeTrackingSlice.ts";
+import {ajax, AjaxResponse} from "rxjs/ajax";
+import {createRequest} from "../../../misc/RequestCreator.ts";
+import {
+    getTodayTotalDurationByUserIdQuery,
+    GetTodayTotalDurationResponse
+} from "../api/getTodayTotalDurationByUserId.ts";
+import {RootState} from "../../../store.ts";
+
+export const getTodayTotalDurationEpic = (action$: Observable<Action>, state$: StateObservable<RootState>) => action$.pipe(
+    ofType(getTodayTotalDuration.type, deleteWorkSessionSuccess.type, stopSessionSuccessful.type),
+    switchMap(() =>
+        ajax(createRequest(getTodayTotalDurationByUserIdQuery(state$.value.auth.user.id))).pipe(
+            map((ajaxResponse: AjaxResponse<GetTodayTotalDurationResponse>) => {
+                const errors = ajaxResponse.response.errors;
+
+                if (errors && errors.length > 0) {
+                    throw new Error(errors[0].message);
+                }
+                return getTodayTotalDurationSuccessful(ajaxResponse.response.data.timeTrackerQuery.totalDuration??0);
+            }),
+            catchError((error) => {
+                ShowFailure(error.message);
+                return of();
+            })
+        )
+    )
+)
+

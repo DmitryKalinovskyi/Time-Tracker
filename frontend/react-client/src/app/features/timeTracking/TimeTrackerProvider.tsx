@@ -1,6 +1,6 @@
 import {ReactElement, useEffect} from "react";
 import {useDispatch} from "react-redux";
-import {getCurrentWorkSession} from "./timeTrackingSlice.ts";
+import {getCurrentWorkSession, getTodayTotalDuration} from "./timeTrackingSlice.ts";
 import useAuth from "../../hooks/useAuth.ts";
 
 interface TimeTrackerProviderProps{
@@ -13,6 +13,7 @@ export function TimeTrackerProvider(props: TimeTrackerProviderProps){
     useEffect(() => {
         if(auth.user){
             dispatch(getCurrentWorkSession(auth.user.id))
+            dispatch(getTodayTotalDuration())
         }
     }, [dispatch, auth]);
 

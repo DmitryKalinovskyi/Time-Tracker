@@ -1,27 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
-import PaginatedRequest from "../../types/PaginatedRequest";
 import PaginatedResult from "../../types/PaginatedResult";
-import FilterCriteria from "../../types/FilterCriteria";
-import { SortCriteria } from "../../types/SortCriteria";
-import { addDays } from "date-fns";
 
-// export interface PaginationInfo{
-//     totalRecords?: number
-//     totalPages?: number
-//     currentPage: number
-//     pageSize?: number
-// }
+export interface PaginationInfo{
+    totalRecords: number
+    totalPages: number
+    currentPage: number
+    pageSize: number
+}
+
 export interface TimeTrackerType {
-    // workSessions: Array<WorkSession>;
-    // paginationInfo?: PaginationInfo;
+    workSessions: WorkSession[];
+    paginationInfo: PaginationInfo;
     currentWorkSession: WorkSession | null;
     // filters?: FilterCriteria[];
     // sorts: SortCriteria[];
     todayTotalDuration: number;
     // workSessionsListingTotalDuration: number;
-    loading: boolean;
 }
 
 // export interface AddSessionPayload{
@@ -42,8 +38,14 @@ export interface UpdateSessionPayload{
 export type WorkSessionPaginationResult = PaginatedResult<WorkSession>;
 
 const initialState: TimeTrackerType = {
+    workSessions: [],
     currentWorkSession: null,
-    loading: false,
+    paginationInfo: {
+        totalRecords: 0,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 5
+    },
     todayTotalDuration: 0,
 }
 
@@ -51,38 +53,46 @@ const timeTrackerSlice = createSlice({
     name: "timeTracker",
     initialState,
     reducers: {
-        startSession(state){
-            state.isLoading = true;
+        startSession(){
         },
-        startSuccessful(state, action: PayloadAction<WorkSession>) {
+        startSessionSuccessful(state, action: PayloadAction<WorkSession>) {
             state.currentWorkSession = action.payload
             state.isTracking = true;
-            state.loading = false;
         },
-        stopSession(state)
+        stopSession()
         {
-            state.loading = true;
         },
-        stopSuccessful(state) {
-            state.loading = false;
+        stopSessionSuccessful(state) {
             state.isTracking = false;
             state.currentWorkSession = null;
         },
 
-        // getSessions(state, _action: PayloadAction<PaginatedRequest>)
-        // {
-        //     state.loading = true;
-        // },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        getWorkSessions(state)
+        {
+        },
+        getWorkSessionsSuccessful(state, action: PayloadAction<WorkSessionPaginationResult>)
+        {
+            state.loading = false;
+            state.error = null;
+            state.workSessions = action.payload.results;
+            state.paginationInfo = {
+                currentPage: action.payload.currentPage,
+                pageSize: action.payload.pageSize,
+                totalPages: action.payload.totalPages,
+                totalRecords: action.payload.totalRecords
+            }
+        },
         //
         // updateSession(state, _action: PayloadAction<UpdateSessionPayload>)
         // {
-        //     state.loading = true;
         // },
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         deleteWorkSession(state, action: PayloadAction<number>)
         {
-            state.loading = true;
+        },
+        deleteWorkSessionSuccess(state) {
         },
 
         // addSession(state, action: PayloadAction<AddSessionPayload>)
@@ -93,28 +103,25 @@ const timeTrackerSlice = createSlice({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         getCurrentWorkSession(state, action: PayloadAction<number>)
         {
-            state.loading = true;
         },
 
         getCurrentWorkSessionSuccessful(state, action: PayloadAction<WorkSession | null>)
         {
-            state.loading = false;
             state.currentWorkSession = action.payload;
+        },
+        getTodayTotalDuration()
+        {
+        },
+        getTodayTotalDurationSuccessful(state, action: PayloadAction<number>)
+        {
+            state.todayTotalDuration = action.payload;
         },
 
         // getWorkSessionsListingTotalDuration(state, _action: PayloadAction<Array<FilterCriteria>>)
         // {
         //     state.loading = true;
         // },
-        // getTodayTotalDuration(state, _action: PayloadAction<number>)
-        // {
-        //     state.loading = true;
-        // },
-        // getTodayTotalDurationSuccessful(state, action: PayloadAction<number>)
-        // {
-        //     state.loading = false;
-        //     state.todayTotalDuration = action.payload;
-        // },
+
 
         // getWorkSessionsListingTotalDurationSuccessful(state, action: PayloadAction<number>)
         // {
@@ -122,10 +129,10 @@ const timeTrackerSlice = createSlice({
         //     state.workSessionsListingTotalDuration = action.payload;
         // },
         //
-        // setPage(state, action: PayloadAction<number>)
-        // {
-        //     state.paginationInfo!.currentPage = action.payload;
-        // },
+        setWorkSessionsPage(state, action: PayloadAction<number>)
+        {
+            state.paginationInfo.currentPage = action.payload;
+        },
         //
         // setFilters(state, action: PayloadAction<FilterCriteria[]>)
         // {
@@ -157,11 +164,7 @@ const timeTrackerSlice = createSlice({
         //     });
         // },
         //
-        // deleteSessionSuccessful(state, _action: PayloadAction<number>) {
-        //     state.loading = false;
-        //     state.error = null;
-        //     state.paginationInfo!.currentPage = 1
-        // },
+
         //
         // updateSessionSuccessful(state, _action: PayloadAction<WorkSession>)
         // {
@@ -169,29 +172,25 @@ const timeTrackerSlice = createSlice({
         //     state.error = null;
         // },
         //
-        // getSessionsSuccessful(state, action: PayloadAction<WorkSessionPaginationResult>)
-        // {
-        //     state.loading = false;
-        //     state.error = null;
-        //     state.workSessions = action.payload.results;
-        //     state.paginationInfo = {
-        //         currentPage: action.payload.currentPage,
-        //         pageSize: action.payload.pageSize,
-        //         totalPages: action.payload.totalPages,
-        //         totalRecords: action.payload.totalRecords
-        //     }
-        // },
+
     },
 })
 
 export const {
     startSession,
-    startSuccessful,
+    startSessionSuccessful,
     stopSession,
-    stopSuccessful,
+    stopSessionSuccessful,
     deleteWorkSession,
+    deleteWorkSessionSuccess,
     getCurrentWorkSession,
-    getCurrentWorkSessionSuccessful
+    getCurrentWorkSessionSuccessful,
+    getWorkSessions,
+    getWorkSessionsSuccessful,
+    setWorkSessionsPage,
+    getTodayTotalDuration,
+    getTodayTotalDurationSuccessful
+
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

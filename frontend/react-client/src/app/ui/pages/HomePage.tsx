@@ -1,14 +1,6 @@
 import Timer from "../components/timeTracking/Timer.tsx";
-import SessionList from "../components/timeTracking/SessionList.tsx";
 import { Box } from "@mui/material";
-import StyledButton from "../components/timeTracking/StyledButton.tsx";
-import { useState } from "react";
-import FilterCriteria from "../../types/FilterCriteria.ts";
-import FiltersModal from "../components/timeTracking/FiltersModal.tsx";
-import { SortCriteria } from "../../types/SortCriteria.ts";
-import SortsModal from "../components/timeTracking/SortsModal.tsx";
-import { useDispatch } from "react-redux";
-import { setFilters, setSorts } from "../../features/timeTracking/timeTrackingSlice.ts";
+import {SessionList} from "../components/timeTracking/SessionList.tsx";
 
 export default function HomePage() {
   // const [isFilterModalOpen, setFilterModalOpen] = useState(false);
@@ -52,7 +44,7 @@ export default function HomePage() {
       {/*  <StyledButton label="Sorting" onClickHandler={handleOpenSortModal} />*/}
       {/*</Box>*/}
       <Box height={'60%'}>
-        {/*<SessionList />*/}
+        <SessionList />
       </Box>
       
       {/*/!* Modal for picking filters *!/*/}
