@@ -8,6 +8,9 @@ import TimerIcon from '@mui/icons-material/Timer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {stringAvatar} from "../../../misc/StringHelper.ts";
+import useIsHavePermission from "../../../hooks/useIsHavePermission.ts";
+import {ManageUsersSessionsPermission} from "../../../features/permissions/permissions.ts";
+import {useIsMe} from "../../../hooks/useIsMe.ts";
 interface SessionProps {
   session: WorkSession;
   onEdit: () => void;
@@ -15,7 +18,8 @@ interface SessionProps {
 }
 
 const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
-
+    const isCanManageUsersSessions = useIsHavePermission(ManageUsersSessionsPermission);
+    const isMySession = useIsMe(session.user);
   return (
     <TableRow>
       <TableCell sx={{ width: '10%', fontSize: '1rem', textAlign: 'center' }}>
@@ -82,7 +86,7 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
       </TableCell>
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          { session.endTime && <Button
+          {(isCanManageUsersSessions || isMySession) && session.endTime && <Button
             sx={{ color: "#00101D" }}
             onClick={onEdit}
           >
