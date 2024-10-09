@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
 import PaginatedResult from "../../types/PaginatedResult";
+import User from "../../types/User.ts";
 
 export interface PaginationInfo{
     totalRecords: number
@@ -10,14 +11,20 @@ export interface PaginationInfo{
     pageSize: number
 }
 
+export interface TimeTrackerFilter{
+    selectedUser: User | null;
+    selectedOrigins: number[]
+}
+
 export interface TimeTrackerType {
     workSessions: WorkSession[];
     paginationInfo: PaginationInfo;
     currentWorkSession: WorkSession | null;
-    // filters?: FilterCriteria[];
     // sorts: SortCriteria[];
     todayTotalDuration: number;
     isWorkSessionUpdating: boolean
+
+    filter: TimeTrackerFilter
 }
 
 // export interface AddSessionPayload{
@@ -44,6 +51,10 @@ const initialState: TimeTrackerType = {
         totalPages: 1,
         currentPage: 1,
         pageSize: 5
+    },
+    filter: {
+        selectedUser: null,
+        selectedOrigins: []
     },
     todayTotalDuration: 0,
     isWorkSessionUpdating: false
@@ -108,7 +119,9 @@ const timeTrackerSlice = createSlice({
         },
         deleteWorkSessionSuccess(state, action: PayloadAction<number>) {
         },
-
+        applyTimeTrackerFilter(state, action: PayloadAction<TimeTrackerFilter>){
+            state.filter = action.payload;
+        },
         // addSession(state, action: PayloadAction<AddSessionPayload>)
         // {
         //     state.loading = true;
@@ -190,8 +203,8 @@ export const {
     getWorkSessionsSuccessful,
     setWorkSessionsPage,
     getTodayTotalDuration,
-    getTodayTotalDurationSuccessful
-
+    getTodayTotalDurationSuccessful,
+    applyTimeTrackerFilter
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

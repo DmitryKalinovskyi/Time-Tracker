@@ -3,7 +3,6 @@ import { TableRow, TableCell, Box, Avatar, Typography, Button } from '@mui/mater
 import moment from 'moment';
 import { WorkSession } from '../../../types/WorkSession';
 import { formatDuration } from '../../../misc/TimeFormatter';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TimerIcon from '@mui/icons-material/Timer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -11,6 +10,7 @@ import {stringAvatar} from "../../../misc/StringHelper.ts";
 import useIsHavePermission from "../../../hooks/useIsHavePermission.ts";
 import {ManageUsersSessionsPermission} from "../../../features/permissions/permissions.ts";
 import {useIsMe} from "../../../hooks/useIsMe.ts";
+import dayjs from "dayjs";
 interface SessionProps {
   session: WorkSession;
   onEdit: () => void;
@@ -23,35 +23,11 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
   return (
     <TableRow>
       <TableCell sx={{ width: '10%', fontSize: '1rem', textAlign: 'center' }}>
-        {moment.utc(session.startTime).local().format("MMM DD, YYYY")}
+        {dayjs(session.startTime).format("DD.MM.YYYY HH:mm:ss")}
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center' }}>
-        <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
-          <Typography sx={{ color: "#00101D", fontSize: '1rem' }}>
-            {session.user?.fullName}
-          </Typography>
-            <Avatar
-                {...stringAvatar(session.user?.fullName ?? "")}
-                sx={{
-                    ...stringAvatar(session.user?.fullName ?? "").sx,
-                    width: "30px",
-                    height: "30px",
-                    fontSize: '1rem'
-                }}
-            />
-        </Box>
-      </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-          <Box>
-            {`${moment.utc(session.startTime).local().format("HH:mm")} - ${session.endTime ? moment.utc(session.endTime).local().format("HH:mm") : "Now"}`}
-          </Box>
-          <AccessTimeIcon sx={{ width: "30px", height: "30px", color: "#00101D" }} />
-        </Box>
-      </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
-        {session.endTime ? "Finished" : "In Progress"}
-      </TableCell>
+        <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
+            {session.endTime && dayjs(session.endTime).format("DD.MM.YYYY HH:mm:ss")}
+        </TableCell>
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
           <Box>
@@ -60,6 +36,25 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
           <TimerIcon sx={{ width: "30px", height: "30px", color: "#00101D" }} />
         </Box>
       </TableCell>
+        <TableCell sx={{ width: '10%', textAlign: 'center' }}>
+            <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
+                <Typography sx={{ color: "#00101D", fontSize: '1rem' }}>
+                    {session.user?.fullName}
+                </Typography>
+                <Avatar
+                    {...stringAvatar(session.user?.fullName ?? "")}
+                    sx={{
+                        ...stringAvatar(session.user?.fullName ?? "").sx,
+                        width: "30px",
+                        height: "30px",
+                        fontSize: '1rem'
+                    }}
+                />
+            </Box>
+        </TableCell>
+        <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
+            {session.endTime ? "Finished" : "In Progress"}
+        </TableCell>
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
         {session.sessionOrigin.originName}
       </TableCell>

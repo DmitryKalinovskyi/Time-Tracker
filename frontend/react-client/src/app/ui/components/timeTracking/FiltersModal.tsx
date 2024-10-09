@@ -7,29 +7,21 @@ import {
   Button,
   Typography,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
-  OutlinedInput,
-  Chip,
-  MenuItem,
-  useTheme,
-  Theme,
-  TextField,
+  Theme, MenuItem, useTheme, FormControl, InputLabel, Select, OutlinedInput, Chip,
 } from '@mui/material';
-import FilterCriteria from '../../../types/FilterCriteria';
-import { DateRangePicker } from 'rsuite';
 import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import { UserAutoComplete } from '../shared/UserAutoCompolete/UserAutoComplete.tsx';
-import User from '../../../types/User';
-import { DateRange } from 'rsuite/esm/DateRangePicker';
-import useAuth from '../../../hooks/useAuth';
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../../store.ts";
+import {
+  applyTimeTrackerFilter,
+  getWorkSessions,
+  TimeTrackerFilter
+} from "../../../features/timeTracking/timeTrackingSlice.ts";
 
 interface FiltersModalProps {
   open: boolean,
   onClose: () => void,
-  onApplyFilters: (filters: FilterCriteria[]) => void
 }
 
 const predefinedRanges: any = [
@@ -113,12 +105,6 @@ const origins = [
   { id: "3", name: "Edited" }
 ];
 
-const durationLengthOperators = [
-  {title:  "=", apiTitle: "EQUAL"},
-  {title: ">=", apiTitle: "GREATER_THAN_OR_EQUAL"},
-  {title: "<=", apiTitle: "LESS_THAN_OR_EQUAL"},
-]
-
 function getStyles(id: string , personName: readonly string[], theme: Theme) {
   return {
     fontWeight: personName.includes(id)
@@ -128,117 +114,52 @@ function getStyles(id: string , personName: readonly string[], theme: Theme) {
 }
 
 
-const FiltersModal = ({
-  open,
-  onClose,
-  onApplyFilters,
-}: FiltersModalProps): JSX.Element => {
+export default function FiltersModal({open, onClose}: FiltersModalProps){
   const theme = useTheme();
-  const [origin, setOrigin] = useState<string[]>([]);
-  const [editedBy, setEditedBy] = useState<User | null>(null);
-  const [durationOperator, setDurationOperator] = useState<string | null>();
-  const [durationValue, setDurationValue] = useState<string | null>();
-  const [dateRange, setDateRange] = useState<DateRange | null>(predefinedRanges[4].value());
-  const me = useAuth().user!;
-
-  const handleApply = () => {
-    let finalFilters: FilterCriteria[] = [];
-    if(dateRange)
-    {
-      let formatedDateRange = "";
-      if(dateRange[0].toDateString() == dateRange[1].toDateString())
-        formatedDateRange = dateRange[0].toISOString().split('T')[0] + ',' + addDays(dateRange[0], 1).toISOString().split('T')[0]; 
-      else
-        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ',' + addDays(dateRange[1], 1).toISOString().split('T')[0]; 
-      finalFilters.push(
-        {
-          filterBy: "START_TIME",
-          operator: "BETWEEN",
-          value: formatedDateRange
-        }
-      )
-    }
-    if(origin.toString())
-    {
-      finalFilters.push(
-        {
-          filterBy: "SESSION_ORIGIN_ID",
-          operator: "IN",
-          value: origin.join(',')
-        }
-      )
-    }
-    if(editedBy)
-    {
-      finalFilters.push(
-        {
-          filterBy: "EDITED_BY",
-          operator: "EQUAL",
-          value: editedBy.id.toString()
-        }
-      )
-    }
-    if(durationOperator && durationValue)
-    {
-      finalFilters.push(
-        {
-          filterBy: "DURATION",
-          operator: durationOperator,
-          value: durationValue
-        }
-      )
-    }
-    finalFilters.push(
-      {
-          filterBy: "USER_ID",
-          operator: "EQUAL",
-          value: me.id.toString()
-      }
-  )
-    onApplyFilters(finalFilters);
+  const {selectedUser, selectedOrigins} = useSelector((state: RootState) => state.timeTracker.filter);
+  const [filter, setFilter] = useState<TimeTrackerFilter>({
+    selectedUser: (selectedUser? {...selectedUser}: null),
+    selectedOrigins
+  });
+  const dispatch = useDispatch();
+  const handleClose = () => {
+    setFilter({
+      selectedUser: (selectedUser? {...selectedUser}: null),
+      selectedOrigins
+    });
     onClose();
-  };
-
-  const handleOriginChange = (event: SelectChangeEvent<typeof origin>) => {
-    const value = event.target.value;
-    setOrigin(typeof value === 'string' ? value.split(',') : value,);
-  };
-
-  // Clear handlers
-  const handleClearDateRange = () => setDateRange(predefinedRanges[4].value());
-  const handleClearOrigin = () => setOrigin([]);
-  const handleClearEditedBy = () => setEditedBy(null);
-  const handleClearDuration = () => {
-    setDurationOperator('');
-    setDurationValue('');
-  };
+  }
+  const handleApply = () => {
+    dispatch(applyTimeTrackerFilter(filter));
+    onClose();
+  }
 
   return (
     <Dialog 
     open={open} 
-    onClose={onClose} 
+    onClose={handleClose}
     fullWidth 
     maxWidth="md"
-    PaperProps={{ sx: { color: '#00101D', borderColor: '#00101D', borderWidth: 2, borderStyle: 'solid' } }}>
-      <DialogTitle sx={{ color: '#00101D', borderBottom: '1px solid #00101D' }}>
+    PaperProps={{ sx: { color: '#00101D', borderStyle: 'solid' } }}>
+      <DialogTitle sx={{ color: '#00101D' }}>
         Add Filters
       </DialogTitle>
 
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', border: "1px solid black", m: '1rem', px: '1rem' }}>
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', m: '1rem', px: '1rem' }}>
         {/* Date Range Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Date Range</Typography>
-          <DateRangePicker 
-            ranges={predefinedRanges} 
-            value={dateRange}
-            format="dd.MM.yyyy" 
-            style={{ width: '60%', height: '56px' }}
-            placeholder="Select Date Range"
-            onOk={(date: [Date, Date]) => setDateRange(date)}
-            defaultValue={predefinedRanges[4].value()}
-          />
-          <Button onClick={handleClearDateRange} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
-        </Box>
+        {/*<Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>*/}
+        {/*  <Typography variant='h6' width={'30%'}>Date Range</Typography>*/}
+        {/*  <DateRangePicker */}
+        {/*    ranges={predefinedRanges} */}
+        {/*    value={dateRange}*/}
+        {/*    format="dd.MM.yyyy" */}
+        {/*    style={{ width: '60%', height: '56px' }}*/}
+        {/*    placeholder="Select Date Range"*/}
+        {/*    onOk={(date: [Date, Date]) => setDateRange(date)}*/}
+        {/*    defaultValue={predefinedRanges[4].value()}*/}
+        {/*  />*/}
+        {/*  <Button onClick={handleClearDateRange} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>*/}
+        {/*</Box>*/}
 
         {/* Origin Filter */}
         <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
@@ -249,9 +170,9 @@ const FiltersModal = ({
               id="session-origin-select"
               labelId='multiple-origin-label'
               multiple
-              value={origin}
-              onChange={handleOriginChange}
-              input={<OutlinedInput id="origin-chip" label="Origin" />} 
+              value={filter.selectedOrigins}
+              onChange={(e) => setFilter({...filter, selectedOrigins: e.target.value})}
+              input={<OutlinedInput id="origin-chip" label="Origin" />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => (
@@ -260,66 +181,65 @@ const FiltersModal = ({
                 </Box>
               )}>
               {origins.map((org) => (
-                <MenuItem key={org.id} value={org.id} style={getStyles(org.id, origin, theme)}>
+                <MenuItem key={org.id} value={org.id} style={getStyles(org.id, origins, theme)}>
                   {org.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Button onClick={handleClearOrigin} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
+          <Button onClick={() => setFilter({...filter, selectedOrigins: []})} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
 
-        {/* Edited By Filter */}
+        {/* Owner Filter */}
         <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Edited By</Typography>
+          <Typography variant='h6' width={'30%'}>Session owner</Typography>
           <Box width={'60%'}>
-            <UserAutoComplete selectedUser={editedBy} onChange={(user) => setEditedBy(user)} />
+            <UserAutoComplete selectedUser={filter.selectedUser}
+                              onChange={(selectedUser) => setFilter({...filter, selectedUser})} />
+              {/*<Button onClick={dispatch(setTimeTrackerSelectedUser)} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>*/}
           </Box>
-          <Button onClick={handleClearEditedBy} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
         </Box>
 
-        {/* Duration Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Duration</Typography>
-          <FormControl sx={{ width: '60%', display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <InputLabel id="duration-operator-select-label">Operator</InputLabel>
-          <Select
-            id="duration-operator-select"
-            labelId="duration-operator-select-label"
-            label="Operator"
-            sx={{ width: '35%' }}
-            value={durationOperator}
-            onChange={(event) => setDurationOperator(event.target.value)}
-          >
-            <MenuItem aria-label="None" value="" />
-            {durationLengthOperators.map((dur) => (
-              <MenuItem key={dur.apiTitle} value={dur.apiTitle}>
-                {dur.title}
-              </MenuItem>
-            ))}
-          </Select>
-            <TextField 
-              id="duration-value"
-              label="Value" 
-              variant='outlined'
-              value={durationValue}
-              onChange={(event) => setDurationValue(event.target.value)}
-              sx={{ width: '65%' }}
-            />
-          </FormControl>
-          <Button onClick={handleClearDuration} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
-        </Box>
+        {/*/!* Duration Filter *!/*/}
+        {/*<Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>*/}
+        {/*  <Typography variant='h6' width={'30%'}>Duration</Typography>*/}
+        {/*  <FormControl sx={{ width: '60%', display: 'flex', flexDirection: 'row', gap: '1rem' }}>*/}
+        {/*  <InputLabel id="duration-operator-select-label">Operator</InputLabel>*/}
+        {/*  <Select*/}
+        {/*    id="duration-operator-select"*/}
+        {/*    labelId="duration-operator-select-label"*/}
+        {/*    label="Operator"*/}
+        {/*    sx={{ width: '35%' }}*/}
+        {/*    value={durationOperator}*/}
+        {/*    onChange={(event) => setDurationOperator(event.target.value)}*/}
+        {/*  >*/}
+        {/*    <MenuItem aria-label="None" value="" />*/}
+        {/*    {durationLengthOperators.map((dur) => (*/}
+        {/*      <MenuItem key={dur.apiTitle} value={dur.apiTitle}>*/}
+        {/*        {dur.title}*/}
+        {/*      </MenuItem>*/}
+        {/*    ))}*/}
+        {/*  </Select>*/}
+        {/*    <TextField */}
+        {/*      id="duration-value"*/}
+        {/*      label="Value" */}
+        {/*      variant='outlined'*/}
+        {/*      value={durationValue}*/}
+        {/*      onChange={(event) => setDurationValue(event.target.value)}*/}
+        {/*      sx={{ width: '65%' }}*/}
+        {/*    />*/}
+        {/*  </FormControl>*/}
+        {/*  <Button onClick={handleClearDuration} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>*/}
+        {/*</Box>*/}
         
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} sx={{ color: '#00101D' }}>Cancel</Button>
+        <Button onClick={handleClose} sx={{ color: '#00101D' }}>Cancel</Button>
         <Button onClick={handleApply} variant="contained" sx={{ backgroundColor: '#00101D' }}>
           Apply
         </Button>
       </DialogActions>
     </Dialog>
   );
-};
-
-export default FiltersModal;
+}
