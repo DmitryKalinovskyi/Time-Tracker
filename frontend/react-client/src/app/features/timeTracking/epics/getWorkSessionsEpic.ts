@@ -13,6 +13,7 @@ import {createRequest} from "../../../misc/RequestCreator.ts";
 import {getWorkSessionsQuery, GetWorkSessionsResponse} from "../api/getWorkSessionsQuery.ts";
 import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
 import {RootState} from "../../../store.ts";
+import WorkSessionsInputBuilder from "../filtering/WorkSessionsInputBuilder.ts";
 
 export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateObservable<RootState>) => action$.pipe(
     ofType(getWorkSessions.type,
@@ -22,16 +23,13 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
         updateWorkSessionSuccessful.type,
         deleteWorkSessionSuccess.type,
         ),
-    switchMap(() =>
-        ajax(createRequest(getWorkSessionsQuery(), {
-            input: {
-                pageNumber: state$.value.timeTracker.paginationInfo.currentPage,
-                pageSize: state$.value.timeTracker.paginationInfo.pageSize,
-            }
-        })).pipe(
+    switchMap(() => {
+        const filterQueryBuilder = new WorkSessionsInputBuilder(state$.value);
+        return ajax(createRequest(getWorkSessionsQuery(), filterQueryBuilder.getVariables())).pipe(
             map((ajaxResponse: AjaxResponse<GetWorkSessionsResponse>) => {
                 const errors = ajaxResponse.response.errors;
                 if (errors && errors.length > 0) {
+                    console.log(errors);
                     throw new Error(errors[0].message);
                 }
 
@@ -43,5 +41,5 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
                 return of();
             })
         )
-    )
+    })
 );

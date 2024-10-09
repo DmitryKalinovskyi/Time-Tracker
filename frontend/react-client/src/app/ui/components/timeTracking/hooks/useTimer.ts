@@ -18,7 +18,7 @@ export const useTimer = () => {
         let subscription = null;
 
         if (isTracking) {
-            const timeElapsedFromStart = Math.floor((new Date().getTime() - new Date(currentWorkSession.startTime+"+00:00").getTime()) / 1000);
+            const timeElapsedFromStart = Math.floor((new Date().getTime() - new Date(currentWorkSession.startTime).getTime()) / 1000);
 
             setDuration(timeElapsedFromStart);
             subscription = observable.subscribe((x) => {
@@ -34,5 +34,5 @@ export const useTimer = () => {
         };
     }, [isTracking, currentWorkSession]);
 
-    return [duration, isTracking];
+    return {duration, isTracking};
 };

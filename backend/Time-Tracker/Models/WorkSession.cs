@@ -8,9 +8,9 @@ namespace Time_Tracker.Models
 
         public int UserId { get; set; }
 
-        public DateTime? StartTime { get; set; }
+        public DateTimeOffset? StartTime { get; set; }
 
-        public DateTime? EndTime { get; set; }
+        public DateTimeOffset? EndTime { get; set; }
 
         public int SessionOriginId { get; set; }
 
@@ -18,8 +18,8 @@ namespace Time_Tracker.Models
 
         public int? EditedBy { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
-        public DateTime LastUpdatedAt { get; set; }
+        public DateTimeOffset LastUpdatedAt { get; set; }
     }
 }

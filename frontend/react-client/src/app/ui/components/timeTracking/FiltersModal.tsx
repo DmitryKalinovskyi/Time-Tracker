@@ -7,29 +7,26 @@ import {
   Button,
   Typography,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
-  OutlinedInput,
-  Chip,
-  MenuItem,
-  useTheme,
-  Theme,
-  TextField,
+  Theme, MenuItem, useTheme, FormControl, InputLabel, Select, OutlinedInput, Chip, Stack,
 } from '@mui/material';
-import FilterCriteria from '../../../types/FilterCriteria';
-import { DateRangePicker } from 'rsuite';
 import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import { UserAutoComplete } from '../shared/UserAutoCompolete/UserAutoComplete.tsx';
-import User from '../../../types/User';
-import { DateRange } from 'rsuite/esm/DateRangePicker';
-import useAuth from '../../../hooks/useAuth';
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../../store.ts";
+import {
+  applyTimeTrackerFilter,
+  getWorkSessions,
+  TimeTrackerFilter
+} from "../../../features/timeTracking/timeTrackingSlice.ts";
+import {DateTimePicker} from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
 
 interface FiltersModalProps {
   open: boolean,
   onClose: () => void,
-  onApplyFilters: (filters: FilterCriteria[]) => void
 }
 
 const predefinedRanges: any = [
@@ -113,12 +110,6 @@ const origins = [
   { id: "3", name: "Edited" }
 ];
 
-const durationLengthOperators = [
-  {title:  "=", apiTitle: "EQUAL"},
-  {title: ">=", apiTitle: "GREATER_THAN_OR_EQUAL"},
-  {title: "<=", apiTitle: "LESS_THAN_OR_EQUAL"},
-]
-
 function getStyles(id: string , personName: readonly string[], theme: Theme) {
   return {
     fontWeight: personName.includes(id)
@@ -128,198 +119,149 @@ function getStyles(id: string , personName: readonly string[], theme: Theme) {
 }
 
 
-const FiltersModal = ({
-  open,
-  onClose,
-  onApplyFilters,
-}: FiltersModalProps): JSX.Element => {
+export default function FiltersModal({open, onClose}: FiltersModalProps){
   const theme = useTheme();
-  const [origin, setOrigin] = useState<string[]>([]);
-  const [editedBy, setEditedBy] = useState<User | null>(null);
-  const [durationOperator, setDurationOperator] = useState<string | null>();
-  const [durationValue, setDurationValue] = useState<string | null>();
-  const [dateRange, setDateRange] = useState<DateRange | null>(predefinedRanges[4].value());
-  const me = useAuth().user!;
-
-  const handleApply = () => {
-    let finalFilters: FilterCriteria[] = [];
-    if(dateRange)
-    {
-      let formatedDateRange = "";
-      if(dateRange[0].toDateString() == dateRange[1].toDateString())
-        formatedDateRange = dateRange[0].toISOString().split('T')[0] + ',' + addDays(dateRange[0], 1).toISOString().split('T')[0]; 
-      else
-        formatedDateRange = addDays(dateRange[0], 1).toISOString().split('T')[0] + ',' + addDays(dateRange[1], 1).toISOString().split('T')[0]; 
-      finalFilters.push(
-        {
-          filterBy: "START_TIME",
-          operator: "BETWEEN",
-          value: formatedDateRange
-        }
-      )
-    }
-    if(origin.toString())
-    {
-      finalFilters.push(
-        {
-          filterBy: "SESSION_ORIGIN_ID",
-          operator: "IN",
-          value: origin.join(',')
-        }
-      )
-    }
-    if(editedBy)
-    {
-      finalFilters.push(
-        {
-          filterBy: "EDITED_BY",
-          operator: "EQUAL",
-          value: editedBy.id.toString()
-        }
-      )
-    }
-    if(durationOperator && durationValue)
-    {
-      finalFilters.push(
-        {
-          filterBy: "DURATION",
-          operator: durationOperator,
-          value: durationValue
-        }
-      )
-    }
-    finalFilters.push(
-      {
-          filterBy: "USER_ID",
-          operator: "EQUAL",
-          value: me.id.toString()
-      }
-  )
-    onApplyFilters(finalFilters);
+  const {selectedUser, selectedOrigins, startTime, endTime} = useSelector((state: RootState) => state.timeTracker.filter);
+  const [filter, setFilter] = useState<TimeTrackerFilter>({
+    selectedUser: (selectedUser? {...selectedUser}: null),
+    selectedOrigins,
+    startTime: (startTime? new Date(startTime): null),
+    endTime: (endTime? new Date(endTime): null),
+  });
+  const dispatch = useDispatch();
+  const handleClose = () => {
+    setFilter({
+      selectedUser: (selectedUser? {...selectedUser}: null),
+      selectedOrigins,
+      startTime: (startTime? new Date(startTime): null),
+      endTime: (endTime? new Date(endTime): null),
+    });
     onClose();
-  };
+  }
+  const handleApply = () => {
+    dispatch(applyTimeTrackerFilter(filter));
+    onClose();
+  }
 
-  const handleOriginChange = (event: SelectChangeEvent<typeof origin>) => {
-    const value = event.target.value;
-    setOrigin(typeof value === 'string' ? value.split(',') : value,);
-  };
-
-  // Clear handlers
-  const handleClearDateRange = () => setDateRange(predefinedRanges[4].value());
-  const handleClearOrigin = () => setOrigin([]);
-  const handleClearEditedBy = () => setEditedBy(null);
-  const handleClearDuration = () => {
-    setDurationOperator('');
-    setDurationValue('');
-  };
-
+  console.log()
   return (
-    <Dialog 
-    open={open} 
-    onClose={onClose} 
-    fullWidth 
-    maxWidth="md"
-    PaperProps={{ sx: { color: '#00101D', borderColor: '#00101D', borderWidth: 2, borderStyle: 'solid' } }}>
-      <DialogTitle sx={{ color: '#00101D', borderBottom: '1px solid #00101D' }}>
-        Add Filters
-      </DialogTitle>
+      <Dialog
+          open={open}
+          onClose={handleClose}
+          fullWidth
+          maxWidth="md"
+          PaperProps={{sx: {color: '#00101D', borderStyle: 'solid'}}}>
+        <DialogTitle sx={{color: '#00101D'}}>
+          Add Filters
+        </DialogTitle>
 
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', border: "1px solid black", m: '1rem', px: '1rem' }}>
-        {/* Date Range Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Date Range</Typography>
-          <DateRangePicker 
-            ranges={predefinedRanges} 
-            value={dateRange}
-            format="dd.MM.yyyy" 
-            style={{ width: '60%', height: '56px' }}
-            placeholder="Select Date Range"
-            onOk={(date: [Date, Date]) => setDateRange(date)}
-            defaultValue={predefinedRanges[4].value()}
-          />
-          <Button onClick={handleClearDateRange} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
-        </Box>
+        <DialogContent sx={{display: 'flex', flexDirection: 'column', m: '1rem', px: '1rem'}}>
+          <Grid container sx={{pt: 1}} columns={12} rowSpacing={2}>
+            {/* Date Range Filter */}
+            <Grid item xs={3} className="flex items-center">
+              <Typography variant='h6'>Date Range</Typography>
+            </Grid>
+            <Grid item  xs={8}>
+              <Stack direction={"horizontal"} alignItems={"center"} justifyContent={"space-between"}>
+                <DateTimePicker value={filter.startTime ? dayjs(filter.startTime) : undefined}
+                                onChange={(date) => setFilter({...filter, startTime: date?.toDate()})}
+                                label={"Start Time"}/>
+                <HorizontalRuleIcon/>
 
-        {/* Origin Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Origin</Typography>
-          <FormControl sx={{ width: '60%' }}>
-            <InputLabel id="multiple-origin-label">Origin</InputLabel>
-            <Select
-              id="session-origin-select"
-              labelId='multiple-origin-label'
-              multiple
-              value={origin}
-              onChange={handleOriginChange}
-              input={<OutlinedInput id="origin-chip" label="Origin" />} 
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={origins.find((org) => org.id === value)!.name} />
+                <DateTimePicker value={filter.endTime ? dayjs(filter.endTime) : undefined}
+                                onChange={(date) => setFilter({...filter, endTime: date?.toDate()})}
+                                label={"End Time"}/>
+              </Stack>
+            </Grid>
+            <Grid item xs={1} className="flex items-center">
+              <Button onClick={() => setFilter({...filter, startTime: null, endTime: null})}
+                      sx={{ml: 'auto', color: '#00101D'}}>Clear</Button>
+            </Grid>
+
+            {/* Origin Filter */}
+            <Grid item  xs={3} className="flex items-center">
+              <Typography variant='h6' width={'30%'}>Origin</Typography>
+            </Grid>
+            <Grid item xs={8}>
+              <FormControl fullWidth>
+                <InputLabel id="multiple-origin-label">Origin</InputLabel>
+                <Select
+                    id="session-origin-select"
+                    labelId='multiple-origin-label'
+                    multiple
+                    value={filter.selectedOrigins}
+                    onChange={(e) => setFilter({...filter, selectedOrigins: e.target.value})}
+                    input={<OutlinedInput id="origin-chip" label="Origin"/>}
+                    renderValue={(selected) => (
+                        <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
+                          {selected.map((value) => (
+                              <Chip key={value} label={origins.find((org) => org.id === value)!.name}/>
+                          ))}
+                        </Box>
+                    )}>
+                  {origins.map((org) => (
+                      <MenuItem key={org.id} value={org.id} style={getStyles(org.id, origins, theme)}>
+                        {org.name}
+                      </MenuItem>
                   ))}
-                </Box>
-              )}>
-              {origins.map((org) => (
-                <MenuItem key={org.id} value={org.id} style={getStyles(org.id, origin, theme)}>
-                  {org.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button onClick={handleClearOrigin} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
-        </Box>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item  xs={1} className="flex items-center">
+              <Button onClick={() => setFilter({...filter, selectedOrigins: []})}
+                      sx={{ml: 'auto', color: '#00101D'}}>Clear</Button>
+            </Grid>
 
-        {/* Edited By Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Edited By</Typography>
-          <Box width={'60%'}>
-            <UserAutoComplete selectedUser={editedBy} onChange={(user) => setEditedBy(user)} />
-          </Box>
-          <Button onClick={handleClearEditedBy} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
-        </Box>
+            {/* Owner Filter */}
+            <Grid item  xs={3} className="flex items-center">
+              <Typography variant='h6'>Session owner</Typography>
+            </Grid>
+            <Grid item  xs={8}>
+              <UserAutoComplete selectedUser={filter.selectedUser}
+                                onChange={(selectedUser) => setFilter({...filter, selectedUser})}/>
+            </Grid>
 
-        {/* Duration Filter */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>
-          <Typography variant='h6' width={'30%'}>Duration</Typography>
-          <FormControl sx={{ width: '60%', display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <InputLabel id="duration-operator-select-label">Operator</InputLabel>
-          <Select
-            id="duration-operator-select"
-            labelId="duration-operator-select-label"
-            label="Operator"
-            sx={{ width: '35%' }}
-            value={durationOperator}
-            onChange={(event) => setDurationOperator(event.target.value)}
-          >
-            <MenuItem aria-label="None" value="" />
-            {durationLengthOperators.map((dur) => (
-              <MenuItem key={dur.apiTitle} value={dur.apiTitle}>
-                {dur.title}
-              </MenuItem>
-            ))}
-          </Select>
-            <TextField 
-              id="duration-value"
-              label="Value" 
-              variant='outlined'
-              value={durationValue}
-              onChange={(event) => setDurationValue(event.target.value)}
-              sx={{ width: '65%' }}
-            />
-          </FormControl>
-          <Button onClick={handleClearDuration} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>
-        </Box>
-        
-      </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} sx={{ color: '#00101D' }}>Cancel</Button>
-        <Button onClick={handleApply} variant="contained" sx={{ backgroundColor: '#00101D' }}>
-          Apply
-        </Button>
-      </DialogActions>
-    </Dialog>
+            {/*/!* Duration Filter *!/*/}
+            {/*<Box sx={{ display: 'flex', alignItems: 'center', mt: '1rem', color: '#00101D' }}>*/}
+            {/*  <Typography variant='h6' width={'30%'}>Duration</Typography>*/}
+            {/*  <FormControl sx={{ width: '60%', display: 'flex', flexDirection: 'row', gap: '1rem' }}>*/}
+            {/*  <InputLabel id="duration-operator-select-label">Operator</InputLabel>*/}
+            {/*  <Select*/}
+            {/*    id="duration-operator-select"*/}
+            {/*    labelId="duration-operator-select-label"*/}
+            {/*    label="Operator"*/}
+            {/*    sx={{ width: '35%' }}*/}
+            {/*    value={durationOperator}*/}
+            {/*    onChange={(event) => setDurationOperator(event.target.value)}*/}
+            {/*  >*/}
+            {/*    <MenuItem aria-label="None" value="" />*/}
+            {/*    {durationLengthOperators.map((dur) => (*/}
+            {/*      <MenuItem key={dur.apiTitle} value={dur.apiTitle}>*/}
+            {/*        {dur.title}*/}
+            {/*      </MenuItem>*/}
+            {/*    ))}*/}
+            {/*  </Select>*/}
+            {/*    <TextField */}
+            {/*      id="duration-value"*/}
+            {/*      label="Value" */}
+            {/*      variant='outlined'*/}
+            {/*      value={durationValue}*/}
+            {/*      onChange={(event) => setDurationValue(event.target.value)}*/}
+            {/*      sx={{ width: '65%' }}*/}
+            {/*    />*/}
+            {/*  </FormControl>*/}
+            {/*  <Button onClick={handleClearDuration} sx={{ ml: 'auto', color: '#00101D' }}>Clear</Button>*/}
+            {/*</Box>*/}
+          </Grid>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleClose} sx={{color: '#00101D'}}>Cancel</Button>
+          <Button onClick={handleApply} variant="contained" sx={{backgroundColor: '#00101D'}}>
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
   );
-};
-
-export default FiltersModal;
+}
