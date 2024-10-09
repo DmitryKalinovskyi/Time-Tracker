@@ -31,6 +31,21 @@ export default class WorkSessionsInputBuilder {
             })
         }
 
+        if(this.state.timeTracker.filter.startTime){
+            variables.input.filterCriterias.push({
+                "filterBy": "START_TIME",
+                "value": this.state.timeTracker.filter.startTime,
+                "operator": "GREATER_THAN_OR_EQUAL"
+            })
+        }
+        if(this.state.timeTracker.filter.endTime){
+            variables.input.filterCriterias.push({
+                "filterBy": "START_TIME",
+                "value": this.state.timeTracker.filter.endTime,
+                "operator": "LESS_THAN_OR_EQUAL"
+            })
+        }
+
         console.log(variables)
         return variables;
     }

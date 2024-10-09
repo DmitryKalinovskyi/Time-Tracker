@@ -12,8 +12,10 @@ export interface PaginationInfo{
 }
 
 export interface TimeTrackerFilter{
-    selectedUser: User | null;
+    selectedUser: User | null
     selectedOrigins: number[]
+    startTime: Date | null,
+    endTime: Date | null
 }
 
 export interface TimeTrackerType {
