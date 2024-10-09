@@ -13,13 +13,13 @@ import ResetUserPasswordPage from "./ui/pages/ResetPasswordPage.tsx";
 import {AuthProvider} from "./features/authentification/AuthProvider.tsx";
 import UserPage from "./ui/pages/UserPage.tsx";
 import UsersPage from "./ui/pages/UsersPage.tsx";
-import { TimerProvider } from './features/timeTracking/TimerProvider.tsx';
 import {CalendarPage} from "./ui/pages/CalendarPage.tsx";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import RequirePermission from "./gates/RequirePermission.tsx";
 import {ManageUsersPermission} from "./features/permissions/permissions.ts";
 import {ReportsPage} from "./ui/pages/ReportsPage.tsx";
+import {TimeTrackerProvider} from "./features/timeTracking/TimeTrackerProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -51,17 +51,17 @@ const router = createBrowserRouter([
 ])
 
 export default function App() {
-  return (
-    <Provider store={store}>
-          <AuthProvider>
-              <SnackbarProvider>
-                <TimerProvider>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <RouterProvider router={router} />
-                  </LocalizationProvider>
-                </TimerProvider>
-              </SnackbarProvider>
-      </AuthProvider>
-    </Provider>
-  )
+    return (
+        <Provider store={store}>
+            <AuthProvider>
+                <SnackbarProvider>
+                    <TimeTrackerProvider>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <RouterProvider router={router}/>
+                        </LocalizationProvider>
+                    </TimeTrackerProvider>
+                </SnackbarProvider>
+            </AuthProvider>
+        </Provider>
+    )
 }

@@ -3,11 +3,11 @@ import { WorkSessionOrigin } from "./WorkSessionOrigin";
 
 export interface WorkSession {
     id: number;
-    startTime: Date;
-    endTime: Date | null;
+    startTime: string;
+    endTime: string | null;
     duration: number | null;
-    createdAt: Date;
-    lastUpdatedAt: Date;
+    createdAt: string;
+    lastUpdatedAt: string;
     user: User;
     editedBy: User | null;
     sessionOrigin: WorkSessionOrigin;

@@ -12,13 +12,13 @@ import { Link } from "react-router-dom";
 import GroupIcon from '@mui/icons-material/Group';
 import BadgeIcon from '@mui/icons-material/Badge';
 
-import { useTimerContext } from "../../../features/timeTracking/TimerProvider";
 import useIsHavePermission from "../../../hooks/useIsHavePermission.ts";
 import {ManageUsersPermission} from "../../../features/permissions/permissions.ts";
+import {useTimer} from "../timeTracking/hooks/useTimer.ts";
 
 
 const Sidebar: React.FC = () => {
-  const { duration } = useTimerContext();
+  const [duration] = useTimer();
 
   const isCanManageUsers = useIsHavePermission(ManageUsersPermission);
 

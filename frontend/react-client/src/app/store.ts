@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUserEpic } from "./features/registration/registerEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
 import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
-import { addSessionEpic, deleteSessionEpic, deleteSessionSuccessfullEpic, getCurrentSessionEpic, getSessionsEpic, getTodayTotalDurationEpic, getWorkSessionsListingTotalDurationEpic, startSessionEpic, stopSessionEpic, updateSessionEpic } from "./features/timeTracking/timeTrackingEpics.ts";
 import { getUsersEpic } from "./features/users/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
 import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
@@ -27,6 +26,7 @@ import {
     updateCalendarEventEpic
 } from "./features/calendar/calendarEpic.ts";
 import {fetchWorkReportEpic} from "./features/workReporting/workReportingEpic.ts";
+import {timeTrackingEpics} from "./features/timeTracking/timeTrackingEpics.ts";
 
 
 
@@ -43,16 +43,8 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     updateUserPermissionsEpic,
     getPermissionsEpic,
     resetUserPasswordEpic,
-    startSessionEpic,
-    stopSessionEpic,
-    getSessionsEpic,
-    getCurrentSessionEpic,
-    getWorkSessionsListingTotalDurationEpic,
-    getTodayTotalDurationEpic,
-    updateSessionEpic,
-    deleteSessionEpic,
-    deleteSessionSuccessfullEpic,
-    addSessionEpic,
+
+    timeTrackingEpics,
 
     createCalendarEventEpic,
     updateCalendarEventEpic,
