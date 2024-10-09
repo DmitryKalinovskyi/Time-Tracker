@@ -5,6 +5,7 @@ import {deleteWorkSessionEpic} from "./epics/deleteWorkSessionEpic.ts";
 import {getCurrentWorkSessionEpic} from "./epics/getCurrentWorkSessionEpic.ts";
 import {getWorkSessionsEpic} from "./epics/getWorkSessionsEpic.ts";
 import {getTodayTotalDurationEpic} from "./epics/getTodayTotalDurationEpic.ts";
+import {updateWorkSessionEpic} from "./epics/updateWorkSessionEpic.ts";
 
 export const timeTrackingEpics = combineEpics(
     startSessionEpic,
@@ -12,19 +13,6 @@ export const timeTrackingEpics = combineEpics(
     deleteWorkSessionEpic,
     getCurrentWorkSessionEpic,
     getWorkSessionsEpic,
-    getTodayTotalDurationEpic
+    getTodayTotalDurationEpic,
+    updateWorkSessionEpic
 );
-
-
-
-// ????
-// export const deleteSessionSuccessfullEpic = (action$: Observable<Action>, state$: Observable<RootState>) => action$.pipe(
-//     ofType(deleteSessionSuccessful.type),
-//     withLatestFrom(state$),
-//     map(([_action, state]: [any, RootState]) =>
-//         getSessions(getCurrentPagArgs(state.timeTracker.paginationInfo!,
-//             state.timeTracker.sorts,
-//             state.timeTracker.filters!
-//     )))
-// );
-//

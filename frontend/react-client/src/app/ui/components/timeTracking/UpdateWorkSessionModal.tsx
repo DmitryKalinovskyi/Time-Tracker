@@ -10,66 +10,50 @@ import {
   Typography,
 } from '@mui/material';
 import { WorkSession } from '../../../types/WorkSession';
-import { DatePicker } from 'rsuite';
 import useAuth from '../../../hooks/useAuth';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateSession } from '../../../features/timeTracking/timeTrackingSlice';
+import { updateWorkSession } from '../../../features/timeTracking/timeTrackingSlice';
 import { RootState } from '../../../store';
+import {DateTimePicker, PickerValidDate} from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 interface UpdateWorkSessionModalProps {
   open: boolean;
   onClose: () => void;
-  onUpdateSuccess: () => void;
   initialData: WorkSession;
 }
 
-const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, onUpdateSuccess, initialData }) => {
+const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, onClose, initialData }) => {
   const [session, setSession] = useState<WorkSession>(initialData);
   const [errors, setErrors] = useState<string>();
-  const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
-  const { user: me } = useAuth();
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.timeTracker);
+  const { isWorkSessionUpdating } = useSelector((state: RootState) => state.timeTracker);
 
   useEffect(() => {
     setSession(initialData);
     setErrors("");
   }, [initialData]);
 
-  useEffect(() => {
-    if (!loading && hasAttemptedSave && !error) {
-      onUpdateSuccess();
-      setHasAttemptedSave(false);
-    }
-    if (!loading && hasAttemptedSave && error) {
-      setErrors(error);
-      setHasAttemptedSave(false);
-    }
-  }, [loading, error]);
+  // useEffect(() => {
+  //   if (!loading && hasAttemptedSave && !error) {
+  //     setHasAttemptedSave(false);
+  //   }
+  //   if (!loading && hasAttemptedSave && error) {
+  //     setErrors(error);
+  //     setHasAttemptedSave(false);
+  //   }
+  // }, [loading, error]);
 
   const validate = () => {
     let localError = "";
-    const currentTime = new Date();
     const startTime = new Date(session.startTime);
     const endTime = new Date(session.endTime!);
-  
-    const getHour = (date: Date) => date.getHours();
-  
-    // Define acceptable time range (6:00 to 22:00)
-    const minHour = 6;
-    const maxHour = 22;
   
     // Check if startTime is present
     if (!session.startTime) {
       localError = "Start time is required";
     } 
-    else if (startTime > currentTime) {
-      localError = "Start time cannot be in the future";
-    } 
-    else if (getHour(startTime) < minHour || getHour(startTime) >= maxHour) {
-      localError = `Start time must be between ${minHour}:00 and ${maxHour}:00`;
-    }
-  
+
     // Check if endTime is present
     if (!session.endTime) {
       localError = "End time is required";
@@ -77,19 +61,6 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
     else if (endTime < startTime) {
       localError = "End time cannot be earlier than start time";
     } 
-    else if (endTime > currentTime) {
-      localError = "End time cannot be in the future";
-    } 
-    else if (getHour(endTime) < minHour || getHour(endTime) > maxHour) {
-      localError = `End time must be between ${minHour}:00 and ${maxHour}:00`;
-    }
-    else if (endTime > startTime) {
-      const durationInHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-      if (durationInHours > 8) {
-        localError = "Session duration cannot be longer than 8 hours";
-      }
-    }
-  
     setErrors(localError);
     return localError === "";
   };
@@ -97,46 +68,46 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
 
   const handleSave = () => {
     if (validate()) {
-      setHasAttemptedSave(true);
-      dispatch(updateSession({
-        editorId: me!.id,
+      dispatch(updateWorkSession({
         id: session.id,
-        startTime: session.startTime.toISOString() as unknown as Date,
-        endTime: session.endTime!.toISOString() as unknown as Date
+        startTime: new Date(session.startTime),
+        endTime: new Date(session.endTime)
       }));
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Update Work Session</DialogTitle>
       <DialogContent>
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-            <CircularProgress sx={{ color: '#00101D' }} />
-          </Box>
-        )}
         <Box sx={{ display: 'flex', mt: '1rem', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-          <Box mt={'1rem'} width={'100%'} display={'flex'}>
-            <Typography variant='h6' sx={{ verticalAlign: 'middle' }} width={'30%'}>Start Time</Typography>
-            <DatePicker 
-              value={session.startTime}
-              format="dd.MM.yyyy HH:mm" 
-              style={{ width: '70%' }}
-              placeholder="Select Start Time"
-              onOk={(date) => setSession({ ...session, startTime: date })}
+            {/*<Typography variant='h6' mr={2}>Start Time</Typography>*/}
+            <DateTimePicker value={dayjs(session.startTime)}
+                            label={"Start Time"}
+                            onChange={(pickerValidDate) =>
+                                setSession({ ...session, startTime: pickerValidDate.toDate().toString() })}
             />
-          </Box>
-          <Box width={'100%'} display={'flex'}>
-            <Typography variant='h6' sx={{ verticalAlign: 'middle' }} width={'30%'}>End Time</Typography>
-            <DatePicker 
-              value={session.endTime}
-              format="dd.MM.yyyy HH:mm"
-              style={{ width: '70%' }}
-              placeholder="Select End Time"
-              onOk={(date) => setSession({ ...session, endTime: date })}
+
+            {/*<DatePicker */}
+            {/*  value={new Date(session.startTime)}*/}
+            {/*  format="dd.MM.yyyy HH:mm" */}
+            {/*  style={{ width: '70%' }}*/}
+            {/*  placeholder="Select Start Time"*/}
+            {/*  onOk={(date) => setSession({ ...session, startTime: date.toString() })}*/}
+            {/*/>*/}
+            {/*<Typography variant='h6' mr={2}>End Time</Typography>*/}
+            <DateTimePicker value={dayjs(session.endTime)}
+                            label={"End Time"}
+                            onChange={(pickerValidDate) =>
+                                setSession({ ...session, endTime: pickerValidDate.toDate().toString() })}
             />
-          </Box>
+            {/*<DatePicker */}
+            {/*  value={new Date(session.endTime)}*/}
+            {/*  format="dd.MM.yyyy HH:mm"*/}
+            {/*  style={{ width: '70%' }}*/}
+            {/*  placeholder="Select End Time"*/}
+            {/*  onOk={(date) => setSession({ ...session, endTime: date.toString() })}*/}
+            {/*/>*/}
           {errors && (
             <Typography color="error" variant="body2">
               {errors}
@@ -145,16 +116,16 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary" disabled={loading}>
+        <Button onClick={onClose} color="primary" disabled={isWorkSessionUpdating}>
           Cancel
         </Button>
         <Button
           onClick={handleSave}
           color="primary"
           variant="contained"
-          disabled={hasAttemptedSave}
+          disabled={isWorkSessionUpdating}
         >
-          {hasAttemptedSave ? 'Saving...' : 'Save'}
+          {isWorkSessionUpdating ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

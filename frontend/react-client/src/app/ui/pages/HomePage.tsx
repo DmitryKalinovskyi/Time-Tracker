@@ -1,6 +1,6 @@
 import Timer from "../components/timeTracking/Timer.tsx";
 import { Box } from "@mui/material";
-import {SessionList} from "../components/timeTracking/SessionList.tsx";
+import {SessionTable} from "../components/timeTracking/SessionTable.tsx";
 
 export default function HomePage() {
   // const [isFilterModalOpen, setFilterModalOpen] = useState(false);
@@ -44,7 +44,7 @@ export default function HomePage() {
       {/*  <StyledButton label="Sorting" onClickHandler={handleOpenSortModal} />*/}
       {/*</Box>*/}
       <Box height={'60%'}>
-        <SessionList />
+        <SessionTable />
       </Box>
       
       {/*/!* Modal for picking filters *!/*/}

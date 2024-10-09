@@ -1,37 +1,36 @@
-// export const updateSessionEpic = (action$: Observable<Action>) => action$.pipe(
-//     ofType(updateSession.type),
-//     switchMap((action: PayloadAction<UpdateSessionPayload>) =>
-//         from(
-//             ajax(createRequest(updateSessionQuery(action.payload)))
-//                 .pipe(
-//                     map((ajaxResponse: any) => {
-//                         console.log(ajaxResponse.data)
-//                         const errors = ajaxResponse.response.errors;
-//                         const data: UpdateSessionResponse = ajaxResponse.response.data;
-//
-//                         if (errors && errors.length > 0) {
-//                             return setError(errors[0].message);
-//                         }
-//
-//                         if (data && data.timeTrackerMutation && data.timeTrackerMutation.updateSession) {
-//                             return updateSessionSuccessful(data.timeTrackerMutation.updateSession);
-//                         } else {
-//                             throw new Error('[Session updating] Unexpected response format or missing login data');
-//                         }
-//                     }),
-//                     catchError((error: any) => {
-//                         let errorMessage = 'An unexpected error occurred';
-//
-//                         if (error.status === 0) {
-//                             errorMessage = 'Connection time out';
-//                         } else if (error.message) {
-//                             errorMessage = error.message;
-//                         }
-//
-//                         return of(setError(errorMessage));
-//                     })
-//                 )
-//             )
-//     )
-// );
-//
+import {
+    UpdateSessionPayload,
+    updateWorkSession,
+    updateWorkSessionFailure,
+    updateWorkSessionSuccessful
+} from "../timeTrackingSlice.ts";
+import {ofType} from "redux-observable";
+import {catchError, map, Observable, of, switchMap} from "rxjs";
+import {Action, PayloadAction} from "@reduxjs/toolkit";
+import {ajax, AjaxResponse} from "rxjs/ajax";
+import {createRequest} from "../../../misc/RequestCreator.ts";
+import {updateWorkSessionQuery, UpdateWorkSessionResponse} from "../api/updateWorkSessionQuery.ts";
+import {ShowFailure, ShowSuccess} from "../../../misc/SnackBarHelper.ts";
+
+export const updateWorkSessionEpic = (action$: Observable<Action>) => action$.pipe(
+    ofType(updateWorkSession.type),
+    switchMap((action: PayloadAction<UpdateSessionPayload>) =>
+        ajax(createRequest(updateWorkSessionQuery(action.payload)))
+            .pipe(
+                map((ajaxResponse: AjaxResponse<UpdateWorkSessionResponse>) => {
+                    const errors = ajaxResponse.response.errors;
+
+                    if (errors && errors.length > 0) {
+                        throw new Error(errors[0].message);
+                    }
+
+                    ShowSuccess("Work session updated successful.")
+                    return updateWorkSessionSuccessful(ajaxResponse.response.data.timeTrackerMutation.updateSession);
+                }),
+                catchError((error) => {
+                    ShowFailure(error.message);
+                    return of(updateWorkSessionFailure());
+                })
+            )
+    )
+);

@@ -6,7 +6,7 @@ import {
     getWorkSessions,
     getWorkSessionsSuccessful,
     setWorkSessionsPage, startSessionSuccessful,
-    stopSessionSuccessful
+    stopSessionSuccessful, updateWorkSessionSuccessful
 } from "../timeTrackingSlice.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {createRequest} from "../../../misc/RequestCreator.ts";
@@ -19,6 +19,7 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
         setWorkSessionsPage.type,
         startSessionSuccessful.type,
         stopSessionSuccessful.type,
+        updateWorkSessionSuccessful.type,
         deleteWorkSessionSuccess.type,
         ),
     switchMap(() =>

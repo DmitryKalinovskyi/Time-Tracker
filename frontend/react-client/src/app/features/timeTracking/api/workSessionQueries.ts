@@ -11,11 +11,7 @@ import {GraphQLExecutionErrorType} from "../../../graphql/GraphQLExecutionErrorT
 //     }
 // }
 
-// export interface UpdateSessionResponse{
-//     timeTrackerMutation: {
-//         updateSession: WorkSession
-//     }
-// }
+
 
 // export interface WorkSessionByIdResponse{
 //     timeTrackerQuery: {
@@ -76,53 +72,6 @@ import {GraphQLExecutionErrorType} from "../../../graphql/GraphQLExecutionErrorT
 //             }
 //             }
 //         }
-//     `;
-//     return query;
-// }
-
-// export const updateSessionQuery = (payload: UpdateSessionPayload) => {
-//     console.log(payload);
-//     const query =
-//     `
-//     mutation{
-//         timeTrackerMutation{
-//             updateSession( editorId: ${payload.editorId} ,
-//                             input:
-//                             {
-//                                 id: ${payload.id},
-//                                 startTime: "${new Date(payload.startTime).toISOString()}",
-//                                 endTime: "${new Date(payload.endTime).toISOString()}"
-//                             }
-//                         )
-//             {
-//             id
-//             startTime
-//             endTime
-//             duration
-//             createdAt
-//             lastUpdatedAt
-//             user {
-//                 id
-//                 fullName
-//                 email
-//                 permissions
-//                 isActive
-//             }
-//             editedBy {
-//                 id
-//                 fullName
-//                 email
-//                 permissions
-//                 isActive
-//             }
-//             sessionOrigin {
-//                 id
-//                 originName
-//                 description
-//             }
-//         }
-//         }
-//     }
 //     `;
 //     return query;
 // }
