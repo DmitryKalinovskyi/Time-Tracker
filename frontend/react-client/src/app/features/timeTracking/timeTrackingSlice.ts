@@ -106,7 +106,7 @@ const timeTrackerSlice = createSlice({
         deleteWorkSession(state, action: PayloadAction<number>)
         {
         },
-        deleteWorkSessionSuccess(state) {
+        deleteWorkSessionSuccess(state, action: PayloadAction<number>) {
         },
 
         // addSession(state, action: PayloadAction<AddSessionPayload>)

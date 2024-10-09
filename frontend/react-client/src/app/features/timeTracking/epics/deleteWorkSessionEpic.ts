@@ -20,7 +20,7 @@ export const deleteWorkSessionEpic = (action$: Observable<Action>) => action$.pi
 
                         ShowSuccess("Session deleted successfully.")
 
-                        return deleteWorkSessionSuccess();
+                        return deleteWorkSessionSuccess(action.payload);
                     }),
                     catchError((error) => {
                         ShowFailure(error.message);

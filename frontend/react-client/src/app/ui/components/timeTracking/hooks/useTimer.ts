@@ -34,5 +34,5 @@ export const useTimer = () => {
         };
     }, [isTracking, currentWorkSession]);
 
-    return [duration, isTracking];
+    return {duration, isTracking};
 };

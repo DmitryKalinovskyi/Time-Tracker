@@ -11,7 +11,7 @@ import {useTimer} from "./hooks/useTimer.ts";
 const Timer: React.FC = () => {
   const timeTracker = useSelector((state: RootState) => state.timeTracker);
 
-  const [duration, isTracking] = useTimer();
+  const {duration, isTracking} = useTimer();
 
   const dispatch = useDispatch();
 

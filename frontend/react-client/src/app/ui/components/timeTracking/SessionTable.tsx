@@ -61,6 +61,7 @@ export function SessionTable(){
   //     <CircularProgress sx={{ color: '#00101D' }} />
   //   </Container>
   // );
+  if(workSessions.length == 0) return null;
 
   return (
       <Fade in={!loading} timeout={500}>
@@ -77,7 +78,7 @@ export function SessionTable(){
           <>
             <Box display={'flex'} flexDirection={'column'} justifyContent={'space-between'}
                  alignItems={'center'} px={2}>
-              <TableContainer stickyHeader component={Paper} sx={{borderRadius: '1.5rem', mb: 2}}>
+              <TableContainer component={Paper} sx={{borderRadius: '1.5rem', mb: 2}}>
                 <Table>
                   <TableHead sx={{backgroundColor: "#00101D", opacity: 0.95}}>
                     <TableRow>

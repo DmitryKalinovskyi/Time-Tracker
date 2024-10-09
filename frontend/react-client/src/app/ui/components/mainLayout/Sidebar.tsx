@@ -18,7 +18,7 @@ import {useTimer} from "../timeTracking/hooks/useTimer.ts";
 
 
 const Sidebar: React.FC = () => {
-  const [duration] = useTimer();
+  const {duration} = useTimer();
 
   const isCanManageUsers = useIsHavePermission(ManageUsersPermission);
 

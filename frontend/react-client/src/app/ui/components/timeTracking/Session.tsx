@@ -89,7 +89,7 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
             <EditIcon />
           </Button>}
           <Button
-            sx={{ color: "#00101D" }}
+              color="error"
             onClick={() => onDelete(session.id)}
           >
             <DeleteForeverIcon />
