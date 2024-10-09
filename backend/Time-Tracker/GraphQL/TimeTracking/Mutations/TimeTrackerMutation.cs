@@ -85,13 +85,6 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                         return null;
                     }
 
-                    if(inputSession.StartTime.Value.Kind != DateTimeKind.Utc ||
-                       inputSession.EndTime.Value.Kind != DateTimeKind.Utc)
-                    {
-                        context.Errors.Add(new ExecutionError("StartTime and EndTime have to be in UTC time format."));
-                        return null;
-                    }
-
                     if(await sessionOriginRepository.GetSessionOriginByIdAsync(inputSession.SessionOriginId) is null)
                     {
                         context.Errors.Add(new ExecutionError($"Invalid Session Origin id = {inputSession.SessionOriginId}"));
