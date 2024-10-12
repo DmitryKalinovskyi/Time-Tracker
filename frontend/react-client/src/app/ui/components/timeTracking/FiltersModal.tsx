@@ -162,7 +162,7 @@ export default function FiltersModal({open, onClose}: FiltersModalProps){
               <Typography variant='h6'>Date Range</Typography>
             </Grid>
             <Grid item  xs={8}>
-              <Stack direction={"horizontal"} alignItems={"center"} justifyContent={"space-between"}>
+              <Stack direction={"row"} alignItems={"center"} justifyContent={"space-between"}>
                 <DateTimePicker value={filter.startTime ? dayjs(filter.startTime) : undefined}
                                 onChange={(date) => setFilter({...filter, startTime: date?.toDate()})}
                                 label={"Start Time"}/>

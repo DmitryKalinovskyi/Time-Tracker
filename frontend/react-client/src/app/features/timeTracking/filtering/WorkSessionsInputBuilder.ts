@@ -11,7 +11,8 @@ export default class WorkSessionsInputBuilder {
             input: {
                 pageNumber: this.state.timeTracker.paginationInfo.currentPage,
                 pageSize: this.state.timeTracker.paginationInfo.pageSize,
-                filterCriterias: []
+                filterCriterias: [],
+                sortCriterias: []
             }
         };
 
@@ -46,7 +47,12 @@ export default class WorkSessionsInputBuilder {
             })
         }
 
-        console.log(variables)
+        // sort by start time
+        variables.input.sortCriterias.push({
+            "sortBy": "START_TIME",
+            "isAscending": false
+        });
+
         return variables;
     }
 }

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {createSlice, current, PayloadAction} from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
 import PaginatedResult from "../../types/PaginatedResult";
@@ -56,7 +56,9 @@ const initialState: TimeTrackerType = {
     },
     filter: {
         selectedUser: null,
-        selectedOrigins: []
+        selectedOrigins: [],
+        startTime: null,
+        endTime: null
     },
     todayTotalDuration: 0,
     isWorkSessionUpdating: false
@@ -118,11 +120,18 @@ const timeTrackerSlice = createSlice({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         deleteWorkSession(state, action: PayloadAction<number>)
         {
+
         },
         deleteWorkSessionSuccess(state, action: PayloadAction<number>) {
+            // imagine case when we try to delete session in the last page
+            if(state.paginationInfo.currentPage >= state.paginationInfo.totalPages
+                &&  state.paginationInfo.totalRecords % state.paginationInfo.pageSize == 1)
+                state.paginationInfo.currentPage = 1;
         },
         applyTimeTrackerFilter(state, action: PayloadAction<TimeTrackerFilter>){
             state.filter = action.payload;
+            // reset page
+            state.paginationInfo.currentPage = 1;
         },
         // addSession(state, action: PayloadAction<AddSessionPayload>)
         // {

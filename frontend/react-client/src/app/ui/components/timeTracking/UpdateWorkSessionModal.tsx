@@ -73,6 +73,7 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
         startTime: new Date(session.startTime),
         endTime: new Date(session.endTime)
       }));
+      onClose();
     }
   };
 
@@ -125,7 +126,7 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
           variant="contained"
           disabled={isWorkSessionUpdating}
         >
-          {isWorkSessionUpdating ? 'Saving...' : 'Save'}
+          Save
         </Button>
       </DialogActions>
     </Dialog>

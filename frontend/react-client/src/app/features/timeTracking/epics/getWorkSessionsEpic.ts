@@ -2,6 +2,7 @@ import {catchError, map, Observable, of, switchMap} from "rxjs";
 import {Action} from "@reduxjs/toolkit";
 import {ofType, StateObservable} from "redux-observable";
 import {
+    applyTimeTrackerFilter,
     deleteWorkSessionSuccess,
     getWorkSessions,
     getWorkSessionsSuccessful,
@@ -22,8 +23,10 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
         stopSessionSuccessful.type,
         updateWorkSessionSuccessful.type,
         deleteWorkSessionSuccess.type,
+        applyTimeTrackerFilter.type
         ),
     switchMap(() => {
+        console.log("Fetched.");
         const filterQueryBuilder = new WorkSessionsInputBuilder(state$.value);
         return ajax(createRequest(getWorkSessionsQuery(), filterQueryBuilder.getVariables())).pipe(
             map((ajaxResponse: AjaxResponse<GetWorkSessionsResponse>) => {
