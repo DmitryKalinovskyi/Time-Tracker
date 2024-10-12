@@ -7,11 +7,8 @@ namespace Time_Tracker.GraphQL.TimeTracking.Types
         public AddSessionInputGraphType() 
         {
             Field<NonNullGraphType<IntGraphType>>("userId");
-            Field<NonNullGraphType<DateTimeGraphType>>("startTime");
-            Field<NonNullGraphType<DateTimeGraphType>>("endTime");
-            Field<NonNullGraphType<IntGraphType>>("sessionOriginId");
-            Field<IntGraphType>("editedBy");
+            Field<NonNullGraphType<DateTimeOffsetGraphType>>("startTime");
+            Field<NonNullGraphType<DateTimeOffsetGraphType>>("endTime");
         }
-
     }
 }
