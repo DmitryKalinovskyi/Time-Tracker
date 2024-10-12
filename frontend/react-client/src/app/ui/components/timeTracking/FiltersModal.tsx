@@ -23,6 +23,7 @@ import dayjs from "dayjs";
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
+import {DatePicker} from "@mui/x-date-pickers/DatePicker";
 
 interface FiltersModalProps {
   open: boolean,
@@ -121,20 +122,18 @@ function getStyles(id: string , personName: readonly string[], theme: Theme) {
 
 export default function FiltersModal({open, onClose}: FiltersModalProps){
   const theme = useTheme();
-  const {selectedUser, selectedOrigins, startTime, endTime} = useSelector((state: RootState) => state.timeTracker.filter);
+  const {selectedUser, selectedOrigins, selectedDay} = useSelector((state: RootState) => state.timeTracker.filter);
   const [filter, setFilter] = useState<TimeTrackerFilter>({
     selectedUser: (selectedUser? {...selectedUser}: null),
     selectedOrigins,
-    startTime: (startTime? new Date(startTime): null),
-    endTime: (endTime? new Date(endTime): null),
+    selectedDay
   });
   const dispatch = useDispatch();
   const handleClose = () => {
     setFilter({
       selectedUser: (selectedUser? {...selectedUser}: null),
       selectedOrigins,
-      startTime: (startTime? new Date(startTime): null),
-      endTime: (endTime? new Date(endTime): null),
+      selectedDay
     });
     onClose();
   }
@@ -159,22 +158,17 @@ export default function FiltersModal({open, onClose}: FiltersModalProps){
           <Grid container sx={{pt: 1}} columns={12} rowSpacing={2}>
             {/* Date Range Filter */}
             <Grid item xs={3} className="flex items-center">
-              <Typography variant='h6'>Date Range</Typography>
+              <Typography variant='h6'>Day</Typography>
             </Grid>
-            <Grid item  xs={8}>
-              <Stack direction={"row"} alignItems={"center"} justifyContent={"space-between"}>
-                <DateTimePicker value={filter.startTime ? dayjs(filter.startTime) : undefined}
-                                onChange={(date) => setFilter({...filter, startTime: date?.toDate()})}
-                                label={"Start Time"}/>
-                <HorizontalRuleIcon/>
-
-                <DateTimePicker value={filter.endTime ? dayjs(filter.endTime) : undefined}
-                                onChange={(date) => setFilter({...filter, endTime: date?.toDate()})}
-                                label={"End Time"}/>
-              </Stack>
+            <Grid item xs={8}>
+              <FormControl fullWidth>
+                <DatePicker value={filter.selectedDay ? dayjs(filter.selectedDay) : undefined}
+                            onChange={(value) => setFilter({...filter, selectedDay: value.toDate()})}
+                />
+              </FormControl>
             </Grid>
             <Grid item xs={1} className="flex items-center">
-              <Button onClick={() => setFilter({...filter, startTime: null, endTime: null})}
+              <Button onClick={() => setFilter({...filter, selectedDay: null})}
                       sx={{ml: 'auto', color: '#00101D'}}>Clear</Button>
             </Grid>
 

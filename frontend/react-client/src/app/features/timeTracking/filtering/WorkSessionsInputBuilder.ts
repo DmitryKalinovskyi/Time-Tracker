@@ -1,4 +1,5 @@
 import {RootState} from "../../../store.ts";
+import dayjs from "dayjs";
 
 export default class WorkSessionsInputBuilder {
     private state: RootState;
@@ -32,17 +33,21 @@ export default class WorkSessionsInputBuilder {
             })
         }
 
-        if(this.state.timeTracker.filter.startTime){
+        if(this.state.timeTracker.filter.selectedDay){
+            const selectedDay = dayjs(this.state.timeTracker.filter.selectedDay);
+            // Start and end moments of the day
+            const startOfDay = selectedDay.startOf('day');
+            const endOfDay = selectedDay.endOf('day');
+
             variables.input.filterCriterias.push({
                 "filterBy": "START_TIME",
-                "value": this.state.timeTracker.filter.startTime,
+                "value": startOfDay.toDate(),
                 "operator": "GREATER_THAN_OR_EQUAL"
-            })
-        }
-        if(this.state.timeTracker.filter.endTime){
+            });
+
             variables.input.filterCriterias.push({
                 "filterBy": "START_TIME",
-                "value": this.state.timeTracker.filter.endTime,
+                "value": endOfDay.toDate(),
                 "operator": "LESS_THAN_OR_EQUAL"
             })
         }
@@ -53,6 +58,8 @@ export default class WorkSessionsInputBuilder {
             "isAscending": false
         });
 
+
+        console.log(variables);
         return variables;
     }
 }

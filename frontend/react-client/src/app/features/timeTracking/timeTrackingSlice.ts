@@ -13,9 +13,8 @@ export interface PaginationInfo{
 
 export interface TimeTrackerFilter{
     selectedUser: User | null
-    selectedOrigins: number[]
-    startTime: Date | null,
-    endTime: Date | null
+    selectedOrigins: number[],
+    selectedDay: Date|null
 }
 
 export interface TimeTrackerType {
@@ -57,8 +56,7 @@ const initialState: TimeTrackerType = {
     filter: {
         selectedUser: null,
         selectedOrigins: [],
-        startTime: null,
-        endTime: null
+        selectedDay: new Date()
     },
     todayTotalDuration: 0,
     isWorkSessionUpdating: false
@@ -126,7 +124,7 @@ const timeTrackerSlice = createSlice({
             // imagine case when we try to delete session in the last page
             if(state.paginationInfo.currentPage >= state.paginationInfo.totalPages
                 &&  state.paginationInfo.totalRecords % state.paginationInfo.pageSize == 1)
-                state.paginationInfo.currentPage = 1;
+                state.paginationInfo.currentPage = Math.max(1, state.paginationInfo.currentPage-1);
         },
         applyTimeTrackerFilter(state, action: PayloadAction<TimeTrackerFilter>){
             state.filter = action.payload;
