@@ -6,7 +6,6 @@ import {getCurrentWorkSessionEpic} from "./epics/getCurrentWorkSessionEpic.ts";
 import {getWorkSessionsEpic} from "./epics/getWorkSessionsEpic.ts";
 import {getTodayTotalDurationEpic} from "./epics/getTodayTotalDurationEpic.ts";
 import {updateWorkSessionEpic} from "./epics/updateWorkSessionEpic.ts";
-import {resetPageEpic} from "./epics/resetPageEpic.ts";
 
 export const timeTrackingEpics = combineEpics(
     startSessionEpic,

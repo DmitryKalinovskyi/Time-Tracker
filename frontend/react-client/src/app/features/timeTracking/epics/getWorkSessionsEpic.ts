@@ -26,7 +26,6 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
         applyTimeTrackerFilter.type
         ),
     switchMap(() => {
-        console.log("Fetched.");
         const filterQueryBuilder = new WorkSessionsInputBuilder(state$.value);
         return ajax(createRequest(getWorkSessionsQuery(), filterQueryBuilder.getVariables())).pipe(
             map((ajaxResponse: AjaxResponse<GetWorkSessionsResponse>) => {
