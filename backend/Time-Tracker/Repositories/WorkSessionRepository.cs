@@ -142,7 +142,7 @@ namespace Time_Tracker.Repositories
             var queryBuilder = new StringBuilder("SELECT COUNT(*) " +
                                                  "FROM WORKSESSIONS " +
                                                  "WHERE StartTime <= @EndTime AND " +
-                                                 "(EndTime >= @StartTime OR EndTime IS NULL) AND " +
+                                                 "(EndTime IS NULL OR EndTime >= @StartTime) AND " +
                                                  "Id != @Id AND " +
                                                  "UserId = @UserId");
             var totalCount = 0;

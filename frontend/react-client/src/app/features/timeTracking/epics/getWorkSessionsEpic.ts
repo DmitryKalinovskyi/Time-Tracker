@@ -2,6 +2,8 @@ import {catchError, map, Observable, of, switchMap} from "rxjs";
 import {Action} from "@reduxjs/toolkit";
 import {ofType, StateObservable} from "redux-observable";
 import {
+    addWorkSessionSuccessful,
+    applyTimeTrackerFilter,
     deleteWorkSessionSuccess,
     getWorkSessions,
     getWorkSessionsSuccessful,
@@ -20,8 +22,10 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
         setWorkSessionsPage.type,
         startSessionSuccessful.type,
         stopSessionSuccessful.type,
+        addWorkSessionSuccessful.type,
         updateWorkSessionSuccessful.type,
         deleteWorkSessionSuccess.type,
+        applyTimeTrackerFilter.type,
         ),
     switchMap(() => {
         const filterQueryBuilder = new WorkSessionsInputBuilder(state$.value);

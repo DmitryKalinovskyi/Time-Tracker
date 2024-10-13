@@ -4,78 +4,11 @@ import {GraphQLExecutionErrorType} from "../../../graphql/GraphQLExecutionErrorT
 
 
 
-
-// export interface AddSessionResponse{
-//     timeTrackerMutation: {
-//         addSession: WorkSession
-//     }
-// }
-
-
-
 // export interface WorkSessionByIdResponse{
 //     timeTrackerQuery: {
 //         workSession: WorkSession
 //     }
 // }
-
-
-
-
-
-
-
-
-
-
-
-// export const addSessionQuery = (payload: AddSessionPayload) => {
-//     const query =
-//     `
-//         mutation
-//         {
-//             timeTrackerMutation{
-//                 addSession(input:
-//                                 {
-//                                     userId: ${payload.userId},
-//                                     startTime: "${payload.startTime.toISOString()}",
-//                                     endTime: "${payload.endTime.toISOString()}",
-//                                     sessionOriginId: ${payload.sessionOriginId}
-//                                 }
-//                             )
-//                     {
-//                 id
-//                 startTime
-//                 endTime
-//                 duration
-//                 createdAt
-//                 lastUpdatedAt
-//                 user {
-//                     id
-//                     fullName
-//                     email
-//                     permissions
-//                     isActive
-//                 }
-//                 editedBy {
-//                     id
-//                     fullName
-//                     email
-//                     permissions
-//                     isActive
-//                 }
-//                 sessionOrigin {
-//                     id
-//                     originName
-//                     description
-//                 }
-//             }
-//             }
-//         }
-//     `;
-//     return query;
-// }
-
 
 
 // export const getWorkSessionByIdQuery = (workSessionId: number) => {

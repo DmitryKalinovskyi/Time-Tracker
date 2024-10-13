@@ -125,7 +125,7 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
           variant="contained"
           disabled={isWorkSessionUpdating}
         >
-          {isWorkSessionUpdating ? 'Saving...' : 'Save'}
+          Save
         </Button>
       </DialogActions>
     </Dialog>

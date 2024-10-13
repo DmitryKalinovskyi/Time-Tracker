@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {createSlice, current, PayloadAction} from "@reduxjs/toolkit";
 
 import { WorkSession} from "../../types/WorkSession";
 import PaginatedResult from "../../types/PaginatedResult";
@@ -13,9 +13,8 @@ export interface PaginationInfo{
 
 export interface TimeTrackerFilter{
     selectedUser: User | null
-    selectedOrigins: number[]
-    startTime: Date | null,
-    endTime: Date | null
+    selectedOrigins: number[],
+    selectedDay: Date|null
 }
 
 export interface TimeTrackerType {
@@ -29,13 +28,11 @@ export interface TimeTrackerType {
     filter: TimeTrackerFilter
 }
 
-// export interface AddSessionPayload{
-//     userId: number;
-//     startTime: Date;
-//     endTime: Date;
-//     sessionOriginId: number;
-//     editedBy: number | null;
-// }
+export interface AddWorkSessionPayload {
+    userId: number;
+    startTime: Date;
+    endTime: Date;
+}
 
 export interface UpdateSessionPayload{
     id: number;
@@ -56,7 +53,8 @@ const initialState: TimeTrackerType = {
     },
     filter: {
         selectedUser: null,
-        selectedOrigins: []
+        selectedOrigins: [],
+        selectedDay: new Date()
     },
     todayTotalDuration: 0,
     isWorkSessionUpdating: false
@@ -118,16 +116,20 @@ const timeTrackerSlice = createSlice({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         deleteWorkSession(state, action: PayloadAction<number>)
         {
+
         },
         deleteWorkSessionSuccess(state, action: PayloadAction<number>) {
+            // imagine case when we try to delete session in the last page
+            if(state.paginationInfo.currentPage >= state.paginationInfo.totalPages
+                &&  state.paginationInfo.totalRecords % state.paginationInfo.pageSize == 1)
+                state.paginationInfo.currentPage = Math.max(1, state.paginationInfo.currentPage-1);
         },
         applyTimeTrackerFilter(state, action: PayloadAction<TimeTrackerFilter>){
             state.filter = action.payload;
+            // reset page
+            state.paginationInfo.currentPage = 1;
         },
-        // addSession(state, action: PayloadAction<AddSessionPayload>)
-        // {
-        //     state.loading = true;
-        // },
+
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         getCurrentWorkSession(state, action: PayloadAction<number>)
@@ -150,42 +152,11 @@ const timeTrackerSlice = createSlice({
         {
             state.paginationInfo.currentPage = action.payload;
         },
-        //
-        // setFilters(state, action: PayloadAction<FilterCriteria[]>)
-        // {
-        //     if(action.payload.length == 1)
-        //         action.payload.push(
-        //       {
-        //         filterBy: "START_TIME",
-        //         operator: "BETWEEN",
-        //         value: new Date().toISOString().split('T')[0] + ',' + addDays(new Date(), 1).toISOString().split('T')[0]
-        //       });
-        //     state.filters = action.payload;
-        // },
-
-        
-        // setSorts(state, action: PayloadAction<SortCriteria[]>)
-        // {
-        //     state.sorts = action.payload;
-        // },
-        //
-        // addSessionSuccessful(state, action: PayloadAction<WorkSession>) {
-        //     state.loading = false;
-        //     state.error = null;
-        //     state.workSessions = [
-        //         ...state.workSessions,
-        //         action.payload
-        //     ];
-        //     state.workSessions.sort((a, b) => {
-        //         return a.startTime.valueOf() - b.startTime.valueOf();
-        //     });
-        // },
-        //
-
-
-
-
-
+        addWorkSession(state, action: PayloadAction<AddWorkSessionPayload>)
+        {
+        },
+        addWorkSessionSuccessful(state, action: PayloadAction<WorkSession>) {
+        },
     },
 })
 
@@ -206,7 +177,10 @@ export const {
     setWorkSessionsPage,
     getTodayTotalDuration,
     getTodayTotalDurationSuccessful,
-    applyTimeTrackerFilter
+    applyTimeTrackerFilter,
+    addWorkSession,
+    addWorkSessionSuccessful
+
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

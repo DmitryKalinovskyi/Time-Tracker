@@ -72,29 +72,35 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                 .Authorize()
                 .ResolveAsync(async context =>
                 {
+                    // restrict access
                     var inputSession = context.GetArgument<WorkSession>("input");
+                    var creatorId = context.User.GetUserId();
+
+                    var hasAccess = creatorId == inputSession.UserId ||
+                        await permissionsService.HasPermission(creatorId, Permissions.ManageUsersSessions);
+
+                    if (!hasAccess) {
+                        throw new AccessDeniedError("addSession");
+                    }
 
                     if(await userRepository.FindAsync(inputSession.UserId) is null)
                     {
-                        context.Errors.Add(new ExecutionError($"User with id = {inputSession.UserId} does not exist."));
-                        return null;
-                    }
-                    else if(!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
-                    {
-                        context.Errors.Add(new ExecutionError("Work session time overlaps with an existing one"));
-                        return null;
+                        throw new UserDoesNotExistExecutionError($"User with id = {inputSession.UserId} does not exist.");
                     }
 
-                    if(await sessionOriginRepository.GetSessionOriginByIdAsync(inputSession.SessionOriginId) is null)
+                    if(!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
                     {
-                        context.Errors.Add(new ExecutionError($"Invalid Session Origin id = {inputSession.SessionOriginId}"));
-                        return null;
+                        throw new WorkSessionsOverlapsExecutionError("Work session time overlaps with an existing one");
                     }
 
-                    if (inputSession.EditedBy is not null && await userRepository.FindAsync((int)inputSession.EditedBy) is null)
+                    if(creatorId == inputSession.UserId)
                     {
-                        context.Errors.Add(new ExecutionError($"[Edited By] User with id = {inputSession.EditedBy} does not exist."));
-                        return null;
+                        inputSession.SessionOriginId = (int)WorkSessionOrigins.Manual;
+                    }
+                    else
+                    {
+                        inputSession.SessionOriginId = (int)WorkSessionOrigins.Edited;
+                        inputSession.EditedBy = creatorId;
                     }
 
                     var newWorkSession = await workSessionRepository.AddWorkSessionAsync(inputSession);
@@ -109,34 +115,27 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                 {
                     var inputSession = context.GetArgument<WorkSession>("input");
                     var editorId = context.User.GetUserId();
-                    var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(inputSession.Id);
+                    var currentWorkSession = await workSessionRepository.GetWorkSessionByIdAsync(inputSession.Id)
+                    ?? throw new WorkSessionDoesNotExistExecutionError($"Work session with id = {inputSession.Id} does not exist.");
 
                     if (await userRepository.FindAsync(editorId) is null)
                     {
                         throw new InvalidOperationException($"User with id = {editorId} not founded.");
                     }
 
-                    if (currentWorkSession is null)
-                    {
-                        context.Errors.Add(new ExecutionError($"Work session with id = {inputSession.Id} does not exist."));
-                        return null;
-                    }
-                    else inputSession.UserId = currentWorkSession.UserId;
+                    inputSession.UserId = currentWorkSession.UserId;
 
                     // restrict access
                     if (inputSession.UserId != editorId &&
-                    !await permissionsService.HasRequiredPermission(editorId, Permissions.ManageUsersSessions))
+                    !await permissionsService.HasPermission(editorId, Permissions.ManageUsersSessions))
                     {
                         throw new AccessDeniedError("updateSession");
                     }
 
                     if (!await workSessionRepository.IsWorkSessionTimeAvailable(inputSession))
                     {
-                        context.Errors.Add(new ExecutionError("Work session time overlaps with an existing one"));
-                        return null;
+                        throw new WorkSessionsOverlapsExecutionError("Work session time overlaps with an existing one");
                     }
-
-                    
 
                     currentWorkSession.SessionOriginId = (int)WorkSessionOrigins.Edited;
                     currentWorkSession.EditedBy = editorId;
@@ -155,17 +154,13 @@ namespace Time_Tracker.GraphQL.TimeTracking.Mutations
                 {
                     int workSessionId = context.GetArgument<int>("workSessionId");
 
-                    var workSession = await workSessionRepository.GetWorkSessionByIdAsync(workSessionId);
-                    if (workSession is null)
-                    {
-                        context.Errors.Add(new ExecutionError($"Work session with id = {workSessionId} does not exist."));
-                        return null;
-                    }
+                    var workSession = await workSessionRepository.GetWorkSessionByIdAsync(workSessionId)
+                    ?? throw new WorkSessionDoesNotExistExecutionError($"Work session with id = {workSessionId} does not exist.");
 
                     // restrict access
                     var userId = context.User.GetUserId();
                     if(workSession.UserId != userId &&
-                    !await permissionsService.HasRequiredPermission(userId, Permissions.ManageUsersSessions)){
+                    !await permissionsService.HasPermission(userId, Permissions.ManageUsersSessions)){
                         throw new AccessDeniedError("deleteSession");
                     }
 

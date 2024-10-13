@@ -27,5 +27,8 @@ namespace Time_Tracker.Authorization
 
             return true;
         }
+
+        public async Task<bool> HasPermission(int userId, string permission) => await HasRequiredPermission(userId, permission);
+        public async Task<bool> HasPermissions(int userId, List<string> permissions) => await HasRequiredPermissions(userId, permissions);
     }
 }

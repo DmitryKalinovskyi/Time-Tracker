@@ -81,18 +81,15 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
       </TableCell>
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          {(isCanManageUsersSessions || isMySession) && session.endTime && <Button
-            sx={{ color: "#00101D" }}
-            onClick={onEdit}
-          >
-            <EditIcon />
-          </Button>}
-          <Button
-              color="error"
-            onClick={() => onDelete(session.id)}
-          >
-            <DeleteForeverIcon />
-          </Button>
+
+          {(isCanManageUsersSessions || isMySession) && session.endTime && <>
+              <Button sx={{ color: "#00101D" }} onClick={onEdit}>
+                <EditIcon />
+              </Button>
+              <Button color="error" onClick={() => onDelete(session.id)}>
+                <DeleteForeverIcon />
+              </Button>
+          </>}
         </Box>
       </TableCell>
     </TableRow>

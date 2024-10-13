@@ -15,7 +15,7 @@ export const getCurrentWorkSessionEpic = (action$, store$: StateObservable<RootS
     filter((action) => {
        if(action.type === deleteWorkSessionSuccess.type){
            // update when we deleted current session.
-           return store$.value.timeTracker.currentWorkSession?.id == action.payload ?? false;
+           return store$.value.timeTracker.currentWorkSession?.id == action.payload;
        }
        else if(action.type === getCurrentWorkSession.type){
            return true;
