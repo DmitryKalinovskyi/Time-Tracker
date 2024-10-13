@@ -1,1 +1,1 @@
-export {UserAutoComplete} from "./UserAutoComplete.tsx";
+export {UserAutoComplete} from "./ui/UserAutoComplete.tsx";

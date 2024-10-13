@@ -10,7 +10,7 @@ import {
   Theme, MenuItem, useTheme, FormControl, InputLabel, Select, OutlinedInput, Chip, Stack,
 } from '@mui/material';
 import { addDays, addMonths, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
-import { UserAutoComplete } from '../../../shared/ui/UserAutoComplete/UserAutoComplete.tsx';
+import { UserAutoComplete } from '@time-tracker/shared/ui/UserAutoComplete/ui/UserAutoComplete.tsx';
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store.ts";
 import {

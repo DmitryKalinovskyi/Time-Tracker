@@ -13,7 +13,7 @@ import {AddWorkSessionPayload, addWorkSession} from '@time-tracker/features/time
 import { RootState } from '../../../store.ts';
 import {DateTimePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import {UserAutoComplete} from "../../../shared/ui/UserAutoComplete/UserAutoComplete.tsx";
+import {UserAutoComplete} from "@time-tracker/shared/ui/UserAutoComplete/ui/UserAutoComplete.tsx";
 import User from "@time-tracker/types/User.ts";
 import useIsHavePermission from "@time-tracker/features/authentification/hooks/useIsHavePermission.ts";
 import {ManageUsersSessionsPermission} from "@time-tracker/features/permissions/permissions.ts";
