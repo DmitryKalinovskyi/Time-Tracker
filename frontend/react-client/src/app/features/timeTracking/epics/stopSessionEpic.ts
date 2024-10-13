@@ -3,9 +3,9 @@ import {Action} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
 import {setError, stopSession, stopSessionSuccessful} from "../timeTrackingSlice.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "../../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {stopSessionQuery, StopSessionResponse} from "../api/stopSessionQuery.ts";
-import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
+import {ShowFailure} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 
 export const stopSessionEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(stopSession.type),

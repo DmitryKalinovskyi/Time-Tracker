@@ -9,7 +9,7 @@ import {
     refreshTokenReject,
     beginRefreshToken
 } from "./authSlice.ts";
-import { createRequest } from "../../misc/RequestCreator.ts";
+import { createRequest } from "@time-tracker/shared/misc/RequestCreator.ts";
 import {loginQuery, LoginQueryResponseType, refreshTokenQuery, RefreshTokenQueryResponseType} from "./api/authQueries.ts"
 import { loginUser } from "./authSlice.ts";
 import { Action, PayloadAction } from "@reduxjs/toolkit";

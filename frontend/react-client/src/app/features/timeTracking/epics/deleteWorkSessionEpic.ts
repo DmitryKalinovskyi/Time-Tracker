@@ -3,9 +3,9 @@ import {Action, PayloadAction} from "@reduxjs/toolkit";
 import {deleteWorkSession, deleteWorkSessionSuccess} from "../timeTrackingSlice.ts";
 import {ofType} from "redux-observable";
 import {ajax} from "rxjs/ajax";
-import {createRequest} from "../../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {deleteWorkSessionQuery} from "../api/deleteWorkSessionQuery.ts";
-import {ShowFailure, ShowSuccess} from "../../../misc/SnackBarHelper.ts";
+import {ShowFailure, ShowSuccess} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 
 export const deleteWorkSessionEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(deleteWorkSession.type),

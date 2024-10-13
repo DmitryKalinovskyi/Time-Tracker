@@ -1,4 +1,4 @@
-import {GraphQLExecutionErrorType} from "../../../graphql/GraphQLExecutionErrorType.ts";
+import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/GraphQLExecutionErrorType.ts";
 
 export interface DeleteSessionResponse{
     errors?: GraphQLExecutionErrorType,

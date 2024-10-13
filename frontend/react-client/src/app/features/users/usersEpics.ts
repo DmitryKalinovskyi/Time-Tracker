@@ -3,7 +3,7 @@ import { catchError, map, mergeMap, Observable, of } from "rxjs";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
-import { createRequest } from "../../misc/RequestCreator";
+import { createRequest } from "@time-tracker/shared/misc/RequestCreator";
 import {getUsersQuery, GetUsersQueryResponseType} from "./api/usersQueries";
 import { fetchUsersFailure, fetchUsersSuccess } from "./usersSlice";
 

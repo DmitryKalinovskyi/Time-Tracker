@@ -3,7 +3,7 @@ import { ofType } from "redux-observable";
 import { Observable, catchError, map, mergeMap, of } from "rxjs";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {getPermissionsQuery, GetPermissionsQueryResponse} from "./api/permissionQueries";
-import { createRequest } from "../../misc/RequestCreator";
+import { createRequest } from "@time-tracker/shared/misc/RequestCreator";
 import { fetchPermissionsFailure, fetchPermissionsSuccess } from "./permissionsSlice";
 
 export const fetchPermissions = () => ({ type: "FETCH_PERMISSIONS", payload: {} });

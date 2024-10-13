@@ -3,7 +3,7 @@ import {Action, PayloadAction} from "@reduxjs/toolkit";
 import { ResetPlayload, resetUserPasswordRequest, resetUserPasswordSuccess, resetUserPasswordFailure } from "./resetSlice.ts";
 import { ofType } from "redux-observable";
 import {ajax} from "rxjs/ajax";
-import {createRequest} from "../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {resetUserPasswordQuery} from "./api/resetPasswordQueries.ts";
 
 export const resetUserPasswordEpic = (action$: Observable<Action>) =>

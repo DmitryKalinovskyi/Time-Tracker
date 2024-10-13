@@ -1,4 +1,4 @@
-import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
+import {ShowFailure} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 import {catchError, map, Observable, of, switchMap} from "rxjs";
 import {ofType, StateObservable} from "redux-observable";
 import {Action, PayloadAction} from "@reduxjs/toolkit";
@@ -8,7 +8,7 @@ import {
     getTodayTotalDurationSuccessful, stopSessionSuccessful
 } from "../timeTrackingSlice.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "../../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {
     getTodayTotalDurationByUserIdQuery,
     GetTodayTotalDurationResponse

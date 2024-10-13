@@ -1,7 +1,7 @@
 import {ReactElement, useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {getCurrentWorkSession, getTodayTotalDuration} from "./timeTrackingSlice.ts";
-import useAuth from "../../hooks/useAuth.ts";
+import useAuth from "../authentification/hooks/useAuth.ts";
 
 interface TimeTrackerProviderProps{
     children?: ReactElement[]

@@ -2,7 +2,7 @@ import {catchError, map, mergeMap, Observable, of} from "rxjs";
 import {Action, PayloadAction} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {
     createCalendarEventQuery,
     CreateCalendarEventQueryResponseType,
@@ -20,7 +20,7 @@ import {
     setSelectedUser,
     updateCalendarEvent, UpdateCalendarEventInputType
 } from "./calendarSlice.ts";
-import {ShowFailure, ShowSuccess} from "../../misc/SnackBarHelper.ts";
+import {ShowFailure, ShowSuccess} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 
 
 

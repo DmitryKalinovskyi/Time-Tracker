@@ -2,9 +2,9 @@ import {catchError, concat, delay, filter, from, map, mergeMap, Observable, of, 
 import {Action, PayloadAction} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {WorkReportQueryResponse, workReportQuery} from "./api/workReportingQueries.ts";
-import {ShowFailure} from "../../misc/SnackBarHelper.ts";
+import {ShowFailure} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 import {
     fetchWorkReport,
     fetchWorkReportFailure,

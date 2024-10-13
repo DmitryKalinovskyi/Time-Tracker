@@ -1,5 +1,5 @@
 import Token from "../../types/Token.ts";
-import {isTokenExpired} from "../../misc/tokenValidation.ts";
+import {isTokenExpired} from "@time-tracker/shared/misc/tokenValidation.ts";
 
 const KEYNAME = "_REFRESH_TOKEN";
 export function saveRefreshToken(refreshToken: Token): void{

@@ -3,8 +3,8 @@ import { ofType } from "redux-observable";
 import { catchError, map, mergeMap, Observable, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { getUserQuery, updateUserActiveStatusMutation, updateUserMutation, updateUserPermissionsMutation } from "./api/userQueries";
-import { createRequest } from "../../misc/RequestCreator";
-import { ShowFailure, ShowSuccess } from "../../misc/SnackBarHelper";
+import { createRequest } from "@time-tracker/shared/misc/RequestCreator";
+import { ShowFailure, ShowSuccess } from "@time-tracker/shared/misc/SnackBarHelper";
 import { fetchUserFailure, fetchUserSuccess } from "./userSlice";
 
 export const fetchUser = (userId: number) => ({ type: "FETCH_USER", payload: userId });

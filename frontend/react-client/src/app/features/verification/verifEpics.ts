@@ -4,7 +4,7 @@ import { ajax } from "rxjs/ajax";
 import { VerifPayload, verifUserRequest, verifUserSuccess, verifUserFailure } from "./verifSlice";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
-import { createRequest } from "../../misc/RequestCreator";
+import { createRequest } from "@time-tracker/shared/misc/RequestCreator";
 import { verifUserQuery } from "./api/verifQueries.ts";
 
 export const verifUserEpic = (action$: Observable<Action>) =>
