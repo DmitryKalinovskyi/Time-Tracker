@@ -27,6 +27,13 @@ namespace Time_Tracker.Repositories
             return await connection.QuerySingleOrDefaultAsync<CalendarEvent>("SELECt * FROM CalendarEvents WHERE Id = @id", new { id });
         }
 
+        public async Task<List<CalendarEvent>> FindEventsByUserAndDateRangeAsync(int userId, DateTimeOffset from, DateTimeOffset to)
+        {
+            using SqlConnection connection = sqlConnectionFactory.GetSqlConnection();
+            var sql = @"SELECT * FROM CalendarEvents WHERE UserId = @userId AND StartTime >= @from AND EndTime <= @to";
+            return [.. await connection.QueryAsync<CalendarEvent>(sql, new { userId, from, to })];
+        }
+
         public async Task<int> InsertAsync(CalendarEvent calendarEvent)
         {
             using SqlConnection connection = sqlConnectionFactory.GetSqlConnection();

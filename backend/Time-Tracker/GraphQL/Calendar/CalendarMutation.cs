@@ -1,6 +1,9 @@
 ﻿using GraphQL;
+using GraphQL.Server.Transports.AspNetCore.Errors;
 using GraphQL.Types;
+using GraphQL.Validation;
 using Time_Tracker.GraphQL.Calendar.Dtos;
+using Time_Tracker.GraphQL.Calendar.Errors;
 using Time_Tracker.GraphQL.Calendar.Types;
 using Time_Tracker.Helpers;
 using Time_Tracker.Models;
@@ -19,6 +22,11 @@ namespace Time_Tracker.GraphQL.Calendar
                 {
                     var createCalendarEventRequest = context.GetArgument<CreateCalendarEventRequest>("calendarEvent");
 
+                    if(createCalendarEventRequest.StartTime > createCalendarEventRequest.EndTime)
+                    {
+                        throw new ValidationError("Start time should be before end time.");
+                    }
+
                     var userId = context.User.GetUserId();
                     var calendarEvent = new CalendarEvent()
                     {
@@ -28,7 +36,7 @@ namespace Time_Tracker.GraphQL.Calendar
                     };
 
                     var calendarEventId = await calendarEventsRepository.InsertAsync(calendarEvent);
-                    return await calendarEventsRepository.FindAsync(calendarEventId) ?? throw new Exception("Calendar event not founded.");
+                    return await calendarEventsRepository.FindAsync(calendarEventId) ?? throw new InvalidOperationException("Calendar event not founded.");
                 });
 
             Field<CalendarEventGraphType>("updateCalendarEvent")
@@ -36,18 +44,21 @@ namespace Time_Tracker.GraphQL.Calendar
                 .Argument<NonNullGraphType<UpdateCalendarEventInputGraphType>>("calendarEvent")
                 .ResolveAsync(async (context) =>
                 {
-                    // check is belong to the user or not.
                     var updateCalendarEventInputType = context.GetArgument<UpdateCalendarEventRequest>("calendarEvent");
 
-                    var calendarEvent = await calendarEventsRepository.FindAsync(updateCalendarEventInputType.Id) 
-                        ?? throw new Exception("Calendar event not founded.");
+                    var calendarEvent = await calendarEventsRepository.FindAsync(updateCalendarEventInputType.Id)
+                        ?? throw new CalendarEventDoesNotExistExecutionError("Calendar event does not exist.");
 
                     var userId = context.User.GetUserId();
 
-                    if(userId != calendarEvent.UserId)
+                    if (updateCalendarEventInputType.StartTime > updateCalendarEventInputType.EndTime)
                     {
-                        // access deniend
-                        return null;
+                        throw new ValidationError("Start time should be before end time.");
+                    }
+
+                    if (userId != calendarEvent.UserId)
+                    {
+                        throw new AccessDeniedError("updateCalendarEvent");
                     }
 
                     calendarEvent.StartTime = updateCalendarEventInputType.StartTime;
@@ -65,12 +76,15 @@ namespace Time_Tracker.GraphQL.Calendar
                 {
                     var calendarEventId = context.GetArgument<int>("calendarEventId");
 
-                    var calendarEvent = await calendarEventsRepository.FindAsync(calendarEventId);
+                    var calendarEvent = await calendarEventsRepository.FindAsync(calendarEventId)
+                        ?? throw new CalendarEventDoesNotExistExecutionError("Calendar event does not exist.");
+
                     var userId = context.User.GetUserId();
-                    if(calendarEvent != null && calendarEvent.UserId == userId)
-                    {
-                        await calendarEventsRepository.DeleteAsync(calendarEventId);
-                    }
+
+                    if(userId != calendarEvent.UserId)
+                        throw new AccessDeniedError("deleteCalendarEvent");
+
+                    await calendarEventsRepository.DeleteAsync(calendarEventId);
 
                     return "Ok";
                 });
