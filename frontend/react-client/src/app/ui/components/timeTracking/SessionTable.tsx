@@ -103,6 +103,7 @@ export function SessionTable(){
                 </Table>
               </TableContainer>
 
+
               <Box sx={{justifySelf: 'flex-end'}}>
                 <CustomPagination/>
               </Box>

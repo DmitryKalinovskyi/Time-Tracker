@@ -28,13 +28,11 @@ export interface TimeTrackerType {
     filter: TimeTrackerFilter
 }
 
-// export interface AddSessionPayload{
-//     userId: number;
-//     startTime: Date;
-//     endTime: Date;
-//     sessionOriginId: number;
-//     editedBy: number | null;
-// }
+export interface AddWorkSessionPayload {
+    userId: number;
+    startTime: Date;
+    endTime: Date;
+}
 
 export interface UpdateSessionPayload{
     id: number;
@@ -131,10 +129,7 @@ const timeTrackerSlice = createSlice({
             // reset page
             state.paginationInfo.currentPage = 1;
         },
-        // addSession(state, action: PayloadAction<AddSessionPayload>)
-        // {
-        //     state.loading = true;
-        // },
+
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         getCurrentWorkSession(state, action: PayloadAction<number>)
@@ -157,42 +152,11 @@ const timeTrackerSlice = createSlice({
         {
             state.paginationInfo.currentPage = action.payload;
         },
-        //
-        // setFilters(state, action: PayloadAction<FilterCriteria[]>)
-        // {
-        //     if(action.payload.length == 1)
-        //         action.payload.push(
-        //       {
-        //         filterBy: "START_TIME",
-        //         operator: "BETWEEN",
-        //         value: new Date().toISOString().split('T')[0] + ',' + addDays(new Date(), 1).toISOString().split('T')[0]
-        //       });
-        //     state.filters = action.payload;
-        // },
-
-        
-        // setSorts(state, action: PayloadAction<SortCriteria[]>)
-        // {
-        //     state.sorts = action.payload;
-        // },
-        //
-        // addSessionSuccessful(state, action: PayloadAction<WorkSession>) {
-        //     state.loading = false;
-        //     state.error = null;
-        //     state.workSessions = [
-        //         ...state.workSessions,
-        //         action.payload
-        //     ];
-        //     state.workSessions.sort((a, b) => {
-        //         return a.startTime.valueOf() - b.startTime.valueOf();
-        //     });
-        // },
-        //
-
-
-
-
-
+        addWorkSession(state, action: PayloadAction<AddWorkSessionPayload>)
+        {
+        },
+        addWorkSessionSuccessful(state, action: PayloadAction<WorkSession>) {
+        },
     },
 })
 
@@ -213,7 +177,10 @@ export const {
     setWorkSessionsPage,
     getTodayTotalDuration,
     getTodayTotalDurationSuccessful,
-    applyTimeTrackerFilter
+    applyTimeTrackerFilter,
+    addWorkSession,
+    addWorkSessionSuccessful
+
 } = timeTrackerSlice.actions;
 
 export default timeTrackerSlice.reducer;

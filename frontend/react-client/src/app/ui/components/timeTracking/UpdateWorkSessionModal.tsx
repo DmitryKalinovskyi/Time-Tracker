@@ -73,7 +73,6 @@ const UpdateWorkSessionModal: React.FC<UpdateWorkSessionModalProps> = ({ open, o
         startTime: new Date(session.startTime),
         endTime: new Date(session.endTime)
       }));
-      onClose();
     }
   };
 
