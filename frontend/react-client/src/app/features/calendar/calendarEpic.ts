@@ -88,7 +88,7 @@ export const deleteCalendarEventEpic = (action$: Observable<Action>) => action$.
             }),
             catchError((error) => {
                 console.log(error)
-                ShowFailure("Error while trying to add calendar event.");
+                ShowFailure("Error when trying to remove calendar event.");
                 return of();
             })
         )

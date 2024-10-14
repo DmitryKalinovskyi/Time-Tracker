@@ -83,7 +83,6 @@ export function SessionTable(){
                       <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>End time</TableCell>
                       <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>Duration</TableCell>
                       <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>User</TableCell>
-                      <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>Status</TableCell>
                       <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>Origin</TableCell>
                       <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>Edited By</TableCell>
                       <TableCell sx={{color: "white", width: '10%', textAlign: 'center'}}>Last Updated At</TableCell>

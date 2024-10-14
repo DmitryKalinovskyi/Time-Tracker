@@ -18,8 +18,8 @@ interface SessionProps {
 }
 
 const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
-    const isCanManageUsersSessions = useIsHavePermission(ManageUsersSessionsPermission);
-    const isMySession = useIsMe(session.user);
+  const isCanManageUsersSessions = useIsHavePermission(ManageUsersSessionsPermission);
+  const isMySession = useIsMe(session.user);
   return (
     <TableRow>
       <TableCell sx={{ width: '10%', fontSize: '1rem', textAlign: 'center' }}>
@@ -51,9 +51,6 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
                     }}
                 />
             </Box>
-        </TableCell>
-        <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
-            {session.endTime ? "Finished" : "In Progress"}
         </TableCell>
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
         {session.sessionOrigin.originName}
