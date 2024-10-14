@@ -5,10 +5,10 @@ import {
     getCurrentWorkSessionSuccessful
 } from "../timeTrackingSlice.ts";
 import {ofType, StateObservable} from "redux-observable";
-import {createRequest} from "../../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {CurrentWorkSessionResponse, getCurrentWorkSessionQuery} from "../api/currentWorkSessionQuery.ts";
-import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
+import {ShowFailure} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 import {RootState} from "../../../store.ts";
 
 export const getCurrentWorkSessionEpic = (action$, store$: StateObservable<RootState>) => action$.pipe(

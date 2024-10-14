@@ -12,7 +12,7 @@ import timeTrackerReducer from './features/timeTracking/timeTrackingSlice.ts';
 import calendarReducer from "./features/calendar/calendarSlice.ts";
 import workReportingReducer from "./features/workReporting/workReportingSlice.ts";
 
-import {authUserEpic, beginRefreshTokenEpic, refreshTokenEpic} from "./features/authentification/authEpics.ts";
+import {authEpics} from "./features/authentification/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUserEpic } from "./features/registration/registerEpics.ts";
 import { verifUserEpic } from "./features/verification/verifEpics.ts";
@@ -31,9 +31,7 @@ import {timeTrackingEpics} from "./features/timeTracking/timeTrackingEpics.ts";
 
 
 const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, any, any>(
-    authUserEpic,
-    beginRefreshTokenEpic,
-    refreshTokenEpic,
+    authEpics,
     registerUserEpic,
     verifUserEpic,
     getUsersEpic,

@@ -11,9 +11,9 @@ import {
     stopSessionSuccessful, updateWorkSessionSuccessful
 } from "../timeTrackingSlice.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "../../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {getWorkSessionsQuery, GetWorkSessionsResponse} from "../api/getWorkSessionsQuery.ts";
-import {ShowFailure} from "../../../misc/SnackBarHelper.ts";
+import {ShowFailure} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 import {RootState} from "../../../store.ts";
 import WorkSessionsInputBuilder from "../filtering/WorkSessionsInputBuilder.ts";
 

@@ -1,6 +1,6 @@
 import Token from "../../../types/Token.ts";
 import User from "../../../types/User.ts";
-import {GraphQLExecutionErrorType} from "../../../graphql/GraphQLExecutionErrorType.ts";
+import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
 
 export interface LoginQueryResponseType {
     errors?: GraphQLExecutionErrorType[]

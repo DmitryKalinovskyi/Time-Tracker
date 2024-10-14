@@ -1,6 +1,6 @@
 import { WorkSession } from "../../../types/WorkSession";
 import {WorkSessionPaginationResult} from "../timeTrackingSlice.ts";
-import {GraphQLExecutionErrorType} from "../../../graphql/GraphQLExecutionErrorType.ts";
+import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
 
 
 

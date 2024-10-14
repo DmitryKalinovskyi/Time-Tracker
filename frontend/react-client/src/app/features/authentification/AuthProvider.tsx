@@ -2,7 +2,7 @@ import {useEffect} from "react";
 import {store} from "../../store.ts";
 import {useSelector} from "react-redux";
 import {CircularProgress} from "@mui/material";
-import useIsHaveRefreshToken from "../../hooks/useIsHaveRefreshToken.ts";
+import useIsHaveRefreshToken from "./hooks/useIsHaveRefreshToken.ts";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import {beginRefreshToken} from "./authSlice.ts";

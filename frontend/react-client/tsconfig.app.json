@@ -22,7 +22,16 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+
+    /* Absolute paths*/
+    "baseUrl": ".",
+    "paths": {
+        "@time-tracker/types/*": ["src/app/types/*"],
+        "@time-tracker/features/*": ["src/app/features/*"],
+        "@time-tracker/pages/*": ["src/app/pages/*"],
+        "@time-tracker/shared/*": ["src/app/shared/*"]
+    }
   },
   "include": ["src"]
 }

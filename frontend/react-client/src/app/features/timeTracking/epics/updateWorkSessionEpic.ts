@@ -8,9 +8,9 @@ import {ofType} from "redux-observable";
 import {catchError, map, Observable, of, switchMap} from "rxjs";
 import {Action, PayloadAction} from "@reduxjs/toolkit";
 import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "../../../misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
 import {updateWorkSessionQuery, UpdateWorkSessionResponse} from "../api/updateWorkSessionQuery.ts";
-import {ShowFailure, ShowSuccess} from "../../../misc/SnackBarHelper.ts";
+import {ShowFailure, ShowSuccess} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 
 export const updateWorkSessionEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(updateWorkSession.type),

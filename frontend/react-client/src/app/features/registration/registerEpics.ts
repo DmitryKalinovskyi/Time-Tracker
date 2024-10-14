@@ -4,7 +4,7 @@ import {ajax, AjaxResponse} from "rxjs/ajax";
 import { RegisterPayload, registerUserFailure, registerUserRequest, registerUserSuccess } from "./registerSlice.ts";
 import { Action } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
-import { createRequest } from "../../misc/RequestCreator";
+import { createRequest } from "@time-tracker/shared/misc/RequestCreator";
 import { registerUserQuery, RegisterUserQueryResponse } from "./api/registrationQueries.ts";
 
 export const registerUserEpic = (action$: Observable<Action>) =>
