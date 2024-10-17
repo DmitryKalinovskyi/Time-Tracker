@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.1" />
     <PackageReference Include="GraphQL" Version="7.8.0" />
     <PackageReference Include="GraphQL.Authorization" Version="7.0.0" />
     <PackageReference Include="GraphQL.DataLoader" Version="7.8.0" />

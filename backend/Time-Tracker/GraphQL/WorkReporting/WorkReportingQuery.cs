@@ -27,6 +27,17 @@ namespace Time_Tracker.GraphQL.WorkReporting
                 });
 
             //// excel file format
+            Field<StringGraphType>("excelWorkReport")
+                .ResolveAsync(async context =>
+                {
+                    var workReportBuilder = new WorkReportBuilder(sqlConnectionFactory);
+
+                    var reportFile = await workReportBuilder.From(DateTimeOffset.Parse("2024-09-11 11:08:53.6233333+00:00"))
+                    .To(DateTimeOffset.Parse("2024-10-17 08:40:37.0466667 +00:00"))
+                    .BuildExcelReportFile();
+
+                    return reportFile;
+                });
         }
     }
 }
