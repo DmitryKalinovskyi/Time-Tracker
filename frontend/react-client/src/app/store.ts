@@ -1,32 +1,32 @@
 import {combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 
-import authReducer from "./features/authentification/authSlice.ts";
-import registerReducer from "./features/registration/registerSlice.ts";
-import verifReducer  from "./features/verification/verifSlice.ts";
-import usersReducer from "./features/users/usersSlice.ts";
-import userReducer from "./features/user/userSlice.ts";
-import permissionsReducer from "./features/permissions/permissionsSlice.ts";
-import resetReducer  from "./features/resetPassword/resetSlice.ts";
-import timeTrackerReducer from './features/timeTracking/timeTrackingSlice.ts';
-import calendarReducer from "./features/calendar/calendarSlice.ts";
-import workReportingReducer from "./features/workReporting/workReportingSlice.ts";
+import authReducer from "@time-tracker/shared/authentication/authSlice.ts";
+import registerReducer from "@time-tracker/pages/create-user/registerSlice.ts";
+import verifReducer  from "@time-tracker/pages/account-verification/verifSlice.ts";
+import usersReducer from "@time-tracker/pages/users/usersSlice.ts";
+import userReducer from "@time-tracker/pages/user/userSlice.ts";
+import permissionsReducer from "@time-tracker/shared/authorization/permissionsSlice.ts";
+import resetReducer  from "@time-tracker/pages/reset-password/resetSlice.ts";
+import calendarReducer from "@time-tracker/pages/calendar/calendarSlice.ts";
+import timeTrackerReducer from "@time-tracker/pages/time-tracker/timeTrackingSlice.ts";
+import workReportingReducer from "@time-tracker/pages/work-reports/workReportingSlice.ts";
 
-import {authEpics} from "./features/authentification/authEpics.ts";
+import {authEpics} from "@time-tracker/shared/authentication/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUserEpic } from "./features/registration/registerEpics.ts";
-import { verifUserEpic } from "./features/verification/verifEpics.ts";
-import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
-import { getUsersEpic } from "./features/users/usersEpics.ts";
-import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
-import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
+import { registerUserEpic } from "@time-tracker/pages/create-user/api/registerEpics.ts";
+import { verifUserEpic } from "@time-tracker/pages/account-verification/api/verifEpics.ts";
+import { resetUserPasswordEpic } from "@time-tracker/pages/reset-password/api/resetEpic.ts";
+import { getUsersEpic } from "@time-tracker/pages/users/api/usersEpics.ts";
+import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "@time-tracker/pages/user/api/userEpics.ts";
+import { getPermissionsEpic } from "@time-tracker/shared/authorization/permissionsEpics.ts";
 import {
     createCalendarEventEpic,
     deleteCalendarEventEpic, fetchAndSetSelectedUserEpic,
     updateCalendarEventEpic
-} from "./features/calendar/calendarEpic.ts";
-import {fetchWorkReportEpic} from "./features/workReporting/workReportingEpic.ts";
-import {timeTrackingEpics} from "./features/timeTracking/timeTrackingEpics.ts";
+} from "@time-tracker/pages/calendar/api/calendarEpic.ts";
+import {fetchWorkReportEpic} from "@time-tracker/pages/work-reports/api/workReportingEpic.ts";
+import {timeTrackingEpics} from "@time-tracker/pages/time-tracker/timeTrackingEpics.ts";
 
 
 

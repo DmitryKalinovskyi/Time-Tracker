@@ -27,10 +27,10 @@
     /* Absolute paths*/
     "baseUrl": ".",
     "paths": {
-        "@time-tracker/types/*": ["src/app/types/*"],
-        "@time-tracker/features/*": ["src/app/features/*"],
-        "@time-tracker/pages/*": ["src/app/pages/*"],
-        "@time-tracker/shared/*": ["src/app/shared/*"]
+        "@time-tracker/types/*": ["src/types/*"],
+        "@time-tracker/pages/*": ["src/pages/*"],
+        "@time-tracker/shared/*": ["src/shared/*"],
+        "@time-tracker/app/*": ["src/app/*"]
     }
   },
   "include": ["src"]

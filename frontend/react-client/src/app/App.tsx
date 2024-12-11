@@ -1,25 +1,25 @@
 import { SnackbarProvider } from 'notistack';
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import RequireAuth from "@time-tracker/features/authentification/guards/RequireAuth.tsx";
+import RequireAuth from "@time-tracker/shared/authentication/guards/RequireAuth.tsx";
 import { store } from "./store.ts";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers";
-import RequirePermission from "@time-tracker/features/authentification/guards/RequirePermission.tsx";
+import RequirePermission from "@time-tracker/shared/authentication/guards/RequirePermission.tsx";
 import Root from "@time-tracker/shared/ui/main-layout/Root.tsx";
-import {ManageUsersPermission} from "@time-tracker/features/permissions/permissions.ts";
-import {AuthProvider} from "@time-tracker/features/authentification/AuthProvider.tsx";
-import {TimeTrackerProvider} from "@time-tracker/features/timeTracking/TimeTrackerProvider.tsx";
+import {ManageUsersPermission} from "@time-tracker/shared/authorization/permissions.ts";
+import {AuthProvider} from "@time-tracker/shared/authentication/AuthProvider.tsx";
 import {NotFoundPage} from "@time-tracker/pages/404";
 import {TimeTrackerPage} from "@time-tracker/pages/time-tracker";
 import {UsersPage} from "@time-tracker/pages/users";
 import {UserPage} from "@time-tracker/pages/user";
 import {CreateUserPage} from "@time-tracker/pages/create-user";
 import {CalendarPage} from "@time-tracker/pages/calendar";
-import {ReportsPage} from "@time-tracker/pages/reports";
+import {WorkReportsPage} from "@time-tracker/pages/work-reports";
 import {LoginPage} from "@time-tracker/pages/login";
 import {AccountVerificationPage} from "@time-tracker/pages/account-verification";
 import {ResetPasswordPage} from "@time-tracker/pages/reset-password";
+import {TimeTrackerProvider} from "@time-tracker/pages/time-tracker/TimeTrackerProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
               { path: "/register", element: <CreateUserPage/> },
               ]},
             { path: "/calendar", element: <CalendarPage/> },
-            { path: "/workers-time", element: <ReportsPage /> },
+            { path: "/workers-time", element: <WorkReportsPage /> },
 
           ]
         }
