@@ -4,7 +4,7 @@ import {TimePicker} from "@mui/x-date-pickers";
 import Button from "@mui/material/Button";
 import React, {useRef, useState} from "react";
 import {useDispatch} from "react-redux";
-import {AddCalendarEventInputType, apiCreateCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
+import {AddCalendarEventInputType, createCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
 
 interface CreateEventModalProps{
     day: Date,
@@ -59,7 +59,7 @@ export function CreateEventDialog(props: CreateEventModalProps){
             return;
         }
 
-        dispatch(apiCreateCalendarEvent(details));
+        dispatch(createCalendarEvent(details));
         props.onClose();
     }
 

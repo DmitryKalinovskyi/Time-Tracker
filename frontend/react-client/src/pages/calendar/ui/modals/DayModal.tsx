@@ -9,11 +9,11 @@ import ListItemText from "@mui/material/ListItemText";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from '@mui/icons-material/Edit';
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../../store.ts";
 import {isSameDay} from "@time-tracker/shared/misc/DateHelper.ts";
 import {useIsMe} from "@time-tracker/shared/authentication/hooks/useIsMe.ts";
 import {CalendarEvent} from "../../../../types/CalendarEvent.ts";
-import {apiDeleteCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
+import {deleteCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
+import {RootState} from "@time-tracker/app/store.ts";
 interface DayModalProps{
     isOpen: boolean
     day: Date,
@@ -69,7 +69,7 @@ export function DayModal(props: DayModalProps){
                                     <EditIcon/>
                                 </IconButton>
                                 <IconButton color="error"
-                                    onClick={() => dispatch(apiDeleteCalendarEvent(event.id))}
+                                    onClick={() => dispatch(deleteCalendarEvent(event.id))}
                                 >
                                     <DeleteForeverIcon />
                                 </IconButton>

@@ -20,11 +20,7 @@ import { resetUserPasswordEpic } from "@time-tracker/pages/reset-password/api/re
 import { getUsersEpic } from "@time-tracker/pages/users/api/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "@time-tracker/pages/user/api/userEpics.ts";
 import { getPermissionsEpic } from "@time-tracker/shared/authorization/permissionsEpics.ts";
-import {
-    createCalendarEventEpic,
-    deleteCalendarEventEpic, fetchAndSetSelectedUserEpic,
-    updateCalendarEventEpic
-} from "@time-tracker/pages/calendar/api/calendarEpic.ts";
+import {calendarEpic} from "@time-tracker/pages/calendar/api/calendarEpic.ts";
 import {fetchWorkReportEpic} from "@time-tracker/pages/work-reports/api/workReportingEpic.ts";
 import {timeTrackingEpics} from "@time-tracker/pages/time-tracker/timeTrackingEpics.ts";
 
@@ -43,12 +39,7 @@ const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, an
     resetUserPasswordEpic,
 
     timeTrackingEpics,
-
-    createCalendarEventEpic,
-    updateCalendarEventEpic,
-    deleteCalendarEventEpic,
-    fetchAndSetSelectedUserEpic,
-
+    calendarEpic,
     fetchWorkReportEpic
   );
 

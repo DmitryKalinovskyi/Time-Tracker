@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import React, {useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {CalendarEvent} from "../../../../types/CalendarEvent.ts";
-import {apiUpdateCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
+import {updateCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
 
 interface UpdateEventDialogProps{
     calendarEvent: CalendarEvent
@@ -32,7 +32,7 @@ export function UpdateEventDialog(props: UpdateEventDialogProps){
         }
 
         console.log(calendarEvent);
-        dispatch(apiUpdateCalendarEvent(calendarEvent));
+        dispatch(updateCalendarEvent(calendarEvent));
         props.onClose();
     }
 

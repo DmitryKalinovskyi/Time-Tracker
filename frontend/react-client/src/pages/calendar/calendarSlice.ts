@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {CalendarEvent} from "../../types/CalendarEvent.ts";
 import User from "../../types/User.ts";
+import {ShowFailure, ShowSuccess} from "@time-tracker/shared/misc/SnackBarHelper.ts";
 
 export interface MonthType{
     year:number,
@@ -37,31 +38,52 @@ const calendarSlice = createSlice({
     name: "calendar",
     initialState,
     reducers: {
-        apiCreateCalendarEvent : (state, action: PayloadAction<AddCalendarEventInputType>) => {
+        createCalendarEvent : (state, action: PayloadAction<AddCalendarEventInputType>) => {
         },
-        apiUpdateCalendarEvent : (state, action: PayloadAction<UpdateCalendarEventInputType>) => {
-        },
-        apiDeleteCalendarEvent : (state, action: PayloadAction<number>) => {
-        },
-        addCalendarEvent : (state, action: PayloadAction<CalendarEvent>) => {
+        createCalendarEventSuccess : (state, action: PayloadAction<CalendarEvent>) => {
             state.selectedUser!.calendarEvents.push(action.payload);
+            ShowSuccess("Work time added.")
         },
-        removeCalendarEvent: (state, action: PayloadAction<number>) => {
-            state.selectedUser!.calendarEvents = state.selectedUser!.calendarEvents
-                .filter(e => e.id != action.payload);
+        createCalendarEventFailure : () => {
+            ShowFailure("An error occurred while trying to add the calendar event.");
         },
-        updateCalendarEvent: (state, action: PayloadAction<CalendarEvent>) => {
+
+        updateCalendarEvent : (state, action: PayloadAction<UpdateCalendarEventInputType>) => {
+        },
+        updateCalendarEventSuccess: (state, action: PayloadAction<CalendarEvent>) => {
             state.selectedUser!.calendarEvents = state.selectedUser!.calendarEvents
                 .filter(e => e.id != action.payload.id);
             state.selectedUser!.calendarEvents.push(action.payload);
+            ShowSuccess("Work time updated.")
         },
-        fetchAndSetSelectedUser: (state, _action: PayloadAction<number>) => {
+        updateCalendarEventFailure: () => {
+            ShowFailure("Error while trying to add calendar event.");
+        },
+
+        deleteCalendarEvent : (state, action: PayloadAction<number>) => {
+        },
+
+        deleteCalendarEventSuccess: (state, action: PayloadAction<number>) => {
+            state.selectedUser!.calendarEvents = state.selectedUser!.calendarEvents
+                .filter(e => e.id != action.payload);
+            ShowSuccess("Work time removed.")
+        },
+        deleteCalendarEventFailure: () => {
+            ShowFailure("Error when trying to remove calendar event.");
+        },
+
+
+        setSelectedUser: (state) => {
             state.isFetchingSelectedUser = true;
         },
-        setSelectedUser : (state, action: PayloadAction<User>) => {
+        setSelectedUserSuccess : (state, action: PayloadAction<User>) => {
             state.selectedUser = action.payload;
             state.isFetchingSelectedUser = false;
         },
+        setSelectedUserFailure : () => {
+            ShowFailure("Error while fetching user calendar.");
+        },
+
         changeSelectedMonth : (state, action: PayloadAction<MonthType>) => {
             state.selectedMonth = action.payload;
         }
@@ -69,15 +91,24 @@ const calendarSlice = createSlice({
 })
 
 export const {
-    apiCreateCalendarEvent,
-    apiUpdateCalendarEvent,
-    apiDeleteCalendarEvent,
-    addCalendarEvent,
+    createCalendarEvent,
+    createCalendarEventSuccess,
+    createCalendarEventFailure,
+
     updateCalendarEvent,
-    removeCalendarEvent,
-    fetchAndSetSelectedUser,
+    updateCalendarEventSuccess,
+    updateCalendarEventFailure,
+
+    deleteCalendarEvent,
+    deleteCalendarEventSuccess,
+    deleteCalendarEventFailure,
+
     setSelectedUser,
+    setSelectedUserSuccess,
+    setSelectedUserFailure,
+
     changeSelectedMonth
+
 } = calendarSlice.actions;
 
 export default calendarSlice.reducer;

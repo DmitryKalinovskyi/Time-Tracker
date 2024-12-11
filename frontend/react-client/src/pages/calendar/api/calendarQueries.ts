@@ -1,14 +1,14 @@
 import {CalendarEvent} from "../../../types/CalendarEvent.ts";
 import User from "../../../types/User.ts";
 import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
+import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
 
-export interface CreateCalendarEventQueryResponseType{
+export interface CreateCalendarEventResponse extends GraphQLResponse{
     data: {
         calendarMutation:{
             createCalendarEvent: CalendarEvent
         }
     },
-    errors?: GraphQLExecutionErrorType[]
 }
 export const createCalendarEventQuery = () => `
 mutation CreateCalendarEvent($createCalendarEventInput: CreateCalendarEventInput!){
@@ -21,13 +21,12 @@ mutation CreateCalendarEvent($createCalendarEventInput: CreateCalendarEventInput
   }
 }`;
 
-export interface UpdateCalendarEventQueryResponseType{
+export interface UpdateCalendarEventResponse extends GraphQLResponse{
     data: {
         calendarMutation:{
             updateCalendarEvent: CalendarEvent
         }
     },
-    errors?: GraphQLExecutionErrorType[]
 }
 export const updateCalendarEventQuery = () => `
 mutation UpdateEvent($updateCalendarEventInput: UpdateCalendarEventInput!){
@@ -40,11 +39,10 @@ mutation UpdateEvent($updateCalendarEventInput: UpdateCalendarEventInput!){
   }
 }`
 
-export interface DeleteCalendarEventQueryResponseType{
+export interface DeleteCalendarEventResponse extends GraphQLResponse{
     data: {
         calendarMutation: string
     },
-    errors?: GraphQLExecutionErrorType[]
 }
 export const deleteCalendarEventQuery = () => `
 mutation DeleteCalendarEvent($calendarEventId: Int!){
@@ -53,8 +51,7 @@ mutation DeleteCalendarEvent($calendarEventId: Int!){
   }
 }`
 
-export interface FetchUserByIdResponseType{
-    errors?: GraphQLExecutionErrorType[]
+export interface FetchUserByIdResponse extends GraphQLResponse{
     data:{
         usersQuery:{
             user: User

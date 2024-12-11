@@ -1,10 +1,6 @@
 import Grid from "@mui/material/Grid";
 import {MonthCell} from "./MonthCell.tsx";
-import {
-    Box,
-    IconButton,
-    Stack
-} from "@mui/material";
+import {Box, IconButton, Stack} from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -12,14 +8,12 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import React, {useEffect} from "react";
 import useAuth from "@time-tracker/shared/authentication/hooks/useAuth.ts";
 import {useDispatch, useSelector} from "react-redux";
-import {
-    fetchAndSetSelectedUser
-} from "@time-tracker/pages/calendar/calendarSlice.ts";
-import {RootState} from "../../../store.ts";
+import {setSelectedUser} from "@time-tracker/pages/calendar/calendarSlice.ts";
 import {useMonthDetails} from "./hooks/useMonthDetails.ts";
 import {useMonthSetters} from "./hooks/useMonthSetters.ts";
 import {useDayModal} from "./hooks/useDayModal.ts";
 import {UserAutoComplete} from "@time-tracker/shared/ui/UserAutoComplete";
+import {RootState} from "@time-tracker/app/store.ts";
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -39,7 +33,7 @@ export function CalendarViewByMonth(){
 
     const selectMe = () => {
         if(me)
-        dispatch(fetchAndSetSelectedUser(me.id));
+        dispatch(setSelectedUser(me.id));
     }
 
     function getMonthName(){
@@ -68,7 +62,7 @@ export function CalendarViewByMonth(){
                 <Stack direction="row"  m={2} spacing={2} alignItems="center">
                     <Box sx={{width: '500px'}}>
                         <UserAutoComplete selectedUser={selectedUser} onChange={(user) => {
-                            if (user) dispatch(fetchAndSetSelectedUser(user.id))
+                            if (user) dispatch(setSelectedUser(user.id))
                         }}/>
                     </Box>
                     <Button color="secondary"
