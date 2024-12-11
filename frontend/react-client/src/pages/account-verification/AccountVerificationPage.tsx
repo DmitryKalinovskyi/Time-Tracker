@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { verifUserRequest, verifUserFailure } from '@time-tracker/pages/account-verification/verifSlice.ts';
+import { verifyUser, verifyUserFailure } from './verifySlice.ts';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -9,20 +9,17 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link as MuiLink } from '@mui/material';
-import { RootState } from "../../store.ts";
+import {RootState} from "@time-tracker/app/store.ts";
 
-const defaultTheme = createTheme();
-
-export const AccountVerificationPage: React.FC = () => {
+export function AccountVerificationPage() {
     const [code, setCode] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [repeatPassword, setRepeatPassword] = useState<string>('');
     
     const dispatch = useDispatch();
-    const { error, loading, success } = useSelector((state: RootState) => state.verif);
+    const { error, loading, success } = useSelector((state: RootState) => state.verify);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -32,21 +29,21 @@ export const AccountVerificationPage: React.FC = () => {
 
 
         if (code === '' || password === '' || repeatPassword === '') {
-            dispatch(verifUserFailure('Please fill in all fields'));
+            dispatch(verifyUserFailure('Please fill in all fields'));
             return;
         }
 
         if (password !== repeatPassword) {
-            dispatch(verifUserFailure('Passwords do not match'));
+            dispatch(verifyUserFailure('Passwords do not match'));
             return;
         }
 
             if (!strongPasswordRegex.test(password)) {
-        dispatch(verifUserFailure('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character'));
+        dispatch(verifyUserFailure('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character'));
         return;
     }
 
-        dispatch(verifUserRequest({code, password}));
+        dispatch(verifyUser({code, password}));
     };
 
     useEffect(() => {
@@ -58,7 +55,6 @@ export const AccountVerificationPage: React.FC = () => {
     }, [success]);
 
     return (
-        <ThemeProvider theme={defaultTheme}>
             <Box
                 sx={{
                     my: 8,
@@ -136,6 +132,5 @@ export const AccountVerificationPage: React.FC = () => {
                     </Grid>
                 </Box>
             </Box>
-        </ThemeProvider>
     );
-};
+}

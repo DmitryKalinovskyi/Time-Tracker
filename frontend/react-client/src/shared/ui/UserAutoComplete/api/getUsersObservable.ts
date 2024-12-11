@@ -1,10 +1,10 @@
-import {ajax, AjaxResponse} from "rxjs/ajax";
-import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
+import {AjaxResponse} from "rxjs/ajax";
 import {
     usersByEmailOrFullNameQuery,
     UsersByEmailOrFullNameResponse
 } from "@time-tracker/shared/ui/UserAutoComplete/api/userAutoCompleteQueries.ts";
 import {delay, map} from "rxjs";
+import {apiRequest} from "@time-tracker/shared/graphql/rxjs-operators";
 
 export const getUsersObservable = (emailOrFullName: string, usersLimit: number, fetchDelay: number) => {
     const variables = {
@@ -14,7 +14,7 @@ export const getUsersObservable = (emailOrFullName: string, usersLimit: number, 
         }
     };
 
-    return ajax(createRequest(usersByEmailOrFullNameQuery(), variables)).pipe(
+    return apiRequest(usersByEmailOrFullNameQuery(), variables).pipe(
         delay(fetchDelay),
         map((ajaxResponse: AjaxResponse<UsersByEmailOrFullNameResponse>) => {
             const errors = ajaxResponse.response.errors;

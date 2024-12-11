@@ -1,37 +1,37 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface VerifType {
+export interface VerifyState {
     error: string | null;
     loading: boolean;
     success: boolean | null;
 }
 
-const initialState: VerifType = {
+const initialState: VerifyState = {
     error: null,
     loading: false,
     success: null
 };
 
-export interface VerifPayload {
+export interface VerifyPayload {
     code: string, 
     password: string
 }
 
-const verifSlice = createSlice({
-    name: 'verif',
+const verifySlice = createSlice({
+    name: 'verify',
     initialState,
     reducers: {
-        verifUserRequest: (state, _action: PayloadAction<VerifPayload>) => {
+        verifyUser: (state, _action: PayloadAction<VerifyPayload>) => {
             state.loading = true;
             state.error = null;
             state.success = null;
         },
-        verifUserSuccess: (state) => {
+        verifyUserSuccess: (state) => {
             state.loading = false;
             state.error = null;
             state.success = true;
         },
-        verifUserFailure: (state, action: PayloadAction<string>) => {
+        verifyUserFailure: (state, action: PayloadAction<string>) => {
             state.error = action.payload;
             state.loading = false;
             state.success = false;
@@ -39,6 +39,10 @@ const verifSlice = createSlice({
     }
 });
 
-export const { verifUserRequest, verifUserSuccess, verifUserFailure } = verifSlice.actions;
+export const {
+    verifyUser,
+    verifyUserSuccess,
+    verifyUserFailure
+} = verifySlice.actions;
 
-export default verifSlice.reducer;
+export default verifySlice.reducer;

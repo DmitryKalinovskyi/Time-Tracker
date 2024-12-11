@@ -1,6 +1,5 @@
 import {CalendarEvent} from "../../../types/CalendarEvent.ts";
 import User from "../../../types/User.ts";
-import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
 import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
 
 export interface CreateCalendarEventResponse extends GraphQLResponse{

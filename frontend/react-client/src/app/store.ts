@@ -3,7 +3,6 @@ import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 
 import authReducer from "@time-tracker/shared/authentication/authSlice.ts";
 import registerReducer from "@time-tracker/pages/create-user/registerSlice.ts";
-import verifReducer  from "@time-tracker/pages/account-verification/verifSlice.ts";
 import usersReducer from "@time-tracker/pages/users/usersSlice.ts";
 import userReducer from "@time-tracker/pages/user/userSlice.ts";
 import permissionsReducer from "@time-tracker/shared/authorization/permissionsSlice.ts";
@@ -15,7 +14,6 @@ import workReportingReducer from "@time-tracker/pages/work-reports/workReporting
 import {authEpics} from "@time-tracker/shared/authentication/authEpics.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUserEpic } from "@time-tracker/pages/create-user/api/registerEpics.ts";
-import { verifUserEpic } from "@time-tracker/pages/account-verification/api/verifEpics.ts";
 import { resetUserPasswordEpic } from "@time-tracker/pages/reset-password/api/resetEpic.ts";
 import { getUsersEpic } from "@time-tracker/pages/users/api/usersEpics.ts";
 import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "@time-tracker/pages/user/api/userEpics.ts";
@@ -23,13 +21,16 @@ import { getPermissionsEpic } from "@time-tracker/shared/authorization/permissio
 import {calendarEpic} from "@time-tracker/pages/calendar/api/calendarEpic.ts";
 import {fetchWorkReportEpic} from "@time-tracker/pages/work-reports/api/workReportingEpic.ts";
 import {timeTrackingEpics} from "@time-tracker/pages/time-tracker/timeTrackingEpics.ts";
+import {accountVerificationEpic, verifyReducer} from "@time-tracker/pages/account-verification";
 
 
 
-const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, any, any>(
+const rootEpic: Epic<Action, Action> = combineEpics<Action, Action>(
     authEpics,
     registerUserEpic,
-    verifUserEpic,
+
+    accountVerificationEpic,
+
     getUsersEpic,
     getUserEpic,
     updateUserEpic,
@@ -50,7 +51,7 @@ export const store = configureStore({
     reducer: {
         auth: authReducer,
         reg: registerReducer,
-        verif: verifReducer,
+        verify: verifyReducer,
         users: usersReducer,
         user: userReducer,
         permissions: permissionsReducer,

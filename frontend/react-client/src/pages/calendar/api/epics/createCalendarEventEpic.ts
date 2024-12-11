@@ -14,10 +14,9 @@ export const createCalendarEventEpic = (action$: Observable<Action>) => action$.
     ofType(createCalendarEvent.type),
     mergeMap((action: PayloadAction<AddCalendarEventInputType>) =>
         apiRequest(createCalendarEventQuery(), {createCalendarEventInput: action.payload}).pipe(
-            catchAnyGraphQLError(ajaxResponse =>
-                createCalendarEventSuccess(ajaxResponse.response.data.calendarMutation.createCalendarEvent),
-                () => createCalendarEventFailure(),
-                true
+            catchAnyGraphQLError(
+                ajaxResponse => createCalendarEventSuccess(ajaxResponse.response.data.calendarMutation.createCalendarEvent),
+                () => createCalendarEventFailure()
             )
         )
     )

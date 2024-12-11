@@ -14,10 +14,10 @@ export const updateCalendarEventEpic = (action$: Observable<Action>) => action$.
     ofType(updateCalendarEvent.type),
     mergeMap((action: PayloadAction<UpdateCalendarEventInputType>) =>
         apiRequest(updateCalendarEventQuery(), {updateCalendarEventInput: action.payload}).pipe(
-            catchAnyGraphQLError((ajaxResponse) =>
-                updateCalendarEventSuccess(ajaxResponse.response.data.calendarMutation.updateCalendarEvent),
-                () => updateCalendarEventFailure(),
-                true)
+            catchAnyGraphQLError(
+                (ajaxResponse) => updateCalendarEventSuccess(ajaxResponse.response.data.calendarMutation.updateCalendarEvent),
+                () => updateCalendarEventFailure()
+            )
         )
     )
 );

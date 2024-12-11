@@ -1,6 +1,6 @@
 import {changeSelectedMonth, MonthType} from "@time-tracker/pages/calendar/calendarSlice.ts";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../../store.ts";
+import {RootState} from "@time-tracker/app/store.ts";
 
 export function useMonthSetters(){
     const selectedMonth: MonthType = useSelector((state: RootState) => state.calendar.selectedMonth);

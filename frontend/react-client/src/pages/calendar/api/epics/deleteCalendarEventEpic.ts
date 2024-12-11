@@ -13,9 +13,10 @@ export const deleteCalendarEventEpic = (action$: Observable<Action>) => action$.
     ofType(deleteCalendarEvent.type),
     mergeMap((action: PayloadAction<number>) =>
         apiRequest(deleteCalendarEventQuery(), {calendarEventId: action.payload}).pipe(
-            catchAnyGraphQLError(() => deleteCalendarEventSuccess(action.payload),
-                () => deleteCalendarEventFailure(),
-                true)
+            catchAnyGraphQLError(
+                () => deleteCalendarEventSuccess(action.payload),
+                () => deleteCalendarEventFailure()
+            )
         )
     )
 );

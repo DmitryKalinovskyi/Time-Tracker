@@ -20,6 +20,7 @@ import {LoginPage} from "@time-tracker/pages/login";
 import {AccountVerificationPage} from "@time-tracker/pages/account-verification";
 import {ResetPasswordPage} from "@time-tracker/pages/reset-password";
 import {TimeTrackerProvider} from "@time-tracker/pages/time-tracker/TimeTrackerProvider.tsx";
+import {createTheme, ThemeProvider} from "@mui/material/styles";
 
 const router = createBrowserRouter([
   {
@@ -50,18 +51,22 @@ const router = createBrowserRouter([
   }
 ])
 
+const defaultTheme = createTheme();
+
 export default function App() {
     return (
         <Provider store={store}>
-            <AuthProvider>
-                <SnackbarProvider>
-                    <TimeTrackerProvider>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <RouterProvider router={router}/>
-                        </LocalizationProvider>
-                    </TimeTrackerProvider>
-                </SnackbarProvider>
-            </AuthProvider>
+            <ThemeProvider theme={defaultTheme}>
+                <AuthProvider>
+                    <SnackbarProvider>
+                        <TimeTrackerProvider>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <RouterProvider router={router}/>
+                            </LocalizationProvider>
+                        </TimeTrackerProvider>
+                    </SnackbarProvider>
+                </AuthProvider>
+            </ThemeProvider>
         </Provider>
     )
 }
