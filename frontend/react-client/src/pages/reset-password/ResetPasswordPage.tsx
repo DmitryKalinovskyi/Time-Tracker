@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Box, Avatar, Button, TextField, Typography, Link as MuiLink} from '@mui/material';
 import PasswordIcon from '@mui/icons-material/Password';
-import { resetUserPasswordFailure, resetUserPasswordRequest } from '@time-tracker/pages/reset-password/resetSlice.ts';
+import { resetPasswordFailure, resetPassword } from '@time-tracker/pages/reset-password/resetPasswordSlice.ts';
 import { RootState } from '../../store.ts';
 import Grid from "@mui/material/Grid";
 import {Link as RouterLink} from "react-router-dom";
@@ -12,7 +12,7 @@ export const ResetPasswordPage: React.FC = () => {
 
     const dispatch = useDispatch();
 
-    const { error, loading, success } = useSelector((state: RootState) => state.reset);
+    const { error, loading, success } = useSelector((state: RootState) => state.resetPassword);
 
     useEffect(() => {
         if (success) {
@@ -24,17 +24,17 @@ export const ResetPasswordPage: React.FC = () => {
         event.preventDefault();
 
         if (email === '') {
-            dispatch(resetUserPasswordFailure('Please fill in email'));
+            dispatch(resetPasswordFailure('Please fill in email'));
             return;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            dispatch(resetUserPasswordFailure('Please enter a valid email address'));
+            dispatch(resetPasswordFailure('Please enter a valid email address'));
             return;
         }
 
-        dispatch(resetUserPasswordRequest({ email }));
+        dispatch(resetPassword({ email }));
     };
 
     return (

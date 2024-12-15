@@ -26,10 +26,18 @@ const initialState: UsersSliceStateType= {
     error: null
 };
 
+export interface FetchUsersPayload {
+    pageNumber: number,
+    pageSize: number,
+}
+
 const usersSlice = createSlice({
     name: "users",
     initialState,
     reducers: {
+        fetchUsers: (state, action: PayloadAction<FetchUsersPayload>) => {
+
+        },
         fetchUsersSuccess: (state, action: PayloadAction<GetUsersQueryResponseType>) => {
             state.usersPage = action.payload.data.usersQuery.users
         },
@@ -39,7 +47,8 @@ const usersSlice = createSlice({
     }
 })
 
-export const { 
+export const {
+    fetchUsers,
     fetchUsersSuccess,
     fetchUsersFailure
  } = usersSlice.actions;

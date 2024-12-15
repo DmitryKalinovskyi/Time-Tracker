@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import {SessionTable} from "./ui/SessionTable.tsx";
 import useIsHavePermission from "@time-tracker/shared/authentication/hooks/useIsHavePermission.ts";
 import {TimeTrackingPermission} from "@time-tracker/shared/authorization/permissions.ts";
-import {useTimer} from "./ui/hooks/useTimer.ts";
+import {useTimer} from "@time-tracker/pages/time-tracker/hooks/useTimer.ts";
 import {useState} from "react";
 import StyledButton from "./ui/StyledButton.tsx";
 import FiltersModal from "./ui/FiltersModal.tsx";

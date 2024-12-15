@@ -1,8 +1,10 @@
-import {createSlice, current, PayloadAction} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
-import { WorkSession} from "../../types/WorkSession";
+import {WorkSession} from "../../types/WorkSession";
 import PaginatedResult from "../../types/PaginatedResult";
 import User from "../../types/User.ts";
+import {ShowFailure, ShowSuccess} from "@time-tracker/shared/misc/SnackBarHelper.ts";
+import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
 
 export interface PaginationInfo{
     totalRecords: number
@@ -70,12 +72,20 @@ const timeTrackerSlice = createSlice({
             state.currentWorkSession = action.payload
             state.isTracking = true;
         },
+        startSessionFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+
+            ShowFailure(action.payload.message);
+        },
+
         stopSession()
         {
         },
         stopSessionSuccessful(state) {
             state.isTracking = false;
             state.currentWorkSession = null;
+        },
+        stopSessionFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+            ShowFailure(action.payload.message);
         },
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -94,6 +104,9 @@ const timeTrackerSlice = createSlice({
                 totalRecords: action.payload.totalRecords
             }
         },
+        getWorkSessionsFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+            ShowFailure(action.payload.message);
+        },
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         updateWorkSession(state, action: PayloadAction<UpdateSessionPayload>)
@@ -106,11 +119,13 @@ const timeTrackerSlice = createSlice({
         {
             // update ui
             state.isWorkSessionUpdating = false;
+            ShowSuccess("Work session updated successful.")
         },
 
-        updateWorkSessionFailure(state)
+        updateWorkSessionFailure(state, action: PayloadAction<GraphQLExecutionErrorType>)
         {
             state.isWorkSessionUpdating = false;
+            ShowFailure(action.payload.message);
         },
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -119,11 +134,17 @@ const timeTrackerSlice = createSlice({
 
         },
         deleteWorkSessionSuccess(state, action: PayloadAction<number>) {
+            ShowSuccess("Session deleted successfully.")
+
             // imagine case when we try to delete session in the last page
             if(state.paginationInfo.currentPage >= state.paginationInfo.totalPages
                 &&  state.paginationInfo.totalRecords % state.paginationInfo.pageSize == 1)
                 state.paginationInfo.currentPage = Math.max(1, state.paginationInfo.currentPage-1);
         },
+        deleteWorkSessionFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+            ShowFailure(action.payload.message);
+        },
+
         applyTimeTrackerFilter(state, action: PayloadAction<TimeTrackerFilter>){
             state.filter = action.payload;
             // reset page
@@ -140,6 +161,11 @@ const timeTrackerSlice = createSlice({
         {
             state.currentWorkSession = action.payload;
         },
+
+        getCurrentWorkSessionFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+            ShowFailure(action.payload.message);
+        },
+
         getTodayTotalDuration()
         {
         },
@@ -147,39 +173,63 @@ const timeTrackerSlice = createSlice({
         {
             state.todayTotalDuration = action.payload;
         },
+        getTodayTotalDurationFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+            ShowFailure(action.payload.message);
+        },
 
         setWorkSessionsPage(state, action: PayloadAction<number>)
         {
             state.paginationInfo.currentPage = action.payload;
         },
+
         addWorkSession(state, action: PayloadAction<AddWorkSessionPayload>)
         {
         },
         addWorkSessionSuccessful(state, action: PayloadAction<WorkSession>) {
+            ShowSuccess("Work session added.")
         },
+        addWorkSessionFailure(state, action: PayloadAction<GraphQLExecutionErrorType>){
+            ShowFailure(action.payload.message);
+        }
     },
 })
 
 export const {
     startSession,
     startSessionSuccessful,
+    startSessionFailure,
+
     stopSession,
     stopSessionSuccessful,
+    stopSessionFailure,
+
     updateWorkSession,
     updateWorkSessionSuccessful,
     updateWorkSessionFailure,
+
     deleteWorkSession,
     deleteWorkSessionSuccess,
+    deleteWorkSessionFailure,
+
     getCurrentWorkSession,
     getCurrentWorkSessionSuccessful,
+    getCurrentWorkSessionFailure,
+
     getWorkSessions,
     getWorkSessionsSuccessful,
+    getWorkSessionsFailure,
+
     setWorkSessionsPage,
+
     getTodayTotalDuration,
     getTodayTotalDurationSuccessful,
+    getTodayTotalDurationFailure,
+
     applyTimeTrackerFilter,
+
     addWorkSession,
-    addWorkSessionSuccessful
+    addWorkSessionSuccessful,
+    addWorkSessionFailure
 
 } = timeTrackerSlice.actions;
 

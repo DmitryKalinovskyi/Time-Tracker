@@ -21,6 +21,7 @@ import {AccountVerificationPage} from "@time-tracker/pages/account-verification"
 import {ResetPasswordPage} from "@time-tracker/pages/reset-password";
 import {TimeTrackerProvider} from "@time-tracker/pages/time-tracker/TimeTrackerProvider.tsx";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
+import {PermissionsProvider} from "@time-tracker/shared/authorization/PermissionsProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -58,13 +59,15 @@ export default function App() {
         <Provider store={store}>
             <ThemeProvider theme={defaultTheme}>
                 <AuthProvider>
-                    <SnackbarProvider>
-                        <TimeTrackerProvider>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <RouterProvider router={router}/>
-                            </LocalizationProvider>
-                        </TimeTrackerProvider>
-                    </SnackbarProvider>
+                    <PermissionsProvider>
+                        <SnackbarProvider>
+                            <TimeTrackerProvider>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <RouterProvider router={router}/>
+                                </LocalizationProvider>
+                            </TimeTrackerProvider>
+                        </SnackbarProvider>
+                    </PermissionsProvider>
                 </AuthProvider>
             </ThemeProvider>
         </Provider>

@@ -1,11 +1,10 @@
 import { Box, Button, Card, CardContent, Container, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers } from "@time-tracker/pages/users/api/usersEpics.ts";
-import { RootState } from "../../../store.ts";
 import { useNavigate } from 'react-router-dom';
 import Pagination from "@mui/material/Pagination";
-import {UsersPage} from "@time-tracker/pages/users/usersSlice.ts";
+import {fetchUsers, UsersPage} from "@time-tracker/pages/users/usersSlice.ts";
+import {RootState} from "@time-tracker/app/store.ts";
 
 export default function UsersList() {
     const navigate = useNavigate();

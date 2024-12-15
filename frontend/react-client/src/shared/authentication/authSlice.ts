@@ -48,11 +48,12 @@ const authSlice = createSlice({
             state.isRefreshed = true;
             removeRefreshToken();
         },
-        loginSuccess: (state, action: PayloadAction<{user: User, accessToken: Token}>) => {
+        loginSuccess: (state, action: PayloadAction<{user: User, accessToken: Token, refreshToken: Token}>) => {
             state.accessToken = action.payload.accessToken;
             state.user = action.payload.user;
             state.loading = false;
             state.error = null;
+            saveRefreshToken(action.payload.refreshToken)
         },
         loginFailure: (state, action: PayloadAction<string>) => {
             state.accessToken = null;
@@ -76,6 +77,7 @@ export const {loginUser,
     refreshTokenReject,
     loginSuccess,
     loginFailure,
-    logout} = authSlice.actions;
+    logout
+} = authSlice.actions;
 
 export default authSlice.reducer;

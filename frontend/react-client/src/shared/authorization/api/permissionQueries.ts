@@ -1,6 +1,6 @@
+import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
 
-export interface GetPermissionsQueryResponse{
-    errors?: [],
+export interface GetPermissionsQueryResponse extends GraphQLResponse{
     data: {
         permissionsQuery: {
             availablePermissions: string[]

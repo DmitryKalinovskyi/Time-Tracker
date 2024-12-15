@@ -40,4 +40,4 @@ export default {
 
 ### Structure
 - each page folder should have index.ts
-- index should export page, state reducer, epic.  
+- index should export page, state reducer, epic (if present).  

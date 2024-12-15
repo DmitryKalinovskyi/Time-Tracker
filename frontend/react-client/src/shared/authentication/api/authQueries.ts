@@ -1,9 +1,8 @@
 import Token from "../../../types/Token.ts";
 import User from "../../../types/User.ts";
-import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
+import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
 
-export interface LoginQueryResponseType {
-    errors?: GraphQLExecutionErrorType[]
+export interface LoginQueryResponseType extends GraphQLResponse {
     data:{
         identityMutation: {
             login: {
@@ -15,8 +14,7 @@ export interface LoginQueryResponseType {
     }
 }
 
-export interface RefreshTokenQueryResponseType {
-    errors?: GraphQLExecutionErrorType[]
+export interface RefreshTokenQueryResponseType extends GraphQLResponse{
     data:{
         identityMutation:{
             refreshToken:{

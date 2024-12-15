@@ -4,7 +4,7 @@ import React from 'react';
 import { formatDuration, formatDurationToHMS } from '@time-tracker/shared/misc/TimeFormatter.ts';
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import {useTimer} from "./hooks/useTimer.ts";
+import {useTimer} from "@time-tracker/pages/time-tracker/hooks/useTimer.ts";
 import {RootState} from "@time-tracker/app/store.ts";
 import {startSession, stopSession} from "@time-tracker/pages/time-tracker/timeTrackingSlice.ts";
 

@@ -30,16 +30,13 @@ To prevent duplicated check of that error we use "catchGraphQLError(success, err
 
 ```ts
 export const createCalendarEventEpic = (action$: Observable<Action>) => action$.pipe(
-    ofType(apiCreateCalendarEvent.type),
+    ofType(createCalendarEvent.type),
     mergeMap((action: PayloadAction<AddCalendarEventInputType>) =>
         apiRequest(createCalendarEventQuery(), {createCalendarEventInput: action.payload}).pipe(
-            catchGraphQLError((ajaxResponse: AjaxResponse<CreateCalendarEventResponse>) => {
-                ShowSuccess("Work time added.")
-                return addCalendarEvent(ajaxResponse.response.data
-                    .calendarMutation.createCalendarEvent);
-            }, () => {
-                ShowFailure("An error occurred while trying to add the calendar event.");
-            })
+            catchAnyGraphQLError(
+                ajaxResponse => createCalendarEventSuccess(ajaxResponse.response.data.calendarMutation.createCalendarEvent),
+                () => createCalendarEventFailure()
+            )
         )
     )
 );

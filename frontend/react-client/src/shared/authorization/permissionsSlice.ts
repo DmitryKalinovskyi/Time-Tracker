@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
 
 export interface UserType {
     permissions: string[],
@@ -13,16 +14,20 @@ const permissionsSlice = createSlice({
     name: "users",
     initialState,
     reducers: {
+        fetchPermissions: () => {
+
+        },
         fetchPermissionsSuccess: (state, action: PayloadAction<string[]>) => {
             state.permissions = action.payload
         },
-        fetchPermissionsFailure: (state, action: PayloadAction<string>) => {
-            state.error = action.payload
+        fetchPermissionsFailure: (state, action: PayloadAction<GraphQLExecutionErrorType>) => {
+            state.error = action.payload.message
         },
     }
 })
 
-export const { 
+export const {
+    fetchPermissions,
     fetchPermissionsSuccess,
     fetchPermissionsFailure
  } = permissionsSlice.actions;

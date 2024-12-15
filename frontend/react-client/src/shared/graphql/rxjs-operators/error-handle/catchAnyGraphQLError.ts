@@ -1,15 +1,16 @@
-import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
 import {AjaxResponse} from "rxjs/ajax";
-import {catchError, map, Observable} from "rxjs";
+import {catchError, map, Observable, of} from "rxjs";
 import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
+import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
+import {Action} from "@reduxjs/toolkit";
 
-export function catchAnyGraphQLError<ProjectResult, OnErrorResult>(
-    project: (ajaxResponse: AjaxResponse<GraphQLResponse>) => ProjectResult,
-    onError: (ajaxResponse: AjaxResponse<GraphQLResponse>, error: GraphQLExecutionErrorType) => OnErrorResult,
+export function catchAnyGraphQLError<Response extends GraphQLResponse>(
+    project: (ajaxResponse: AjaxResponse<Response>) => Action,
+    onError: (ajaxResponse: AjaxResponse<Response>, error: GraphQLExecutionErrorType) => Action,
     logError: boolean = true
 ){
-    return (source: Observable<AjaxResponse<GraphQLResponse>>) => source.pipe(
-        map((ajaxResponse: AjaxResponse<GraphQLResponse>) => {
+    return (source: Observable<AjaxResponse<Response>>) => source.pipe(
+        map((ajaxResponse: AjaxResponse<Response>) => {
             if(ajaxResponse.response.errors && ajaxResponse.response.errors.length > 0){
                 const error = ajaxResponse.response.errors[0];
                 if(logError){
@@ -30,7 +31,7 @@ export function catchAnyGraphQLError<ProjectResult, OnErrorResult>(
                 console.log(graphQLError);
             }
 
-            return onError(error.response, graphQLError)
+            return of(onError(error.response, graphQLError))
         })
     )
 }

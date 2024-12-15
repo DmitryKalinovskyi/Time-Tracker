@@ -1,0 +1,41 @@
+import {GraphQLExecutionErrorType} from "@time-tracker/shared/graphql/errors/GraphQLExecutionErrorType.ts";
+import {WorkSession} from "@time-tracker/types/WorkSession.ts";
+
+export interface StopSessionResponse{
+    errors? : GraphQLExecutionErrorType[]
+    data: {
+        timeTrackerMutation:{
+            stopSession: WorkSession
+        }
+    }
+}
+
+export const stopSessionQuery = () => `
+mutation StopSession{
+  timeTrackerMutation{
+    stopSession {
+      id
+      startTime
+      endTime
+      duration
+      createdAt
+      lastUpdatedAt
+      user {
+        id
+        fullName
+        email
+      }
+      editedBy {
+        id
+        fullName
+        email
+      }
+      sessionOrigin {
+        id
+        originName
+        description
+      }
+    } 
+  }
+}
+`

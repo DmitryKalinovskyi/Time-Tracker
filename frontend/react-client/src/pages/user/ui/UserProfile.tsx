@@ -3,6 +3,8 @@ import { Button, Card, Chip, Divider, Grid, IconButton, MenuItem, Switch, TextFi
 import { useState } from "react";
 import User from "../../../types/User.ts";
 import { StyledMenu } from './StyledMenu.tsx';
+import {useSelector} from "react-redux";
+import {RootState} from "@time-tracker/app/store.ts";
 
 
 interface UserProfileProps {
@@ -10,12 +12,11 @@ interface UserProfileProps {
     onSaveProfile: (updatedUser: User) => void;
     onSavePermissions: (permissions: string[]) => void;
     onUpdateUserActiveStatus: (isActive: boolean) => void;
-    getPermissions: () => void;
-    availablePermissions: string[];
 }
 
 export default function UserProfile(props: UserProfileProps) {
-    const { user, onSaveProfile, onSavePermissions, onUpdateUserActiveStatus, getPermissions, availablePermissions } = props;
+    const { user, onSaveProfile, onSavePermissions, onUpdateUserActiveStatus } = props;
+    const availablePermissions = useSelector((state: RootState) => state.permissions.permissions);
 
     // Edit profile
     const [editProfileMode, setEditProfileMode] = useState(false);
@@ -50,7 +51,6 @@ export default function UserProfile(props: UserProfileProps) {
 
     const handleEditPermissionsClick = () => {
         setEditPermissionsMode(true);
-        getPermissions();
         handleMenuClose();
     };
 
@@ -220,4 +220,4 @@ export default function UserProfile(props: UserProfileProps) {
             </Grid>
         </Card>
     );
-};
+}

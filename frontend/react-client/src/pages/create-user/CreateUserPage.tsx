@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Avatar, Button, TextField, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { registerUserFailure } from '@time-tracker/pages/create-user/registerSlice.ts';
-import { RootState } from '../../store.ts';
-import { registerUserRequest } from '@time-tracker/pages/create-user/registerSlice.ts';
+import {RootState} from "@time-tracker/app/store.ts";
+import {createUser, createUserFailure} from "@time-tracker/pages/create-user/createUserSlice.ts";
 
 export const CreateUserPage: React.FC = () => {
     const [fullName, setFullName] = useState('');
@@ -14,7 +13,7 @@ export const CreateUserPage: React.FC = () => {
 
     const dispatch = useDispatch();
 
-    const { error, loading, success } = useSelector((state: RootState) => state.reg);
+    const { error, loading, success } = useSelector((state: RootState) => state.createUser);
 
     useEffect(() => {
         if (success) {
@@ -29,13 +28,13 @@ export const CreateUserPage: React.FC = () => {
         event.preventDefault();
     
         if (fullName === '' || email === '') {
-            dispatch(registerUserFailure('Please fill in all fields'));
+            dispatch(createUserFailure('Please fill in all fields'));
             return;
         }
     
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            dispatch(registerUserFailure('Please enter a valid email address'));
+            dispatch(createUserFailure('Please enter a valid email address'));
             return;
         }
     
@@ -43,11 +42,11 @@ export const CreateUserPage: React.FC = () => {
         const nameValidation = nameParts.every(name => /^[A-Z][a-z]*$/.test(name));
         
         if (!nameValidation) {
-            dispatch(registerUserFailure('Each name must start with a capital letter'));
+            dispatch(createUserFailure('Each name must start with a capital letter'));
             return;
         }
     
-        dispatch(registerUserRequest({ fullName, email, position, workHoursPerMonth}));
+        dispatch(createUser({ fullName, email, position, workHoursPerMonth}));
     };
 
     return (
