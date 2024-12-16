@@ -1,53 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Box, Avatar, Button, TextField, Typography } from '@mui/material';
+import React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Avatar, Box, Button, TextField, Typography} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {RootState} from "@time-tracker/app/store.ts";
-import {createUser, createUserFailure} from "@time-tracker/pages/create-user/createUserSlice.ts";
+import {createUser} from "@time-tracker/pages/create-user/createUserSlice.ts";
+import {number, object, string} from "yup";
+import {getEmailValidation} from "@time-tracker/shared/validation/getEmailValidation.ts";
+import {useFormik} from "formik";
 
-export const CreateUserPage: React.FC = () => {
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
-    const [position, setPosition] = useState('');
-    const [workHoursPerMonth, setWorkHoursPerMonth] = useState(160);
-
+export function CreateUserPage() {
+    const {error, loading, success} = useSelector((state: RootState) => state.createUser);
     const dispatch = useDispatch();
 
-    const { error, loading, success } = useSelector((state: RootState) => state.createUser);
+    const validationScheme = object({
+        fullName: string()
+            .matches(/^[[A-Za-z]* [A-Za-z]*$/, "Full name should consist of two parts (Ivan Ivanovich).")
+            .matches(/^[A-Z][a-z]* [A-Za-z]*$/, "First name should start with a capital letter.")
+            .matches(/^[A-Z][a-z]* [A-Z][a-z]*$/, "Last name should start with a capital letter.")
+            .matches(/^[A-Z][a-z]{0,50} [A-Z][a-z]{0,50}$/, "First and last name could have at most 50 characters.")
+            .required("Full Name is required."),
 
-    useEffect(() => {
-        if (success) {
-            setFullName('');
-            setEmail('');
-            setPosition('');
-            setWorkHoursPerMonth(160);
-        }
-    }, [success]);
+        email: getEmailValidation().required("Email is required."),
+        position: string().required("Position is required."),
+        workHoursPerMonth: number().integer()
+            .min(0, "Work hours per month should be at least 0.")
+            .max(720, "Work hours per month should be at most 720.")
+            .required("Work hours is required."),
 
-    const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-        event.preventDefault();
-    
-        if (fullName === '' || email === '') {
-            dispatch(createUserFailure('Please fill in all fields'));
-            return;
+    })
+
+    const formik = useFormik({
+        initialValues: {
+            fullName: "",
+            email: "",
+            position: "",
+            workHoursPerMonth: 160
+        },
+        validationSchema: validationScheme,
+        onSubmit: (values) => {
+            dispatch(createUser({
+                fullName: values.fullName,
+                email: values.email,
+                position: values.position,
+                workHoursPerMonth: values.workHoursPerMonth
+            }))
         }
-    
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            dispatch(createUserFailure('Please enter a valid email address'));
-            return;
-        }
-    
-        const nameParts = fullName.trim().split(' ');
-        const nameValidation = nameParts.every(name => /^[A-Z][a-z]*$/.test(name));
-        
-        if (!nameValidation) {
-            dispatch(createUserFailure('Each name must start with a capital letter'));
-            return;
-        }
-    
-        dispatch(createUser({ fullName, email, position, workHoursPerMonth}));
-    };
+    })
 
     return (
         <Box
@@ -61,73 +59,85 @@ export const CreateUserPage: React.FC = () => {
                 width: '100%',
             }}
         >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                <AddIcon />
+            <Avatar sx={{m: 1, backgroundColor: 'secondary.main'}}>
+                <AddIcon/>
             </Avatar>
             <Typography component="h1" variant="h5">
                 Create User
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="fullName"
-                    label="Full Name"
-                    name="fullName"
-                    autoComplete="fullName"
-                    autoFocus
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="email"
-                    label="Email Address"
-                    type="email"
-                    id="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    label="Position"
-                    autoComplete="position"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    inputProps={{ type: 'number'}}
-                    label="Work hours per month"
-                    value={workHoursPerMonth}
-                    onChange={(e) => setWorkHoursPerMonth(+e.target.value)}
-                />
-                {(success !== null) && 
-                <Typography
-                    color={success !== false ? "success.main" : "error.main"}
-                    sx={{ width: '100%', textAlign: 'center' }}>
-                    {success !== false ? 'User created successfully!' : error}
-                </Typography>
-                }
+            <Box sx={{mt: 1, width: '100%'}}>
+                <form onSubmit={formik.handleSubmit} noValidate>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="fullName"
+                        label="Full Name"
+                        name="fullName"
+                        autoComplete="fullName"
+                        autoFocus
+                        value={formik.values.fullName}
+                        onChange={formik.handleChange}
+                        error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+                        helperText={formik.touched.fullName && formik.errors.fullName}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="email"
+                        label="Email Address"
+                        type="email"
+                        id="email"
+                        autoComplete="email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        error={formik.touched.email && Boolean(formik.errors.email)}
+                        helperText={formik.touched.email && formik.errors.email}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Position"
+                        autoComplete="position"
+                        name="position"
+                        value={formik.values.position}
+                        onChange={formik.handleChange}
+                        error={formik.touched.position && Boolean(formik.errors.position)}
+                        helperText={formik.touched.position && formik.errors.position}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        inputProps={{type: 'number'}}
+                        name="workHoursPerMonth"
+                        label="Work hours per month"
+                        value={formik.values.workHoursPerMonth}
+                        onChange={formik.handleChange}
+                        error={formik.touched.workHoursPerMonth && Boolean(formik.errors.workHoursPerMonth)}
+                        helperText={formik.touched.workHoursPerMonth && formik.errors.workHoursPerMonth}
+                    />
+                    {(success !== null) &&
+                        <Typography
+                            color={success !== false ? "success.main" : "error.main"}
+                            sx={{width: '100%', textAlign: 'center'}}>
+                            {success !== false ? 'User created successfully!' : error}
+                        </Typography>
+                    }
 
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 1, mb: 2 }}
-                    disabled={loading}
-                >
-                    {loading ? 'Creating...' : 'Create User'}
-                </Button>
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{mt: 1, mb: 2}}
+                        disabled={loading}
+                    >
+                        {loading ? 'Creating...' : 'Create User'}
+                    </Button>
+                </form>
             </Box>
         </Box>
     );
-};
+}

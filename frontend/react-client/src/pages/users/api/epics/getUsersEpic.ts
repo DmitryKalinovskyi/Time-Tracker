@@ -18,7 +18,7 @@ export const getUsersEpic = (action$: Observable<Action>) => action$.pipe(
                 "input": action.payload
             }).pipe(
             catchAnyGraphQLError(
-                () => fetchUsersSuccess(),
+                (ajaxResponse) => fetchUsersSuccess(ajaxResponse.response),
                 (ajaxResponse, error) => fetchUsersFailure(error)
             )
         )

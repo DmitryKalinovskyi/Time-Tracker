@@ -1,7 +1,7 @@
 import { SnackbarProvider } from 'notistack';
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import RequireAuth from "@time-tracker/shared/authentication/guards/RequireAuth.tsx";
+import Authenticated from "@time-tracker/shared/authentication/guards/Authenticated.tsx";
 import { store } from "./store.ts";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers";
@@ -22,34 +22,43 @@ import {ResetPasswordPage} from "@time-tracker/pages/reset-password";
 import {TimeTrackerProvider} from "@time-tracker/pages/time-tracker/TimeTrackerProvider.tsx";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {PermissionsProvider} from "@time-tracker/shared/authorization/PermissionsProvider.tsx";
+import {Unauthenticated} from "@time-tracker/shared/authentication/guards/Unauthenticated.tsx";
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    errorElement: <NotFoundPage />,
-    children: [{
-      element: <RequireAuth />, children: [
-        {
-          element: <Root />, children: [
-            { path: "/", element: <TimeTrackerPage /> },
-            { path: "/home", element: <TimeTrackerPage /> },
-            { path: "/users", element: <UsersPage /> },
-            { path: "/user/:UserId", element: <UserPage /> },
-            { element: <RequirePermission permission={ManageUsersPermission}/>, children: [
-              { path: "/register", element: <CreateUserPage/> },
-              ]},
-            { path: "/calendar", element: <CalendarPage/> },
-            { path: "/workers-time", element: <WorkReportsPage /> },
+    {
+        path: '/',
+        errorElement: <NotFoundPage/>,
+        children: [
+            {
+                element: <Authenticated/>,
+                children: [
+                    {
+                        element: <Root/>, children: [
+                            {path: "/", element: <TimeTrackerPage/>},
+                            {path: "/home", element: <TimeTrackerPage/>},
+                            {path: "/users", element: <UsersPage/>},
+                            {path: "/user/:UserId", element: <UserPage/>},
+                            {
+                                element: <RequirePermission permission={ManageUsersPermission}/>, children: [
+                                    {path: "/register", element: <CreateUserPage/>},
+                                ]
+                            },
+                            {path: "/calendar", element: <CalendarPage/>},
+                            {path: "/workers-time", element: <WorkReportsPage/>},
 
-          ]
-        }
-      ]
-    },
-    { path: "/login", element: <LoginPage /> },
-    { path: "/verification", element: <AccountVerificationPage /> },
-      { path: "/reset", element: <ResetPasswordPage /> },
-    ]
-  }
+                        ]
+                    }
+                ]
+            },
+            {
+                element: <Unauthenticated to={"/"}/>, children: [
+                    {path: "/login", element: <LoginPage/>},
+                    {path: "/verification", element: <AccountVerificationPage/>},
+                    {path: "/reset", element: <ResetPasswordPage/>}
+                ]
+            }
+        ]
+    }
 ])
 
 const defaultTheme = createTheme();

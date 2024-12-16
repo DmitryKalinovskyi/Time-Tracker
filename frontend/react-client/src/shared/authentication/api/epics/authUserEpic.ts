@@ -11,7 +11,6 @@ export const authUserEpic = (action$: Observable<Action>) => action$.pipe(
         apiRequest<LoginQueryResponseType>(loginQuery(), {input: action.payload}).pipe(
             catchAnyGraphQLError((ajaxResponse) => {
                 const loginResult = ajaxResponse.response.data.identityMutation.login;
-
                 return loginSuccess({
                     accessToken: loginResult.accessToken,
                     refreshToken: loginResult.refreshToken,

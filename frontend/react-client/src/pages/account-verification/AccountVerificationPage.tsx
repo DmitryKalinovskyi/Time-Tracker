@@ -11,21 +11,17 @@ import {Link as RouterLink} from 'react-router-dom';
 import {Link as MuiLink} from '@mui/material';
 import {RootState} from "@time-tracker/app/store.ts";
 import {useFormik} from "formik";
-import {object, ref, string} from 'yup';
+import {object} from 'yup';
 import {verifyUser} from "@time-tracker/pages/account-verification/verifySlice.ts";
+import {getPasswordValidation} from "@time-tracker/shared/validation/getPasswordValidation.ts";
+import {getConfirmPasswordValidation} from "@time-tracker/shared/validation/getConfirmPasswordValidation.ts";
+import {getCodeValidation} from "@time-tracker/shared/validation/getCodeValidation.ts";
 
 export function AccountVerificationPage() {
     const validationSchema = object({
-        code: string()
-            .required("Code is required."),
-
-        password: string()
-            .min(8, 'Password should be of minimum 8 characters length.')
-            .max(16, 'Password should be of maximum 16 characters length.')
-            .required('Password is required'),
-
-        confirmPassword: string()
-        .oneOf([ref<string>('password')], 'Passwords must match.')
+        code: getCodeValidation(),
+        password: getPasswordValidation(),
+        confirmPassword: getConfirmPasswordValidation()
     });
 
     const dispatch = useDispatch();

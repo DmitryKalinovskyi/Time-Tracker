@@ -1,6 +1,7 @@
 import User from "../../../types/User.ts";
+import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";
 
-export interface GetUsersQueryResponseType {
+export interface GetUsersQueryResponseType extends GraphQLResponse{
     errors?: [],
     data:{
         usersQuery:{

@@ -6,77 +6,57 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import PersonIcon from '@mui/icons-material/Person';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {Link as RouterLink, Navigate} from 'react-router-dom';
-import { Link as MuiLink } from '@mui/material';
+import {Link as RouterLink} from 'react-router-dom';
+import {Link as MuiLink} from '@mui/material';
 import {useDispatch} from "react-redux";
-import {loginUser, loginFailure} from "@time-tracker/shared/authentication/authSlice.ts";
-import useIsAuthenticated from "@time-tracker/shared/authentication/hooks/useIsAuthenticated.ts";
+import {loginUser} from "@time-tracker/shared/authentication/authSlice.ts";
 import useAuth from "@time-tracker/shared/authentication/hooks/useAuth.ts";
-import { useEffect, useState } from 'react';
+import {object, string} from "yup";
+import {useFormik} from "formik";
+import {getEmailValidation} from "@time-tracker/shared/validation/getEmailValidation.ts";
 
-
-const defaultTheme = createTheme();
 export const LoginPage: React.FC = () => {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-
-    const auth = useAuth();
-    const isAuthenticated = useIsAuthenticated();
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (!auth.error) {
-            setEmail('');
-            setPassword(''); 
-        }
-    }, [auth.error]);
+    const validationScheme = object({
+        email: getEmailValidation(),
+        password: string()
+        // password: getPasswordValidation()
+    })
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        // Email validation using RegExp
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-        // Check if email or password is missing
-        if (!email || !password) {
-            dispatch(loginFailure('Please fill in all fields'));
-            return;
+    const formik = useFormik({
+        initialValues: {
+            email: "",
+            password: ""
+        },
+        validationSchema: validationScheme,
+        onSubmit: (values) => {
+            dispatch(loginUser({email: values.email, password: values.password}));
         }
-    
-        // Check if the email is valid
-        if (!emailRegex.test(email)) {
-            dispatch(loginFailure('Please enter a valid email address'));
-            return;
-        }
-    
-        // Dispatch the authUser action
-        dispatch(loginUser({ email, password }));
-    };
+    })
 
-    if(isAuthenticated)
-        return <Navigate to={"/"}/>
+    const auth = useAuth();
 
     return (
-        <ThemeProvider theme={defaultTheme}>
-            <Box
-                sx={{
-                    my: 8,
-                    mx: 'auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    maxWidth: '550px',
-                    width: '100%'
-                }}
-            >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <PersonIcon />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                    Sign In
-                </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+        <Box
+            sx={{
+                my: 8,
+                mx: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                maxWidth: '550px',
+                width: '100%'
+            }}
+        >
+            <Avatar sx={{m: 1, backgroundColor: 'secondary.main'}}>
+                <PersonIcon/>
+            </Avatar>
+            <Typography component="h1" variant="h5">
+                Sign In
+            </Typography>
+            <Box sx={{mt: 1, width: '100%'}}>
+                <form onSubmit={formik.handleSubmit}>
                     <TextField
                         margin="normal"
                         required
@@ -86,8 +66,10 @@ export const LoginPage: React.FC = () => {
                         name="email"
                         autoComplete="email"
                         autoFocus
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        error={formik.touched.email && Boolean(formik.errors.email)}
+                        helperText={formik.touched.email && formik.errors.email}
                     />
                     <TextField
                         margin="normal"
@@ -97,14 +79,15 @@ export const LoginPage: React.FC = () => {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
                     />
                     {auth.error &&
                         <Typography
                             color={"error.main"}
-                            sx={{ width: '100%', textAlign: 'center' }}>
+                            sx={{width: '100%', textAlign: 'center'}}>
                             {auth.error}
                         </Typography>
                     }
@@ -112,7 +95,7 @@ export const LoginPage: React.FC = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 1, mb: 2 }}
+                        sx={{mt: 1, mb: 2}}
                     >
                         Sign In
                     </Button>
@@ -128,8 +111,8 @@ export const LoginPage: React.FC = () => {
                             </MuiLink>
                         </Grid>
                     </Grid>
-                </Box>
+                </form>
             </Box>
-        </ThemeProvider>
+        </Box>
     );
 };
