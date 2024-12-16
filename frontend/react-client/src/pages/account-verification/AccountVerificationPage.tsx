@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { verifyUser, verifyUserFailure } from './verifySlice.ts';
+import {useDispatch, useSelector} from 'react-redux';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -9,50 +7,41 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { Link as RouterLink } from 'react-router-dom';
-import { Link as MuiLink } from '@mui/material';
+import {Link as RouterLink} from 'react-router-dom';
+import {Link as MuiLink} from '@mui/material';
 import {RootState} from "@time-tracker/app/store.ts";
+import {useFormik} from "formik";
+import {object, ref, string} from 'yup';
+import {verifyUser} from "@time-tracker/pages/account-verification/verifySlice.ts";
 
 export function AccountVerificationPage() {
-    const [code, setCode] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [repeatPassword, setRepeatPassword] = useState<string>('');
-    
+    const validationSchema = object({
+        code: string()
+            .required("Code is required."),
+
+        password: string()
+            .min(8, 'Password should be of minimum 8 characters length.')
+            .max(16, 'Password should be of maximum 16 characters length.')
+            .required('Password is required'),
+
+        confirmPassword: string()
+        .oneOf([ref<string>('password')], 'Passwords must match.')
+    });
+
     const dispatch = useDispatch();
+    const formik = useFormik({
+        initialValues: {
+            code: "",
+            password: "",
+            confirmPassword: ""
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            dispatch(verifyUser({code: values.code, password: values.password}));
+        }
+    });
+
     const { error, loading, success } = useSelector((state: RootState) => state.verify);
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-          // Define a regular expression for a strong password
-        const strongPasswordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/;
-
-
-        if (code === '' || password === '' || repeatPassword === '') {
-            dispatch(verifyUserFailure('Please fill in all fields'));
-            return;
-        }
-
-        if (password !== repeatPassword) {
-            dispatch(verifyUserFailure('Passwords do not match'));
-            return;
-        }
-
-            if (!strongPasswordRegex.test(password)) {
-        dispatch(verifyUserFailure('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character'));
-        return;
-    }
-
-        dispatch(verifyUser({code, password}));
-    };
-
-    useEffect(() => {
-        if (success) {
-            setCode('');
-            setPassword('');
-            setRepeatPassword(''); 
-        }
-    }, [success]);
 
     return (
             <Box
@@ -66,13 +55,13 @@ export function AccountVerificationPage() {
                     width: '100%'
                 }}
             >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                <Avatar sx={{ m: 1, backgroundColor: 'secondary.main' }}>
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Verification
                 </Typography>
-                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+                <form onSubmit={formik.handleSubmit}>
                     <TextField
                         margin="normal"
                         required
@@ -82,8 +71,10 @@ export function AccountVerificationPage() {
                         name="code"
                         autoComplete="code"
                         autoFocus
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
+                        value={formik.values.code}
+                        onChange={formik.handleChange}
+                        error={formik.touched.code && Boolean(formik.errors.code)}
+                        helperText={formik.touched.code && formik.errors.code}
                     />
                     <TextField
                         margin="normal"
@@ -93,21 +84,23 @@ export function AccountVerificationPage() {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
                     />
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        name="repeatPassword"
-                        label="Repeat Password"
+                        name="confirmPassword"
+                        label="Confirm Password"
                         type="password"
-                        id="repeatPassword"
-                        autoComplete="current-password"
-                        value={repeatPassword}
-                        onChange={(e) => setRepeatPassword(e.target.value)}
+                        id="confirmPassword"
+                        value={formik.values.confirmPassword}
+                        onChange={formik.handleChange}
+                        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                     />
                     {(success !== null) && 
                         <Typography
@@ -130,7 +123,7 @@ export function AccountVerificationPage() {
                             {"Do you have an account? Sign In"}
                         </MuiLink>
                     </Grid>
-                </Box>
+                </form>
             </Box>
     );
 }

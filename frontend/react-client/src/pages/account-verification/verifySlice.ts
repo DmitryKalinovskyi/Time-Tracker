@@ -32,7 +32,7 @@ const verifySlice = createSlice({
             state.success = true;
         },
         verifyUserFailure: (state, action: PayloadAction<string>) => {
-            state.error = action.payload;
+            state.error = "Invalid verification code.";
             state.loading = false;
             state.success = false;
         },
