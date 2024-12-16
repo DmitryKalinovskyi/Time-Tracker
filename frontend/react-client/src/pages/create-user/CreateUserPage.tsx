@@ -4,29 +4,22 @@ import {Avatar, Box, Button, TextField, Typography} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {RootState} from "@time-tracker/app/store.ts";
 import {createUser} from "@time-tracker/pages/create-user/createUserSlice.ts";
-import {number, object, string} from "yup";
+import {object} from "yup";
 import {getEmailValidation} from "@time-tracker/shared/validation/getEmailValidation.ts";
 import {useFormik} from "formik";
+import {getFullNameValidation} from "@time-tracker/shared/validation/getFullNameValidation.ts";
+import {getPositionValidation} from "@time-tracker/shared/validation/getPositionValidation.ts";
+import {getWorkHoursPerMonthValidation} from "@time-tracker/shared/validation/getWorkHoursPerMonthValidation.ts";
 
 export function CreateUserPage() {
     const {error, loading, success} = useSelector((state: RootState) => state.createUser);
     const dispatch = useDispatch();
 
     const validationScheme = object({
-        fullName: string()
-            .matches(/^[[A-Za-z]* [A-Za-z]*$/, "Full name should consist of two parts (Ivan Ivanovich).")
-            .matches(/^[A-Z][a-z]* [A-Za-z]*$/, "First name should start with a capital letter.")
-            .matches(/^[A-Z][a-z]* [A-Z][a-z]*$/, "Last name should start with a capital letter.")
-            .matches(/^[A-Z][a-z]{0,50} [A-Z][a-z]{0,50}$/, "First and last name could have at most 50 characters.")
-            .required("Full Name is required."),
-
-        email: getEmailValidation().required("Email is required."),
-        position: string().required("Position is required."),
-        workHoursPerMonth: number().integer()
-            .min(0, "Work hours per month should be at least 0.")
-            .max(720, "Work hours per month should be at most 720.")
-            .required("Work hours is required."),
-
+        fullName: getFullNameValidation().required(),
+        email: getEmailValidation().required(),
+        position: getPositionValidation().required(),
+        workHoursPerMonth: getWorkHoursPerMonthValidation().required(),
     })
 
     const formik = useFormik({

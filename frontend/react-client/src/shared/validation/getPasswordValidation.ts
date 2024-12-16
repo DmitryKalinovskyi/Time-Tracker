@@ -2,7 +2,7 @@ import {string} from "yup";
 
 export function getPasswordValidation(){
     return string()
-        .min(8, 'Password should be of minimum 8 characters length.')
-        .max(16, 'Password should be of maximum 16 characters length.')
-        .required('Password is required')
+        .label("Password")
+        .min(8, 'Password should be of minimum 8 characters length')
+        .max(16, 'Password should be of maximum 16 characters length')
 }

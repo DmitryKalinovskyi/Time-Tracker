@@ -7,16 +7,16 @@ import Grid from "@mui/material/Grid";
 import {Link as RouterLink} from "react-router-dom";
 import {RootState} from "@time-tracker/app/store.ts";
 import {useFormik} from "formik";
-import {object, string} from "yup"
+import {object} from "yup"
 import {getEmailValidation} from "@time-tracker/shared/validation/getEmailValidation.ts";
 
 export const ResetPasswordPage: React.FC = () => {
     const dispatch = useDispatch();
 
-    const { error, loading, success } = useSelector((state: RootState) => state.resetPassword);
+    const {error, loading, success} = useSelector((state: RootState) => state.resetPassword);
 
     const validationScheme = object({
-        email: getEmailValidation()
+        email: getEmailValidation().required()
     })
 
     const formik = useFormik({
@@ -41,14 +41,14 @@ export const ResetPasswordPage: React.FC = () => {
                 width: '100%',
             }}
         >
-            <Avatar sx={{ m: 1, backgroundColor: 'secondary.main' }}>
-                <PasswordIcon />
+            <Avatar sx={{m: 1, backgroundColor: 'secondary.main'}}>
+                <PasswordIcon/>
             </Avatar>
             <Typography component="h1" variant="h5">
                 Reset Password
             </Typography>
-                <Box sx={{ mt: 1, width: '100%' }}>
-                <form onSubmit={formik.handleSubmit}>
+            <Box sx={{mt: 1, width: '100%'}}>
+                <form onSubmit={formik.handleSubmit} noValidate>
                     <TextField
                         margin="normal"
                         required
@@ -66,7 +66,7 @@ export const ResetPasswordPage: React.FC = () => {
                     {(success !== null) &&
                         <Typography
                             color={success ? "success.main" : "error.main"}
-                            sx={{ width: '100%', textAlign: 'center' }}>
+                            sx={{width: '100%', textAlign: 'center'}}>
                             {success ? 'Password reset code has been sent to your email, please go to the verification page' : error}
                         </Typography>
                     }
@@ -75,7 +75,7 @@ export const ResetPasswordPage: React.FC = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 1, mb: 2 }}
+                        sx={{mt: 1, mb: 2}}
                         disabled={loading}
                     >
                         {loading ? 'Sending...' : 'Reset Password'}
@@ -93,7 +93,7 @@ export const ResetPasswordPage: React.FC = () => {
                         </Grid>
                     </Grid>
                 </form>
-                </Box>
+            </Box>
         </Box>
     );
 };

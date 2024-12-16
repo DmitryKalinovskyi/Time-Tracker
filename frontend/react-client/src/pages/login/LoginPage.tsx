@@ -19,8 +19,8 @@ export const LoginPage: React.FC = () => {
     const dispatch = useDispatch();
 
     const validationScheme = object({
-        email: getEmailValidation(),
-        password: string()
+        email: getEmailValidation().required(),
+        password: string().required()
         // password: getPasswordValidation()
     })
 
@@ -56,7 +56,7 @@ export const LoginPage: React.FC = () => {
                 Sign In
             </Typography>
             <Box sx={{mt: 1, width: '100%'}}>
-                <form onSubmit={formik.handleSubmit}>
+                <form onSubmit={formik.handleSubmit} noValidate>
                     <TextField
                         margin="normal"
                         required

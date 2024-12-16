@@ -19,9 +19,9 @@ import {getCodeValidation} from "@time-tracker/shared/validation/getCodeValidati
 
 export function AccountVerificationPage() {
     const validationSchema = object({
-        code: getCodeValidation(),
-        password: getPasswordValidation(),
-        confirmPassword: getConfirmPasswordValidation()
+        code: getCodeValidation().required(),
+        password: getPasswordValidation().required(),
+        confirmPassword: getConfirmPasswordValidation().required()
     });
 
     const dispatch = useDispatch();
@@ -57,7 +57,7 @@ export function AccountVerificationPage() {
                 <Typography component="h1" variant="h5">
                     Verification
                 </Typography>
-                <form onSubmit={formik.handleSubmit}>
+                <form onSubmit={formik.handleSubmit} noValidate>
                     <TextField
                         margin="normal"
                         required
