@@ -40,7 +40,7 @@ const router = createBrowserRouter([
                             {path: "/user/:UserId", element: <UserPage/>},
                             {
                                 element: <RequirePermission permission={ManageUsersPermission}/>, children: [
-                                    {path: "/register", element: <CreateUserPage/>},
+                                    {path: "/create-user", element: <CreateUserPage/>},
                                 ]
                             },
                             {path: "/calendar", element: <CalendarPage/>},

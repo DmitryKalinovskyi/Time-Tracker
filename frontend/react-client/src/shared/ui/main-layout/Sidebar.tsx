@@ -61,7 +61,7 @@ const Sidebar: React.FC = () => {
                 <DataSaverOff sx={{ color: '#FFF', fontSize: '3rem' }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Timekeeper" 
+                primary="Time-Tracker"
                 primaryTypographyProps={{
                   fontSize: '1.5rem',
                   fontWeight: 'bold',
@@ -126,11 +126,11 @@ const Sidebar: React.FC = () => {
           <ListItemText primary="Users" sx={textSx} />
         </ListItemButton>
           {isCanManageUsers &&
-          <ListItemButton component={Link} to="/register" sx={buttonSx}>
+          <ListItemButton component={Link} to="/create-user" sx={buttonSx}>
               <ListItemIcon sx={iconSx}>
                   <BadgeIcon sx={{ color: '#FFF' }} />
               </ListItemIcon>
-              <ListItemText primary="Register" sx={textSx} />
+              <ListItemText primary="Create user" sx={textSx} />
           </ListItemButton>}
         </List>
     </Box>

@@ -22,7 +22,8 @@ export function catchAnyGraphQLError<Response extends GraphQLResponse>(
             return project(ajaxResponse)
         }),
         catchError((error) => {
-            const graphQLError = error.response.errors[0] ?? null;
+
+            const graphQLError = error.response?.errors[0];
             if(logError){
                 console.log(`Rxjs operator (${catchAnyGraphQLError.name}) caught error:  `)
                 console.log(error);

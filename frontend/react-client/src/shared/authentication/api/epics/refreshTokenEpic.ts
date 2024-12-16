@@ -1,4 +1,4 @@
-import {mergeMap, Observable} from "rxjs";
+import {filter, mergeMap, Observable} from "rxjs";
 import {Action} from "@reduxjs/toolkit";
 import {ofType} from "redux-observable";
 import {beginRefreshToken, refreshToken, refreshTokenReject} from "@time-tracker/shared/authentication/authSlice.ts";
@@ -9,8 +9,15 @@ import {apiRequest, catchAnyGraphQLError} from "@time-tracker/shared/graphql/rxj
 
 export const refreshTokenEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(beginRefreshToken.type),
-    mergeMap(() =>
-        apiRequest(refreshTokenQuery(), {input: {refreshToken: getAvailableRefreshToken()?.value}}).pipe(
+    filter(() => {
+        const token = getAvailableRefreshToken();
+        return token != null;
+    }),
+    mergeMap(() => {
+        const token = getAvailableRefreshToken();
+        if(token == null) throw new Error("Refresh token is null.")
+
+        return apiRequest(refreshTokenQuery(), {input: {refreshToken: token.value}}).pipe(
             catchAnyGraphQLError((ajaxResponse: AjaxResponse<RefreshTokenQueryResponseType>) => {
                 const refreshTokenQueryResult = ajaxResponse.response.data.identityMutation.refreshToken;
                 return refreshToken({
@@ -23,5 +30,6 @@ export const refreshTokenEpic = (action$: Observable<Action>) => action$.pipe(
                 return refreshTokenReject()
             })
         )
+        }
     )
 )
