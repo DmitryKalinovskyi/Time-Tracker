@@ -2,7 +2,7 @@ import React from 'react';
 import { TableRow, TableCell, Box, Avatar, Typography, Button } from '@mui/material';
 import moment from 'moment';
 import { WorkSession } from '../../../types/WorkSession.ts';
-import { formatDuration } from '@time-tracker/shared/misc/TimeFormatter.ts';
+import { formatDuration } from '@time-tracker/shared/misc/timeFormetters.ts';
 import TimerIcon from '@mui/icons-material/Timer';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';

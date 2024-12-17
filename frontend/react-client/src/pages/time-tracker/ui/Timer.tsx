@@ -1,7 +1,7 @@
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import React from 'react';
-import { formatDuration, formatDurationToHMS } from '@time-tracker/shared/misc/TimeFormatter.ts';
+import { formatDuration, formatDurationToHMS } from '@time-tracker/shared/misc/timeFormetters.ts';
 import { PlayArrow, Stop } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import {useTimer} from "@time-tracker/pages/time-tracker/hooks/useTimer.ts";

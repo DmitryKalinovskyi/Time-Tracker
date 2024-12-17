@@ -2,7 +2,7 @@ import {changeSelectedMonth, MonthType} from "@time-tracker/pages/calendar/calen
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@time-tracker/app/store.ts";
 
-export function useMonthSetters(){
+export function useMonthState(){
     const selectedMonth: MonthType = useSelector((state: RootState) => state.calendar.selectedMonth);
     const dispatch = useDispatch();
     const changeCalendarDate = (month: MonthType) => {
@@ -30,5 +30,5 @@ export function useMonthSetters(){
         })
     }
 
-    return [selectedMonth, setCurrentMonth, moveToPreviousMonth, moveToNextMonth];
+    return {selectedMonth, setCurrentMonth, moveToPreviousMonth, moveToNextMonth};
 }

@@ -35,7 +35,6 @@ const createUserSlice = createSlice({
             state.user = action.payload;
             state.loading = false;
             state.error = null;
-            console.log("Created.")
             state.success = true;
         },
         createUserFailure: (state, action: PayloadAction<string>) => {

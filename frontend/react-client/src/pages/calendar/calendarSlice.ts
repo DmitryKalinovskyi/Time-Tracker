@@ -11,7 +11,6 @@ export interface MonthType{
 export interface CalendarStateType{
     selectedUser: User | null,
     selectedMonth: MonthType,
-    isFetching: boolean
 }
 
 const initialState: CalendarStateType = {
@@ -20,7 +19,6 @@ const initialState: CalendarStateType = {
         year: new Date().getFullYear(),
         month: new Date().getMonth()
     },
-    isFetching: false
 }
 
 export interface AddCalendarEventInputType {
@@ -73,12 +71,10 @@ const calendarSlice = createSlice({
         },
 
 
-        setSelectedUser: (state) => {
-            state.isFetchingSelectedUser = true;
+        setSelectedUser: (state, action: PayloadAction<number>) => {
         },
         setSelectedUserSuccess : (state, action: PayloadAction<User>) => {
             state.selectedUser = action.payload;
-            state.isFetchingSelectedUser = false;
         },
         setSelectedUserFailure : () => {
             ShowFailure("Error while fetching user calendar.");

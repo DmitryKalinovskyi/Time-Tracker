@@ -1,4 +1,4 @@
-import {createRequest} from "@time-tracker/shared/misc/RequestCreator.ts";
+import {createRequest} from "@time-tracker/shared/misc/requestHelpers.ts";
 import {ajax, AjaxResponse} from "rxjs/ajax";
 import {Observable} from "rxjs";
 import {GraphQLResponse} from "@time-tracker/shared/graphql/GraphQLResponse.ts";

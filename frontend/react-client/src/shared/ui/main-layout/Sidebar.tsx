@@ -6,7 +6,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import { formatDurationToHMS } from "@time-tracker/shared/misc/TimeFormatter.ts";
+import { formatDurationToHMS } from "@time-tracker/shared/misc/timeFormetters.ts";
 import ListItemButton from "@mui/material/ListItemButton";
 import { Link } from "react-router-dom";
 import GroupIcon from '@mui/icons-material/Group';
