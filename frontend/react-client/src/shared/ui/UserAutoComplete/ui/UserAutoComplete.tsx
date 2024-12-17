@@ -10,9 +10,10 @@ interface UserAutoCompleteProps {
     onChange: (user: User | null) => void
     usersLimit?: number,
     renderInput?: (params) => ReactElement
+    disableClearable?: false,
 }
 
-export function UserAutoComplete(props: UserAutoCompleteProps) {
+export function UserAutoComplete (props: UserAutoCompleteProps){
     const [open, setOpen] = useState<boolean>(false);
     const [users, setUsers] = useState<User[] | null>(null);
     const [emailOrFullName, setEmailOrFullName] = useState<string>("");
@@ -68,6 +69,7 @@ export function UserAutoComplete(props: UserAutoCompleteProps) {
                          value={props.selectedUser}
                          onOpen={() => setOpen(true)}
                          onClose={() => setOpen(false)}
+                         disableClearable={props.disableClearable}
                          onChange={handleUserChange}
                          onInputChange={handleInputChange}
                          isOptionEqualToValue={isOptionEqualToValue}

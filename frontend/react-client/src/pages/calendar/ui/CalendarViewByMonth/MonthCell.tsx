@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import {CalendarEvent} from "@time-tracker/types/CalendarEvent.ts";
 import {RootState} from "@time-tracker/app/store.ts";
 import {useMonthState} from "@time-tracker/pages/calendar/ui/hooks/useMonthState.ts";
+import Box from "@mui/material/Box";
 
 interface MonthCellProps{
     day: Date,
@@ -26,7 +27,7 @@ export function MonthCell(props: MonthCellProps) {
         return `${from} - ${to}`;
     }
 
-    return <div
+    return <Box
         onClick={() => props.onClick(props.day)}
         className={`p-2 max-h-full h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isToday ? 'bg-blue-100 border-blue-500' : ''}`}>
         {isDayInCurrentMonth ?
@@ -47,5 +48,5 @@ export function MonthCell(props: MonthCellProps) {
                                        size="small"
                                        sx={{width: "90%", marginTop: 1}}
                                        label={formatEvent(e)}/>)}
-    </div>
+    </Box>
 }

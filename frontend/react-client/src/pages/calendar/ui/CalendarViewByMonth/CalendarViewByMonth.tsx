@@ -7,6 +7,7 @@ import {useMonthDetails} from "../hooks/useMonthDetails.ts";
 import {useDayModal} from "../hooks/useDayModal.ts";
 import {CalendarToolBar} from "@time-tracker/pages/calendar/ui/CalendarViewByMonth/CalendarToolBar.tsx";
 import {useSelectedUser} from "@time-tracker/pages/calendar/ui/hooks/useSelectedUser.ts";
+import Box from "@mui/material/Box";
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -34,23 +35,26 @@ export function CalendarViewByMonth(){
             <Grid container columns={7} alignItems="stretch">
                 {dayNames.map((day, index) =>
                     <Grid item xs={1} key={index}>
-                        <div className="h-12 flex border border-t-2 justify-center items-center">
+                        <Box sx={{
+                            height: "3em",
+                            display: "flex",
+                            borderWidth: "1px",
+                            borderTopWidth: "2px",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
                             <Typography variant="h6">
                                 {day}
                             </Typography>
-                        </div>
+                        </Box>
                     </Grid>
                 )}
             </Grid>
 
             {/*calendar cells*/}
-            <Grid sx={{height: "100%"}}
-                  container
-                  columns={7} >
+            <Grid container columns={7} sx={{height: "100%"}}>
                 {days.map((day, index) =>
-                    <Grid item
-                          xs={1}
-                          key={index}
+                    <Grid key={index} item xs={1}
                           sx={{height: `${100/weeksCount}%`, boxSizing: 'border-box'}}>
                         <MonthCell day={day}
                                    onClick={handleMonthClick}/>

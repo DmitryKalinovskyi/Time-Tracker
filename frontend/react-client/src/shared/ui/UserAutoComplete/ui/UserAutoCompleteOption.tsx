@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import {Avatar} from "@mui/material";
-import {stringAvatar} from "@time-tracker/shared/misc/StringHelper.ts";
+import {stringAvatar} from "@time-tracker/shared/misc/stringHelper.ts";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import User from "../../../../types/User.ts";
@@ -18,18 +18,17 @@ export function UserAutoCompleteOption({props, user}: UserAutoCompleteOptionProp
         {...optionProps}
     >
         <Avatar {...stringAvatar(user.fullName)}/>
-        <div>
-            <div>
+        <Box>
+            <Box>
                 <Typography sx={{ml: 2}}>
                     {user.fullName}
                 </Typography>
-            </div>
-            <div>
+            </Box>
+            <Box>
                 <Typography sx={{ml: 2}} color="secondary">
                     {user.email}
                 </Typography>
-            </div>
-        </div>
-
+            </Box>
+        </Box>
     </Box>
 }

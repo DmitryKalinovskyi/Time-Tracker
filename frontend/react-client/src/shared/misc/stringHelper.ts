@@ -16,7 +16,7 @@ export const stringAvatar = (fullName: string) => {
 
     return {
         sx : {
-            bgcolor: stringToColor(fullName),
+            backgroundColor: stringToColor(fullName),
         },
         children: avatarName
     }

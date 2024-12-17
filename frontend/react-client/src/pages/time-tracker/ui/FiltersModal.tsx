@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useRef, useState} from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -211,7 +211,12 @@ export default function FiltersModal({open, onClose}: FiltersModalProps){
             </Grid>
             <Grid item  xs={8}>
               <UserAutoComplete selectedUser={filter.selectedUser}
+                                disableClearable
                                 onChange={(selectedUser) => setFilter({...filter, selectedUser})}/>
+            </Grid>
+            <Grid item xs={1} className="flex items-center">
+              <Button onClick={() => setFilter({...filter, selectedUser: null})}
+                      sx={{ml: 'auto', color: '#00101D'}}>Clear</Button>
             </Grid>
 
 

@@ -13,6 +13,7 @@ import {isSameDay} from "@time-tracker/shared/misc/dateHelpers.ts";
 import {CalendarEvent} from "../../../../types/CalendarEvent.ts";
 import {deleteCalendarEvent} from "@time-tracker/pages/calendar/calendarSlice.ts";
 import {useSelectedUser} from "@time-tracker/pages/calendar/ui/hooks/useSelectedUser.ts";
+import Box from "@mui/material/Box";
 
 interface DayModalProps {
     isOpen: boolean
@@ -61,7 +62,7 @@ export function DayModal(props: DayModalProps) {
                                         .format("hh:mm A")}`}
                                 />
                                 {selectedUserIsMe &&
-                                    <div className="ml-4">
+                                    <Box className="ml-4">
                                         <IconButton color="primary"
                                                     onClick={() => props.onUpdateEvent(event)}
                                         >
@@ -72,7 +73,7 @@ export function DayModal(props: DayModalProps) {
                                         >
                                             <DeleteForeverIcon/>
                                         </IconButton>
-                                    </div>
+                                    </Box>
                                 }
                             </ListItem>
                         ) :
