@@ -46,11 +46,16 @@ export default function UserProfile(props: UserProfileProps) {
 
     const handleEditProfileClick = () => {
         setEditProfileMode(true);
+
+        setEditedUser(user)
         handleMenuClose();
     };
 
     const handleEditPermissionsClick = () => {
         setEditPermissionsMode(true);
+
+        // we also need to reset editedPermissions
+        setEditedPermissions(user.permissions);
         handleMenuClose();
     };
 
@@ -74,7 +79,7 @@ export default function UserProfile(props: UserProfileProps) {
         }
     };
 
-    const handleSavePermissoins = () => {
+    const handleSavePermissions = () => {
         onSavePermissions(editedPermissions);
         setEditPermissionsMode(false);
     };
@@ -97,6 +102,24 @@ export default function UserProfile(props: UserProfileProps) {
                             label="Email"
                             name="email"
                             value={editedUser.email}
+                            onChange={handleInputChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Position"
+                            name="position"
+                            value={editedUser.position}
+                            onChange={handleInputChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Work hours per month"
+                            name="workHoursPerMonth"
+                            value={editedUser.workHoursPerMonth}
                             onChange={handleInputChange}
                             fullWidth
                         />
@@ -136,7 +159,7 @@ export default function UserProfile(props: UserProfileProps) {
                     ))}
                 </Grid>
                 <Grid item xs={12}>
-                    <Button variant="contained" size='small' onClick={handleSavePermissoins} sx={{ mr: "5px" }}>
+                    <Button variant="contained" size='small' onClick={handleSavePermissions} sx={{ mr: "5px" }}>
                         Save
                     </Button>
                     <Button variant="contained" size='small' onClick={() => setEditPermissionsMode(false)}>
@@ -180,6 +203,24 @@ export default function UserProfile(props: UserProfileProps) {
                                 </Typography>
                                 <Typography sx={{ ml: 'auto', mr: "5px" }}>
                                     {user.isActive ? 'Enabled' : 'Disabled'}
+                                </Typography>
+                            </Grid>
+
+                            <Grid sx={{ display: 'flex', flexDirection: 'row' }}>
+                                <Typography sx={{ ml: '5px' }} color="text.secondary">
+                                    Position
+                                </Typography>
+                                <Typography sx={{ ml: 'auto', mr: "5px" }}>
+                                    {user.position}
+                                </Typography>
+                            </Grid>
+
+                            <Grid sx={{ display: 'flex', flexDirection: 'row' }}>
+                                <Typography sx={{ ml: '5px' }} color="text.secondary">
+                                    Work hours per month
+                                </Typography>
+                                <Typography sx={{ ml: 'auto', mr: "5px" }}>
+                                    {user.workHoursPerMonth}
                                 </Typography>
                             </Grid>
 

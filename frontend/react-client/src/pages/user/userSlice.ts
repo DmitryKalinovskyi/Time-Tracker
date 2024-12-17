@@ -15,7 +15,9 @@ const initialState: UserType = {
 export interface UpdateUserPayload {
     id: number,
     fullName: string,
-    email: string
+    email: string,
+    position: string,
+    workHoursPerMonth: number
 }
 
 export interface UpdateUserActiveStatusPayload {

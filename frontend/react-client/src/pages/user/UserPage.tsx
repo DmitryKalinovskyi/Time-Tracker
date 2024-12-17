@@ -29,7 +29,9 @@ export function UserPage() {
             {
                 id: user.id,
                 fullName: user.fullName,
-                email: user.email
+                email: user.email,
+                position: user.position,
+                workHoursPerMonth: user.workHoursPerMonth
             }
         ));
     };

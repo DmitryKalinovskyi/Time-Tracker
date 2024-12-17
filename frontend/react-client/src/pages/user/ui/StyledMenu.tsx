@@ -4,6 +4,7 @@ import Menu, { MenuProps } from '@mui/material/Menu';
 export const StyledMenu = styled((props: MenuProps) => (
     <Menu
       elevation={0}
+      sx={{position: "absolute"}}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'right',

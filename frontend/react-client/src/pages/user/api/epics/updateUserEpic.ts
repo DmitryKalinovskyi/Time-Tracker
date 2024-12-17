@@ -13,12 +13,7 @@ import {updateUserMutation} from "@time-tracker/pages/user/api/userQueries.ts";
 export const updateUserEpic = (action$: Observable<Action>) => action$.pipe(
     ofType(updateUser.type),
     mergeMap((action: PayloadAction<UpdateUserPayload>) =>
-        apiRequest(updateUserMutation(),
-            {
-                "id": action.payload.id,
-                "fullName": action.payload.fullName,
-                "email": action.payload.email
-            }).pipe(
+        apiRequest(updateUserMutation(), action.payload).pipe(
             catchAnyGraphQLError(
                 () => updateUserSuccess(action.payload.id),
                 (ajaxResponse, error) => updateUserFailure(error)

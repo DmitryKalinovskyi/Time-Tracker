@@ -1,13 +1,14 @@
 export const getUserQuery = () => {
     const query = `
-    query usersQuery($userId: Int!){
+    query GetUserQuery($userId: Int!){
     usersQuery {
       user(userId: $userId) {
-        id
-        fullName
-        email
-        permissions
-        isActive
+        id,
+        fullName,
+        permissions,
+        email,
+        position,
+        workHoursPerMonth
       }
     }
   }
@@ -17,9 +18,9 @@ export const getUserQuery = () => {
 
   export const updateUserMutation = () => {
     const query = `
-    mutation userMutation($id: Int!, $fullName: String!, $email: String!){
+    mutation userMutation($id: Int!, $fullName: String!, $email: String!, $position: String!, $workHoursPerMonth: Int!){
     userMutation {
-      updateUser(user: { id: $id, fullName: $fullName, email: $email })
+      updateUser(user: { id: $id, fullName: $fullName, email: $email, position: $position, workHoursPerMonth: $workHoursPerMonth })
     }
   }
   `;

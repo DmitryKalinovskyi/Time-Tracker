@@ -6,7 +6,9 @@ interface User {
     email: string,
     permissions: string[],
     isActive: boolean,
-    calendarEvents: CalendarEvent[]
+    calendarEvents: CalendarEvent[],
+    workHoursPerMonth: number,
+    position: string
 }
 
 export default User;
