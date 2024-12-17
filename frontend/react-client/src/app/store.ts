@@ -1,70 +1,50 @@
-import {combineEpics, createEpicMiddleware, Epic } from "redux-observable";
+import {combineEpics, createEpicMiddleware, Epic} from "redux-observable";
 import {Action, configureStore, Tuple} from "@reduxjs/toolkit";
 
-import authReducer from "./features/authentification/authSlice.ts";
-import registerReducer from "./features/registration/registerSlice.ts";
-import verifReducer  from "./features/verification/verifSlice.ts";
-import usersReducer from "./features/users/usersSlice.ts";
-import userReducer from "./features/user/userSlice.ts";
-import permissionsReducer from "./features/permissions/permissionsSlice.ts";
-import resetReducer  from "./features/resetPassword/resetSlice.ts";
-import timeTrackerReducer from './features/timeTracking/timeTrackingSlice.ts';
-import calendarReducer from "./features/calendar/calendarSlice.ts";
-import workReportingReducer from "./features/workReporting/workReportingSlice.ts";
-
-import {authEpics} from "./features/authentification/authEpics.ts";
-import { useDispatch, useSelector } from "react-redux";
-import { registerUserEpic } from "./features/registration/registerEpics.ts";
-import { verifUserEpic } from "./features/verification/verifEpics.ts";
-import { resetUserPasswordEpic } from "./features/resetPassword/resetEpic.ts";
-import { getUsersEpic } from "./features/users/usersEpics.ts";
-import { getUserEpic, updateUserActiveStatusEpic, updateUserEpic, updateUserPermissionsEpic } from "./features/user/userEpics.ts";
-import { getPermissionsEpic } from "./features/permissions/permissionsEpics.ts";
-import {
-    createCalendarEventEpic,
-    deleteCalendarEventEpic, fetchAndSetSelectedUserEpic,
-    updateCalendarEventEpic
-} from "./features/calendar/calendarEpic.ts";
-import {fetchWorkReportEpic} from "./features/workReporting/workReportingEpic.ts";
-import {timeTrackingEpics} from "./features/timeTracking/timeTrackingEpics.ts";
+import {authEpics} from "@time-tracker/shared/authentication/api/authEpics.ts";
+import {useDispatch, useSelector} from "react-redux";
+import {timeTrackingEpics} from "@time-tracker/pages/time-tracker/api/timeTrackingEpics.ts";
+import {accountVerificationEpic, verifyReducer} from "@time-tracker/pages/account-verification";
+import {calendarEpic, calendarReducer} from "@time-tracker/pages/calendar";
+import {createUserEpic, createUserReducer} from "@time-tracker/pages/create-user";
+import {resetPasswordEpic, resetPasswordReducer} from "@time-tracker/pages/reset-password";
+import {userEpics, userReducer} from "@time-tracker/pages/user";
+import {usersEpics, usersReducer} from "@time-tracker/pages/users";
+import {timeTrackingReducer} from "@time-tracker/pages/time-tracker";
+import {workReportingReducer, workReportsEpics} from "@time-tracker/pages/work-reports";
+import {getPermissionsEpic, permissionsReducer} from "@time-tracker/shared/authorization";
+import {authReducer} from "@time-tracker/shared/authentication";
 
 
-
-const rootEpic: Epic<Action, Action, any, any> = combineEpics<Action, Action, any, any>(
+const rootEpic: Epic<Action, Action, RootState> = combineEpics<Action, Action, RootState>(
     authEpics,
-    registerUserEpic,
-    verifUserEpic,
-    getUsersEpic,
-    getUserEpic,
-    updateUserEpic,
-    updateUserActiveStatusEpic,
-    updateUserPermissionsEpic,
     getPermissionsEpic,
-    resetUserPasswordEpic,
+
+    accountVerificationEpic,
+    createUserEpic,
+    resetPasswordEpic,
 
     timeTrackingEpics,
 
-    createCalendarEventEpic,
-    updateCalendarEventEpic,
-    deleteCalendarEventEpic,
-    fetchAndSetSelectedUserEpic,
-
-    fetchWorkReportEpic
+    userEpics,
+    usersEpics,
+    calendarEpic,
+    workReportsEpics
   );
 
-const epicMiddleware = createEpicMiddleware<Action, Action, any, any>();
+const epicMiddleware = createEpicMiddleware<Action, Action, RootState>();
 
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
-        reg: registerReducer,
-        verif: verifReducer,
+        createUser: createUserReducer,
+        verify: verifyReducer,
         users: usersReducer,
         user: userReducer,
         permissions: permissionsReducer,
-        reset: resetReducer,
-        timeTracker: timeTrackerReducer,
+        resetPassword: resetPasswordReducer,
+        timeTracker: timeTrackingReducer,
         calendar: calendarReducer,
         workReporting: workReportingReducer
     },

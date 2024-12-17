@@ -6,6 +6,7 @@
         public const string ManageUsersPermissions = "ManageUsersPermissions";
         public const string TimeTracking = "TimeTracking";
         public const string ManageUsersSessions = "ManageUsersSessions";
+        public const string MakeWorkReports = "MakeWorkReports";
 
         public static List<string> GetAllPermissions()
         {
