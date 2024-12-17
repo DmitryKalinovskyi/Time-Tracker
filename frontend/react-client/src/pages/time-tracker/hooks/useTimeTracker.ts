@@ -6,7 +6,7 @@ import {RootState} from "@time-tracker/app/store.ts";
 /*
 Hook returns seconds elapsed from session start and isTracking
  */
-export const useTimer = () => {
+export const useTimeTracker = () => {
     const currentWorkSession = useSelector((state: RootState) => state.timeTracker.currentWorkSession);
 
     const isTracking = currentWorkSession != null;

@@ -80,8 +80,26 @@ const calendarSlice = createSlice({
             ShowFailure("Error while fetching user calendar.");
         },
 
-        changeSelectedMonth : (state, action: PayloadAction<MonthType>) => {
+        setCalendarMonth : (state, action: PayloadAction<MonthType>) => {
             state.selectedMonth = action.payload;
+        },
+        moveToNextMonth: (state) => {
+            state.selectedMonth = {
+                year: state.selectedMonth.year + (state.selectedMonth.month == 11 ? 1: 0),
+                month: ((state.selectedMonth.month + 1) % 12)
+            }
+        },
+        moveToPreviousMonth: (state) => {
+            state.selectedMonth = {
+                year: state.selectedMonth.year + (state.selectedMonth.month == 0 ? -1: 0),
+                month: ((state.selectedMonth.month+11) % 12)
+            };
+        },
+        setActualMonth: (state) => {
+            state.selectedMonth = {
+                year: new Date().getFullYear(),
+                month: new Date().getMonth()
+            };
         }
     }
 })
@@ -103,7 +121,10 @@ export const {
     setSelectedUserSuccess,
     setSelectedUserFailure,
 
-    changeSelectedMonth
+    setCalendarMonth,
+    moveToPreviousMonth,
+    moveToNextMonth,
+    setActualMonth
 
 } = calendarSlice.actions;
 

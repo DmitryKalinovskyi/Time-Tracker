@@ -7,7 +7,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import RequirePermission from "@time-tracker/shared/authentication/guards/RequirePermission.tsx";
 import Root from "@time-tracker/shared/ui/main-layout/Root.tsx";
-import {ManageUsersPermission} from "@time-tracker/shared/authorization/permissions.ts";
+import {MakeWorkReportsPermission, ManageUsersPermission} from "@time-tracker/shared/authorization/permissions.ts";
 import {AuthProvider} from "@time-tracker/shared/authentication/AuthProvider.tsx";
 import {NotFoundPage} from "@time-tracker/pages/404";
 import {TimeTrackerPage} from "@time-tracker/pages/time-tracker";
@@ -44,8 +44,11 @@ const router = createBrowserRouter([
                                 ]
                             },
                             {path: "/calendar", element: <CalendarPage/>},
-                            {path: "/workers-time", element: <WorkReportsPage/>},
-
+                            {
+                                element: <RequirePermission permission={MakeWorkReportsPermission}/>, children: [
+                                    {path: "/workers-time", element: <WorkReportsPage/>}
+                                ]
+                            },
                         ]
                     }
                 ]

@@ -1,5 +1,5 @@
 import Grid from "@mui/material/Grid";
-import {MonthCell} from "./MonthCell.tsx";
+import {DayCell} from "./DayCell.tsx";
 import {Stack} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import React, {useCallback, useEffect} from "react";
@@ -56,8 +56,8 @@ export function CalendarViewByMonth(){
                 {days.map((day, index) =>
                     <Grid key={index} item xs={1}
                           sx={{height: `${100/weeksCount}%`, boxSizing: 'border-box'}}>
-                        <MonthCell day={day}
-                                   onClick={handleMonthClick}/>
+                        <DayCell day={day}
+                                 onClick={handleMonthClick}/>
                     </Grid>
                 )}
             </Grid>

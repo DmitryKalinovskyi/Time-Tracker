@@ -1,9 +1,9 @@
 import TextField from "@mui/material/TextField";
 import {Autocomplete} from "@mui/material";
-import React, {ReactElement, useEffect, useState} from "react";
+import React, {ReactElement, useState} from "react";
 import User from "../../../../types/User.ts";
-import {getUsersObservable} from "@time-tracker/shared/ui/UserAutoComplete/api/getUsersObservable.ts";
 import {UserAutoCompleteOption} from "./UserAutoCompleteOption.tsx";
+import {useUsers} from "@time-tracker/shared/ui/UserAutoComplete/hooks/useUsers.ts";
 
 interface UserAutoCompleteProps {
     selectedUser: User | null,
@@ -11,29 +11,14 @@ interface UserAutoCompleteProps {
     usersLimit?: number,
     renderInput?: (params) => ReactElement
     disableClearable?: false,
+    hideLoading?: false
 }
 
 export function UserAutoComplete (props: UserAutoCompleteProps){
     const [open, setOpen] = useState<boolean>(false);
-    const [users, setUsers] = useState<User[] | null>(null);
     const [emailOrFullName, setEmailOrFullName] = useState<string>("");
 
-    const loading = open && users === null;
-
-    useEffect(() => {
-        if (!loading)
-            return;
-
-        const usersObservable = getUsersObservable(emailOrFullName, props.usersLimit ?? 50, 200);
-        const subscription = usersObservable.subscribe({
-            next: (users: User[]) => setUsers(users),
-            error: () => setUsers([])
-        })
-
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [props.usersLimit, emailOrFullName, loading]);
+    const {users, loading} = useUsers(emailOrFullName, props.usersLimit);
 
     const handleUserChange = (e, value) => {
         setEmailOrFullName(value?.fullName ?? "");
@@ -41,7 +26,6 @@ export function UserAutoComplete (props: UserAutoCompleteProps){
     }
 
     const handleInputChange = (e, value) => {
-        setUsers(null);
         setEmailOrFullName(value);
     }
 
@@ -62,7 +46,7 @@ export function UserAutoComplete (props: UserAutoCompleteProps){
     }
 
     return <Autocomplete renderInput={handleRenderInput}
-                         options={users ?? []}
+                         options={loading && !props.hideLoading ? []: users}
                          sx={{width: "100%"}}
                          open={open}
                          loading={loading}

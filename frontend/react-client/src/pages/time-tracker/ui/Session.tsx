@@ -22,13 +22,13 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
   const isMySession = useIsMe(session.user);
   return (
     <TableRow>
-      <TableCell sx={{ width: '10%', fontSize: '1rem', textAlign: 'center' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center' }}>
         {dayjs(session.startTime).format("DD.MM.YYYY HH:mm:ss")}
       </TableCell>
-        <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
+        <TableCell sx={{ width: '10%', textAlign: 'center'}}>
             {session.endTime && dayjs(session.endTime).format("DD.MM.YYYY HH:mm:ss")}
         </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
           <Box>
             {session.duration ? formatDuration(session.duration) : ""}
@@ -38,7 +38,7 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
       </TableCell>
         <TableCell sx={{ width: '10%', textAlign: 'center' }}>
             <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
-                <Typography sx={{ color: "#00101D", fontSize: '1rem' }}>
+                <Typography sx={{ color: "#00101D"}}>
                     {session.user?.fullName}
                 </Typography>
                 <Avatar
@@ -58,7 +58,7 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
       <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
         {session.editedBy ?
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'} gap={2}>
-            <Typography sx={{ color: "#00101D", fontSize: '1rem' }}>
+            <Typography sx={{ color: "#00101D" }}>
               {session.editedBy?.fullName}
             </Typography>
               <Avatar
@@ -67,16 +67,16 @@ const Session: React.FC<SessionProps> = ({ session, onEdit, onDelete }) => {
                       ...stringAvatar(session.editedBy?.fullName ?? "").sx,
                       width: "30px",
                       height: "30px",
-                      fontSize: '1.1rem'
+                      fontSize: '1rem'
                   }}
               />
           </Box>
           : " "}
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center'}}>
         {moment.utc(session.lastUpdatedAt).local().format("MMM DD, YYYY HH:mm")}
       </TableCell>
-      <TableCell sx={{ width: '10%', textAlign: 'center', fontSize: '1rem' }}>
+      <TableCell sx={{ width: '10%', textAlign: 'center'}}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 
           {(isCanManageUsersSessions || isMySession) && session.endTime && <>

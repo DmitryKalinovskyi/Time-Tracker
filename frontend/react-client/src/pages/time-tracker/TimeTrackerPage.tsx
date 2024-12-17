@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import {SessionTable} from "./ui/SessionTable.tsx";
 import useIsHavePermission from "@time-tracker/shared/authentication/hooks/useIsHavePermission.ts";
 import {TimeTrackingPermission} from "@time-tracker/shared/authorization/permissions.ts";
-import {useTimer} from "@time-tracker/pages/time-tracker/hooks/useTimer.ts";
+import {useTimeTracker} from "@time-tracker/pages/time-tracker/hooks/useTimeTracker.ts";
 import {useState} from "react";
 import StyledButton from "./ui/StyledButton.tsx";
 import FiltersModal from "./ui/FiltersModal.tsx";
@@ -11,7 +11,7 @@ import {AddWorkSessionModal} from "./ui/AddWorkSessionModal.tsx";
 
 export function TimeTrackerPage() {
     const isHaveTimeTrackingPermission = useIsHavePermission(TimeTrackingPermission)
-    const {isTracking} = useTimer();
+    const {isTracking} = useTimeTracker();
     const [isFilterModalOpen, setFilterModalOpen] = useState(false);
     const [isAddWorkSessionModalOpen, setIsAddWordSessionModalOpen] = useState(false);
     const handleOpenFilterModal = () => {

@@ -1,10 +1,11 @@
 import {MonthType} from "@time-tracker/pages/calendar/calendarSlice.ts";
 import {getDaysInMonth} from "@time-tracker/shared/misc/dateHelpers.ts";
 import {useMonthState} from "@time-tracker/pages/calendar/ui/hooks/useMonthState.ts";
+import {useSelector} from "react-redux";
+import {RootState} from "@time-tracker/app/store.ts";
 
 export function useMonthDetails(){
-    const {selectedMonth} = useMonthState();
-
+    const selectedMonth = useSelector((state: RootState) => state.calendar.selectedMonth)
     const firstDay = new Date();
     firstDay.setFullYear(selectedMonth.year);
     firstDay.setMonth(selectedMonth.month);

@@ -14,11 +14,11 @@ import BadgeIcon from '@mui/icons-material/Badge';
 
 import useIsHavePermission from "@time-tracker/shared/authentication/hooks/useIsHavePermission.ts";
 import {ManageUsersPermission} from "@time-tracker/shared/authorization/permissions.ts";
-import {useTimer} from "@time-tracker/pages/time-tracker/hooks/useTimer.ts";
+import {useTimeTracker} from "@time-tracker/pages/time-tracker/hooks/useTimeTracker.ts";
 
 
 const Sidebar: React.FC = () => {
-  const {duration} = useTimer();
+  const {duration} = useTimeTracker();
 
   const isCanManageUsers = useIsHavePermission(ManageUsersPermission);
 

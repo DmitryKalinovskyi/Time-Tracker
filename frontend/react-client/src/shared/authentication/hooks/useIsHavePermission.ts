@@ -5,5 +5,5 @@ export default function useIsHavePermission(permission: string){
 
     if(auth.user === null) return false;
 
-    return auth.user.permissions.filter(p => p === permission).length > 0;
+    return auth.user.permissions.includes(permission);
 }

@@ -5,7 +5,6 @@ import {useSelector} from "react-redux";
 import dayjs from "dayjs";
 import {CalendarEvent} from "@time-tracker/types/CalendarEvent.ts";
 import {RootState} from "@time-tracker/app/store.ts";
-import {useMonthState} from "@time-tracker/pages/calendar/ui/hooks/useMonthState.ts";
 import Box from "@mui/material/Box";
 
 interface MonthCellProps{
@@ -13,8 +12,8 @@ interface MonthCellProps{
     onClick: (day: Date) => void
 }
 
-export function MonthCell(props: MonthCellProps) {
-    const {selectedMonth} = useMonthState();
+export function DayCell(props: MonthCellProps) {
+    const selectedMonth = useSelector((state: RootState) => state.calendar.selectedMonth);
     const isDayInCurrentMonth = selectedMonth.month == props.day.getMonth();
     const isToday = isSameDay(new Date(), props.day);
     const eventsInThatDay = useSelector((state: RootState) => state.calendar.selectedUser.calendarEvents)
@@ -30,23 +29,23 @@ export function MonthCell(props: MonthCellProps) {
     return <Box
         onClick={() => props.onClick(props.day)}
         className={`p-2 max-h-full h-full overflow-hidden border hover:bg-blue-50 cursor-pointer ${isToday ? 'bg-blue-100 border-blue-500' : ''}`}>
-        {isDayInCurrentMonth ?
-            isToday ?
-                <Chip color="secondary" size="small" label={props.day.getDate()}/>
-                :
+        {isToday ?
+            <Chip color="secondary" size="small" label={props.day.getDate()}/>:
+
+            isDayInCurrentMonth ?
                 <Typography variant="body1"
                             color="textPrimary">
                     {props.day.getDate()}
                 </Typography>
-            :
-            <Typography variant="body1" className="text-gray-300">
-                {props.day.getDate()}
-            </Typography>
+                :
+                <Typography variant="body1" className="text-gray-300">
+                    {props.day.getDate()}
+                </Typography>
         }
-        {eventsInThatDay.map((e) => <Chip key={e.id}
+        {eventsInThatDay.map((calendarEvent) => <Chip key={calendarEvent.id}
                                        color="primary"
                                        size="small"
                                        sx={{width: "90%", marginTop: 1}}
-                                       label={formatEvent(e)}/>)}
+                                       label={formatEvent(calendarEvent)}/>)}
     </Box>
 }

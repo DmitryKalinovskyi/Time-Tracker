@@ -30,7 +30,14 @@ export const getWorkSessionsEpic = (action$: Observable<Action>, state$: StateOb
         ),
     switchMap(() => {
         const filterQueryBuilder = new WorkSessionsInputBuilder(state$.value);
-        return apiRequest(getWorkSessionsQuery(), filterQueryBuilder.getVariables()).pipe(
+        const variables = filterQueryBuilder
+            .attachSelectedUser()
+            .attachSelectedDay()
+            .attachSelectedOrigins()
+            .sortByStartTime()
+            .build()
+
+        return apiRequest(getWorkSessionsQuery(), variables).pipe(
             catchAnyGraphQLError(
                 (ajaxResponse) => getWorkSessionsSuccessful(ajaxResponse.response.data.timeTrackerQuery.workSessions),
                 (ajaxResponse, error) => getWorkSessionsFailure(error)
