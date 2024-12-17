@@ -2,7 +2,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, Card, Chip, Divider, Grid, IconButton, MenuItem, Switch, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import User from "../../../types/User.ts";
-import { StyledMenu } from './StyledMenu.tsx';
+import { StyledMenu } from '@time-tracker/shared/ui/StyledMenu/StyledMenu.tsx';
 import {useSelector} from "react-redux";
 import {RootState} from "@time-tracker/app/store.ts";
 
@@ -29,6 +29,7 @@ export default function UserProfile(props: UserProfileProps) {
 
     const handleSaveProfile = () => {
         onSaveProfile(editedUser);
+        console.log(editedUser)
         setEditProfileMode(false);
     };
 
@@ -117,10 +118,11 @@ export default function UserProfile(props: UserProfileProps) {
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
+                            inputProps={{type: 'number'}}
                             label="Work hours per month"
                             name="workHoursPerMonth"
                             value={editedUser.workHoursPerMonth}
-                            onChange={handleInputChange}
+                            onChange={(e) => setEditedUser({ ...editedUser, workHoursPerMonth: +e.target.value})}
                             fullWidth
                         />
                     </Grid>

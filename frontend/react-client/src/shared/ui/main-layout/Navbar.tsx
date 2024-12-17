@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
-import { Toolbar, Typography, IconButton, Avatar, MenuItem, Menu } from '@mui/material';
+import React, {useState} from 'react';
+import {Avatar, IconButton, MenuItem, Toolbar, Typography} from '@mui/material';
 
-import { RootState } from '../../../store.ts';
-import { useDispatch, useSelector } from 'react-redux';
-import { OnlineStyledBadge } from './OnlineStyledBadge.tsx';
-import { logout } from '@time-tracker/shared/authentication/authSlice.ts';
+import {useDispatch, useSelector} from 'react-redux';
+import {OnlineStyledBadge} from './OnlineStyledBadge.tsx';
+import {logout} from '@time-tracker/shared/authentication/authSlice.ts';
 import {stringAvatar} from "@time-tracker/shared/misc/StringHelper.ts";
 import {Link} from "react-router-dom";
-import useAuth from "@time-tracker/shared/authentication/hooks/useAuth.ts";
-
-
-
+import {StyledMenu} from "@time-tracker/shared/ui/StyledMenu";
+import {RootState} from "@time-tracker/app/store.ts";
 
 
 const Navbar: React.FC = () => {
@@ -45,27 +42,15 @@ const Navbar: React.FC = () => {
             <Avatar {...stringAvatar(user?.fullName ?? "")}/>
           </OnlineStyledBadge>
         </IconButton>
-        <Menu
+        <StyledMenu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-          },
-        }}
       >
-            <MenuItem component={Link} to={`user/${user.id}`}>
-              <Typography variant="body2" color="text.secondary">Profile</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-                <Typography variant="body2" color="text.secondary">Logout</Typography>
-            </MenuItem>
-      </Menu>
+            <MenuItem onClick={handleClose} component={Link} to={`user/${user.id}`}
+                      >Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      </StyledMenu>
       </Toolbar>
   );
 };
